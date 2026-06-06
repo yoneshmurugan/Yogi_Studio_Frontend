@@ -1,0 +1,103 @@
+@import "tailwindcss";
+
+@theme {
+  --color-gold: #D4AF37;
+  --color-gold-light: #E8C84A;
+  --color-gold-dark: #B8960E;
+  --color-onyx: #0B0B0B;
+  --color-obsidian: #050505;
+  --color-charcoal: #141414;
+  --color-smoke: #1A1A1A;
+  --color-ash: #222222;
+  --color-silver: #9CA3AF;
+  --color-pearl: #E5E7EB;
+
+  --font-serif: "Cormorant Garamond", "Georgia", serif;
+  --font-sans: "Inter", "system-ui", sans-serif;
+}
+
+/* ─── Global Resets ─── */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #000000;
+  font-family: var(--font-sans);
+}
+
+/* ─── Selection Colors ─── */
+::selection {
+  background-color: rgba(212, 175, 55, 0.3);
+  color: #FFFFFF;
+}
+
+::-moz-selection {
+  background-color: rgba(212, 175, 55, 0.3);
+  color: #FFFFFF;
+}
+
+/* ─── Custom Scrollbar ─── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #000000;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1A1A1A;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #D4AF37;
+}
+
+/* ─── Glassmorphism Utility ─── */
+.glass {
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.glass-strong {
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* ─── Gold Gradient Utility ─── */
+.gold-gradient {
+  background: linear-gradient(135deg, #D4AF37, #E8C84A, #D4AF37);
+}
+
+.gold-text {
+  background: linear-gradient(135deg, #D4AF37, #E8C84A);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─── Safe Area Padding ─── */
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.safe-top {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+/* ─── Typography Effects ─── */
+.outline-text {
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.2);
+}
+
+.outline-text-gold {
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(212, 175, 55, 0.4);
+}
