@@ -1,46 +1,161 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Camera, Film, Users, Sparkles } from 'lucide-react';
 import ScrollReveal from '../ui/ScrollReveal';
-import GlassCard from '../ui/GlassCard';
 
 const services = [
   {
-    Icon: Camera,
-    title: 'Wedding Photography',
-    description: 'Cinematic moments captured with an editorial eye. Every emotion, every glance — preserved forever.',
+    title: 'Cinematic Wedding Films',
+    description: 'Beautifully crafted wedding highlights — film-grade storytelling that feels like a feature.',
+    image: 'src/assets/IMG-20240423-WA0045.jpg',
   },
   {
-    Icon: Film,
-    title: 'Cinematic Videography',
-    description: 'Film-grade wedding videos that feel like a feature. Drone aerials, slow motion, and storytelling edits.',
+    title: 'Candid Photography',
+    description: 'Capturing raw emotions & real moments with an editorial, unposed eye.',
+    image: 'src/assets/0G1A7726.jpg',
   },
   {
-    Icon: Users,
-    title: 'Portrait Sessions',
-    description: 'Pre-wedding, maternity, couple & family portraits with studio or outdoor settings.',
+    title: 'Coming of Age Ceremonies',
+    description: 'Beautifully documenting cultural milestones like Half-Saree functions with warmth, elegance, and tradition.',
+    image: 'src/assets/01.jpg',
   },
   {
-    Icon: Sparkles,
-    title: 'Event Coverage',
-    description: 'Complete coverage for receptions, engagements, baby showers, and milestone celebrations.',
+    title: 'Traditional Photography & Videography',
+    description: 'Classic elegance — time-honoured rituals documented with grace and precision.',
+    image: 'src/assets/IMG-20240503-WA0019.jpg',
+  },
+  {
+    title: 'Pre & Post-Wedding Shoots',
+    description: 'Romantic & artistic storytelling before and after the big day.',
+    image: 'src/assets/IMG-20240503-WA0022.jpg',
+  },
+  {
+    title: 'Baby & Family Portraits',
+    description: 'Treasured milestones — newborns, maternity, couples, and family gatherings.',
+    image: 'src/assets/IMG-20240423-WA0055.jpg',
   },
 ];
 
-const container = {
-  hidden: {},
-  visible: {
-    transition: { staggerChildren: 0.15 },
-  },
-};
+const EASING = 'cubic-bezier(0.4, 0, 0.2, 1)';
+const DURATION = '0.75s';
 
-const item = {
-  hidden: { opacity: 0, y: 40 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.6, ease: [0.25, 0.1, 0.25, 1] },
-  },
-};
+function ServiceCard({ service, index }) {
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 50 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.15 }}
+      transition={{ duration: 0.65, delay: index * 0.1, ease: [0.25, 0.1, 0.25, 1] }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        position: 'relative',
+        overflow: 'hidden',
+        borderRadius: '1rem',
+        aspectRatio: '4 / 5',
+        cursor: 'pointer',
+      }}
+    >
+      {/* ── Photo layer — grayscale ↔ color ── */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          backgroundImage: `url(${service.image})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          filter: hovered
+            ? 'grayscale(0%) brightness(0.72)'
+            : 'grayscale(100%) brightness(0.5)',
+          transform: hovered ? 'scale(1.06)' : 'scale(1)',
+          transition: `filter ${DURATION} ${EASING}, transform ${DURATION} ${EASING}`,
+          willChange: 'filter, transform',
+        }}
+      />
+
+      {/* ── Bottom dark gradient ── */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: hovered
+            ? 'linear-gradient(to top, rgba(0,0,0,0.80) 0%, rgba(0,0,0,0.15) 55%, transparent 100%)'
+            : 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.10) 50%, transparent 100%)',
+          transition: `background ${DURATION} ${EASING}`,
+        }}
+      />
+
+      {/* ── Gold top shimmer line ── */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '2px',
+          background: 'linear-gradient(to right, transparent, #d4af37, transparent)',
+          transform: hovered ? 'scaleX(1)' : 'scaleX(0)',
+          transformOrigin: 'left',
+          transition: `transform 0.65s ${EASING}`,
+        }}
+      />
+
+      {/* ── Text content ── */}
+      <div
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          padding: '1.75rem',
+        }}
+      >
+        {/* Gold accent rule */}
+        <div
+          style={{
+            height: '1.5px',
+            width: hovered ? '52px' : '28px',
+            background: '#d4af37',
+            marginBottom: '0.7rem',
+            opacity: 0.8,
+            transition: `width ${DURATION} ${EASING}`,
+          }}
+        />
+
+        {/* Title */}
+        <h3
+          style={{
+            color: '#ffffff',
+            fontFamily: 'Georgia, serif',
+            fontSize: '1.05rem',
+            fontWeight: 400,
+            lineHeight: 1.35,
+            marginBottom: '0.55rem',
+            letterSpacing: '0.015em',
+          }}
+        >
+          {service.title}
+        </h3>
+
+        {/* Description — fades + slides in on hover */}
+        <p
+          style={{
+            color: 'rgba(255,255,255,0.72)',
+            fontSize: '0.8rem',
+            lineHeight: 1.6,
+            maxHeight: hovered ? '80px' : '0px',
+            opacity: hovered ? 1 : 0,
+            overflow: 'hidden',
+            transition: `opacity 0.55s ${EASING}, max-height 0.65s ${EASING}`,
+          }}
+        >
+          {service.description}
+        </p>
+      </div>
+    </motion.div>
+  );
+}
 
 export default function ServicesSection() {
   return (
@@ -52,25 +167,11 @@ export default function ServicesSection() {
         </h2>
       </ScrollReveal>
 
-      <motion.div
-        variants={container}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.2 }}
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
-      >
-        {services.map((service) => (
-          <motion.div key={service.title} variants={item}>
-            <GlassCard className="h-full text-center md:text-left">
-              <div className="w-12 h-12 rounded-xl bg-gold/10 border border-gold/20 flex items-center justify-center mb-5 mx-auto md:mx-0">
-                <service.Icon className="w-5 h-5 text-gold" />
-              </div>
-              <h3 className="text-white font-medium text-base mb-2">{service.title}</h3>
-              <p className="text-silver/50 text-sm leading-relaxed">{service.description}</p>
-            </GlassCard>
-          </motion.div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {services.map((service, i) => (
+          <ServiceCard key={service.title} service={service} index={i} />
         ))}
-      </motion.div>
+      </div>
     </section>
   );
 }

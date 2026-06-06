@@ -1,13 +1,26 @@
-import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { motion, useScroll, useMotionValueEvent } from 'framer-motion';
 import { LogIn } from 'lucide-react';
 import yogiLogo from '../../assets/yogi-logo.jpg';
 
 export default function DesktopNav({ onLogin, onHome }) {
+  const { scrollY } = useScroll();
+  const [hidden, setHidden] = useState(false);
+
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    const previous = scrollY.getPrevious();
+    if (latest > previous && latest > 150) {
+      setHidden(true);
+    } else {
+      setHidden(false);
+    }
+  });
+
   return (
     <motion.header
       initial={{ y: -80, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.6, delay: 0.2 }}
+      animate={{ y: hidden ? "-100%" : 0, opacity: 1 }}
+      transition={{ duration: 0.4, ease: "easeInOut" }}
       className="fixed top-0 left-0 right-0 z-50 hidden md:block"
     >
       <div className="glass border-b border-white/5">

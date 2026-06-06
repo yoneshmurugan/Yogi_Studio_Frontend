@@ -15,8 +15,10 @@ const portfolioData = [
   { id: 14, src: 'https://picsum.photos/seed/edit3/600/800', category: 'Editorial', title: 'Minimalist Chic', aspect: 'tall' },
   { id: 15, src: 'https://picsum.photos/seed/wed6/600/600', category: 'Weddings', title: 'Ring Exchange', aspect: 'square' },
   { id: 16, src: 'https://picsum.photos/seed/port4/600/400', category: 'Portraits', title: 'Couple in Paris', aspect: 'wide' },
+  { id: 17, src: 'https://picsum.photos/seed/coming1/600/800', category: 'Coming of Age Ceremonies', title: 'Half-Saree Ceremony', aspect: 'tall' },
+  { id: 18, src: 'https://picsum.photos/seed/coming2/600/600', category: 'Coming of Age Ceremonies', title: 'Cultural Milestones', aspect: 'square' },
 ];
 
-export const categories = ['All', 'Weddings', 'Portraits', 'Events', 'Editorial'];
+export const categories = ['All', 'Weddings', 'Portraits', 'Coming of Age Ceremonies', 'Events', 'Editorial', 'E-Album'];
 
 export default portfolioData;
