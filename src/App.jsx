@@ -47,26 +47,43 @@ function App() {
     }
   };
 
-  // Only show nav on landing page (login has its own back button, admin/customer will get their own nav later)
-  const showNav = activeView === 'landing';
+  // Nav only on landing; admin/customer have their own internal navigation
+  const showNav    = activeView === 'landing';
+  // Both admin and customer take full control of the screen
+  const isFullPage = activeView === 'admin' || activeView === 'customer';
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className={`${isFullPage ? '' : 'min-h-screen bg-black text-white'}`}>
       {showNav && (
         <Navigation onLogin={handleLogin} onHome={handleNavigateHome} />
       )}
 
-      <AnimatePresence mode="wait">
-        <motion.main
-          key={activeView}
-          initial={pageTransition.initial}
-          animate={pageTransition.animate}
-          exit={pageTransition.exit}
-          transition={pageTransition.transition}
-        >
-          {renderView()}
-        </motion.main>
-      </AnimatePresence>
+      {isFullPage ? (
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeView}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            {activeView === 'admin'    && <AdminDashboard />}
+            {activeView === 'customer' && <CustomerPortal />}
+          </motion.div>
+        </AnimatePresence>
+      ) : (
+        <AnimatePresence mode="wait">
+          <motion.main
+            key={activeView}
+            initial={pageTransition.initial}
+            animate={pageTransition.animate}
+            exit={pageTransition.exit}
+            transition={pageTransition.transition}
+          >
+            {renderView()}
+          </motion.main>
+        </AnimatePresence>
+      )}
     </div>
   );
 }
