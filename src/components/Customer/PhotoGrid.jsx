@@ -23,10 +23,11 @@ function PhotoCard({ photo, isSelected, isRejected, onToggleSelect, onToggleReje
     <motion.div
       layout
       variants={item}
+      onClick={onOpenLightbox}
       className="relative group aspect-square rounded-xl overflow-hidden cursor-pointer select-none"
     >
       {/* Main image — click opens lightbox */}
-      <div onClick={onOpenLightbox} className="w-full h-full">
+      <div className="w-full h-full">
         <motion.img
           src={photo.thumb}
           alt={photo.filename}

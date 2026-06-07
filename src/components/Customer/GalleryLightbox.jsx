@@ -214,25 +214,25 @@ export default function GalleryLightbox({
       <div className="flex-shrink-0 px-4 py-4 border-t border-white/[0.06]">
         <div className="max-w-lg mx-auto">
           {/* Action buttons */}
-          <div className="flex items-center justify-center gap-4 mb-4">
+          <div className="flex items-center justify-center gap-2 sm:gap-4 mb-4">
 
             {/* Reject */}
             <motion.button
               onClick={handleReject}
               whileHover={{ scale: 1.08 }}
               whileTap={{ scale: 0.92 }}
-              className={`flex items-center gap-2 px-6 py-3 rounded-2xl font-medium text-sm transition-all
+              className={`flex items-center gap-1.5 sm:gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-2xl font-medium text-xs sm:text-sm transition-all
                 ${isRejected
                   ? 'bg-red-500 text-white shadow-lg shadow-red-500/30 border border-red-400'
                   : 'bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500/20'}`}
             >
-              <X className={`w-5 h-5 ${isRejected ? 'text-white' : ''}`} strokeWidth={2.5} />
+              <X className={`w-4 h-4 sm:w-5 sm:h-5 ${isRejected ? 'text-white' : ''}`} strokeWidth={2.5} />
               {isRejected ? 'Rejected' : 'Reject'}
             </motion.button>
 
             {/* Skip */}
             <button onClick={goNext}
-              className="px-5 py-3 rounded-2xl border border-white/10 text-silver/50 text-sm hover:text-white hover:border-white/20 transition-all">
+              className="px-3 sm:px-5 py-2.5 sm:py-3 rounded-2xl border border-white/10 text-silver/50 text-xs sm:text-sm hover:text-white hover:border-white/20 transition-all">
               Skip →
             </button>
 
@@ -241,12 +241,12 @@ export default function GalleryLightbox({
               onClick={handleSelect}
               whileHover={{ scale: 1.08 }}
               whileTap={{ scale: 0.92 }}
-              className={`flex items-center gap-2 px-6 py-3 rounded-2xl font-medium text-sm transition-all
+              className={`flex items-center gap-1.5 sm:gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-2xl font-medium text-xs sm:text-sm transition-all
                 ${isSelected
                   ? 'bg-gold text-black shadow-lg shadow-gold/30 border border-gold'
                   : 'bg-gold/10 border border-gold/30 text-gold hover:bg-gold/20'}`}
             >
-              <Heart className={`w-5 h-5 ${isSelected ? 'text-black fill-current' : ''}`} />
+              <Heart className={`w-4 h-4 sm:w-5 sm:h-5 ${isSelected ? 'text-black fill-current' : ''}`} />
               {isSelected ? 'Selected ✓' : 'Select'}
             </motion.button>
           </div>

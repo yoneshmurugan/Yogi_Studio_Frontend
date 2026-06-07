@@ -1,6 +1,8 @@
 import { useState, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronLeft } from 'lucide-react';
 import WelcomeHeader from './WelcomeHeader';
+import FolderGrid from './FolderGrid';
 import PhotoGrid from './PhotoGrid';
 import GalleryLightbox from './GalleryLightbox';
 import StickyActionBar from './StickyActionBar';
@@ -8,11 +10,15 @@ import SelectionSummaryDrawer from './SelectionSummaryDrawer';
 import FinaliseModal from './FinaliseModal';
 import SuccessScreen from './SuccessScreen';
 import UndoToast from './UndoToast';
-import customerPhotos, { eventInfo } from '../../data/customerPhotos';
+import allPhotos, { eventInfo, mockFolders } from '../../data/customerPhotos';
 
 export default function CustomerPortal() {
+  const [activeFolderId, setActiveFolderId] = useState(null);
+  
+  // Global selection state (event-wide)
   const [selectedIds, setSelectedIds]   = useState(new Set());
   const [rejectedIds, setRejectedIds]   = useState(new Set());
+  
   const [lightboxIdx, setLightboxIdx]   = useState(null);  // null = closed
   const [drawerOpen, setDrawerOpen]     = useState(false);
   const [finaliseOpen, setFinaliseOpen] = useState(false);
@@ -21,6 +27,10 @@ export default function CustomerPortal() {
   // Undo state
   const [undoToast, setUndoToast]       = useState({ visible: false, message: '', action: null });
   const undoTimerRef = useRef(null);
+
+  // Derive current folder and photos
+  const activeFolder = activeFolderId ? mockFolders.find(f => f.id === activeFolderId) : null;
+  const currentFolderPhotos = activeFolder ? activeFolder.photos : [];
 
   // ── Helper: show undo toast for 3 seconds ─────────────────────────────────
   const showUndo = useCallback((message, undoFn) => {
@@ -84,7 +94,6 @@ export default function CustomerPortal() {
   const handleFinalise = () => {
     setFinaliseOpen(false);
     setSubmitted(true);
-    // Here you would fire off an API call with { selectedIds, rejectedIds }
     console.log('Finalised:', {
       selected: [...selectedIds],
       rejected: [...rejectedIds],
@@ -118,8 +127,8 @@ export default function CustomerPortal() {
       <div className="fixed top-0 left-0 right-0 h-64 bg-gradient-to-b from-gold/[0.03] to-transparent pointer-events-none z-0" />
 
       <div className="relative z-10 px-4 md:px-8 lg:px-16 pt-16 pb-36 max-w-7xl mx-auto">
-
-        {/* Welcome header */}
+        
+        {/* Event Header is always visible at the top */}
         <WelcomeHeader
           coupleName={eventInfo.coupleName}
           eventName={eventInfo.eventName}
@@ -131,22 +140,64 @@ export default function CustomerPortal() {
           reviewedCount={reviewedCount}
         />
 
-        {/* Photo grid with filter tabs */}
-        <PhotoGrid
-          photos={customerPhotos}
-          selectedIds={selectedIds}
-          rejectedIds={rejectedIds}
-          onToggleSelect={handleToggleSelect}
-          onToggleReject={handleToggleReject}
-          onOpenLightbox={setLightboxIdx}
-        />
+        <AnimatePresence mode="wait">
+          {!activeFolderId ? (
+            /* LEVEL 1: Folder Grid */
+            <motion.div
+              key="folder-grid"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <FolderGrid 
+                folders={mockFolders} 
+                onSelectFolder={setActiveFolderId} 
+              />
+            </motion.div>
+          ) : (
+            /* LEVEL 2: Photo Grid for specific folder */
+            <motion.div
+              key="photo-grid"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.3 }}
+            >
+              {/* Back to folders button */}
+              <button
+                onClick={() => setActiveFolderId(null)}
+                className="flex items-center gap-2 text-silver/50 hover:text-white transition-colors mb-6 group"
+              >
+                <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-white/10 transition-colors">
+                  <ChevronLeft className="w-4 h-4" />
+                </div>
+                <span className="text-sm font-medium">Back to Folders</span>
+              </button>
+
+              <div className="mb-6">
+                <h2 className="font-serif text-2xl text-white font-light mb-1">{activeFolder.name}</h2>
+                <p className="text-silver/40 text-sm">{currentFolderPhotos.length} Photos in this folder</p>
+              </div>
+
+              <PhotoGrid
+                photos={currentFolderPhotos}
+                selectedIds={selectedIds}
+                rejectedIds={rejectedIds}
+                onToggleSelect={handleToggleSelect}
+                onToggleReject={handleToggleReject}
+                onOpenLightbox={setLightboxIdx}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
-      {/* Fullscreen lightbox */}
+      {/* Fullscreen lightbox (scoped to the currently active folder's photos) */}
       <AnimatePresence>
-        {lightboxIdx !== null && (
+        {lightboxIdx !== null && activeFolder && (
           <GalleryLightbox
-            photos={customerPhotos}
+            photos={currentFolderPhotos}
             startIndex={lightboxIdx}
             selectedIds={selectedIds}
             rejectedIds={rejectedIds}
@@ -157,11 +208,11 @@ export default function CustomerPortal() {
         )}
       </AnimatePresence>
 
-      {/* Summary drawer */}
+      {/* Summary drawer (shows all photos globally) */}
       <SelectionSummaryDrawer
         isOpen={drawerOpen}
         onClose={() => setDrawerOpen(false)}
-        photos={customerPhotos}
+        photos={allPhotos} // we pass the flattened array here so it can find any photo by ID
         selectedIds={selectedIds}
         rejectedIds={rejectedIds}
         onRevertSelect={handleRevertSelect}
@@ -185,7 +236,7 @@ export default function CustomerPortal() {
         onUndo={handleUndo}
       />
 
-      {/* Sticky action bar */}
+      {/* Sticky action bar (Global) */}
       <StickyActionBar
         selectedCount={selectedIds.size}
         rejectedCount={rejectedIds.size}
