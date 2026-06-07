@@ -116,7 +116,7 @@ const CenterImage = () => {
         backgroundSize,
         opacity,
         backgroundImage:
-          "url(/src/assets/IMG-20240423-WA0045.jpg)",
+          "url(/src/assets/Hero.jpg)",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
       }}
@@ -128,30 +128,29 @@ const ParallaxImages = () => {
   return (
     <div className="mx-auto max-w-5xl px-4 pt-[200px] pointer-events-none relative z-10">
       <ParallaxMedia
-        src="src/assets/0G1A7726.jpg"
+        src="src/assets/ALA_7149.jpg"
         alt="Wedding photography"
         start={-200}
         end={200}
         className="w-1/3 rounded-xl shadow-[0_0_40px_rgba(0,0,0,0.5)]"
       />
       <ParallaxMedia
-        
-        src="src/assets/IMG-20240503-WA0019.jpg"
+        src="src/assets/IMG_5775.JPG"
         alt="Sample Video 1"
         start={200}
         end={-250}
         className="mx-auto w-2/3 rounded-xl shadow-[0_0_40px_rgba(0,0,0,0.5)]"
       />
       <ParallaxMedia
-        src="src/assets/IMG-20240503-WA0019.jpg"
+        src="/src/assets/DK_433.jpg"
         alt="Event photography"
         start={-200}
         end={200}
         className="ml-auto w-1/3 rounded-xl shadow-[0_0_40px_rgba(0,0,0,0.5)]"
       />
       <ParallaxMedia
-        
-        src="src/assets/002.jpg"
+        isVideo={true}
+        src="src/assets/IMG_9343.MP4"
         alt="Sample Video 2"
         start={0}
         end={-500}

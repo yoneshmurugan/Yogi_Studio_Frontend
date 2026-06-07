@@ -57,7 +57,7 @@ const Card = React.memo(({
 }) => {
   const [opacity, setOpacity] = useState(0);
   const imgRef = useRef(null);
-  
+
   useEffect(() => {
     setOpacity(0);
     const img = new Image();
@@ -80,8 +80,8 @@ const Card = React.memo(({
   }, [descriptor]);
 
   return (
-    <div 
-      className="absolute overflow-hidden" 
+    <div
+      className="absolute overflow-hidden"
       style={{
         transform: `translate3d(${x}px, ${y}px, 0)`,
         willChange: 'transform',
@@ -91,19 +91,19 @@ const Card = React.memo(({
       }}
     >
       <div className="w-full h-full relative overflow-hidden border border-[#d4af37]/10 bg-zinc-900/50">
-        <img 
-          ref={imgRef} 
-          src={descriptor.src} 
-          alt={descriptor.title} 
-          className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none" 
+        <img
+          ref={imgRef}
+          src={descriptor.src}
+          alt={descriptor.title}
+          className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none"
           style={{
             opacity,
             transition: 'opacity 0.4s ease-out',
             backfaceVisibility: 'hidden',
             transform: 'translateZ(0)'
-          }} 
-          loading="lazy" 
-          decoding="async" 
+          }}
+          loading="lazy"
+          decoding="async"
         />
       </div>
     </div>
@@ -297,11 +297,11 @@ const InfiniteDraggableGrid = ({
   }, [visibleCardsData]);
 
   return (
-    <div 
-      ref={containerRef} 
-      className={`w-full h-full select-none cursor-grab overflow-hidden ${isFullscreen ? 'fixed inset-0' : 'relative'}`} 
-      onMouseDown={handleDragStart} 
-      onTouchStart={handleDragStart} 
+    <div
+      ref={containerRef}
+      className={`w-full h-full select-none cursor-grab overflow-hidden ${isFullscreen ? 'fixed inset-0' : 'relative'}`}
+      onMouseDown={handleDragStart}
+      onTouchStart={handleDragStart}
       style={{
         background: 'transparent',
         touchAction: 'none',
@@ -312,8 +312,8 @@ const InfiniteDraggableGrid = ({
         padding: 0
       }}
     >
-      <div 
-        className="absolute inset-0 overflow-hidden" 
+      <div
+        className="absolute inset-0 overflow-hidden"
         style={{
           transform: 'translateZ(0)',
           backfaceVisibility: 'hidden',
@@ -340,10 +340,10 @@ const LOCAL_GALLERY = [
   { id: 0, src: "src/assets/002.jpg", title: "Yogi Studio Photo 1" },
   { id: 1, src: "src/assets/01.jpg", title: "Yogi Studio Photo 2" },
   { id: 2, src: "src/assets/0G1A7726.jpg", title: "Yogi Studio Photo 3" },
-  { id: 3, src: "src/assets/IMG-20240423-WA0045.jpg", title: "Yogi Studio Photo 4" },
+  { id: 3, src: "src/assets/IMG_9561.JPG", title: "Yogi Studio Photo 4" },
   { id: 4, src: "src/assets/IMG-20240423-WA0055.jpg", title: "Yogi Studio Photo 5" },
-  { id: 5, src: "src/assets/IMG-20240503-WA0019.jpg", title: "Yogi Studio Photo 6" },
-  { id: 6, src: "src/assets/IMG-20240503-WA0021.jpg", title: "Yogi Studio Photo 7" },
+  { id: 5, src: "src/assets/IMG_9561.JPG", title: "Yogi Studio Photo 6" },
+  { id: 6, src: "src/assets/IMG_9561.JPG", title: "Yogi Studio Photo 7" },
   { id: 7, src: "src/assets/IMG-20240503-WA0022.jpg", title: "Yogi Studio Photo 8" },
   { id: 8, src: "src/assets/IMG-20240503-WA0027.jpg", title: "Yogi Studio Photo 9" },
   { id: 9, src: "src/assets/yogi-card-2.jpg", title: "Yogi Studio Photo 10" },

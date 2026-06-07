@@ -4,15 +4,15 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 const sequenceData = [
   {
     title: "Cinematic Wedding Films",
-    image: "src/assets/IMG-20240423-WA0045.jpg"
-  },
-  {
-    title: "Candid Photography",
     image: "src/assets/0G1A7726.jpg"
   },
   {
+    title: "Candid Photography",
+    image: ""
+  },
+  {
     title: "Traditional Photography & Videography",
-    image: "src/assets/IMG-20240503-WA0019.jpg"
+    image: "src/assets/IMG_9561.JPG"
   },
   {
     title: "Pre & Post-Wedding Shoots",
@@ -33,33 +33,33 @@ const sequenceData = [
 // TEXT opacity: [scrollProgress] → [opacity]
 const TEXT_OPACITY = [
   // 0: visible at start, fades out before slot 1, explicitly 0 for the rest
-  { input: [0, 0.12, 0.16, 1],                     output: [1, 1, 0, 0] },
+  { input: [0, 0.12, 0.16, 1], output: [1, 1, 0, 0] },
   // 1: invisible → fade in → hold (pause) → fade out → invisible
-  { input: [0, 0.18, 0.22, 0.32, 0.36, 1],         output: [0, 0, 1, 1, 0, 0] },
+  { input: [0, 0.18, 0.22, 0.32, 0.36, 1], output: [0, 0, 1, 1, 0, 0] },
   // 2
-  { input: [0, 0.38, 0.42, 0.52, 0.56, 1],         output: [0, 0, 1, 1, 0, 0] },
+  { input: [0, 0.38, 0.42, 0.52, 0.56, 1], output: [0, 0, 1, 1, 0, 0] },
   // 3
-  { input: [0, 0.58, 0.62, 0.72, 0.76, 1],         output: [0, 0, 1, 1, 0, 0] },
+  { input: [0, 0.58, 0.62, 0.72, 0.76, 1], output: [0, 0, 1, 1, 0, 0] },
   // 4: last title stays visible at end
-  { input: [0, 0.78, 0.82, 1],                     output: [0, 0, 1, 1] },
+  { input: [0, 0.78, 0.82, 1], output: [0, 0, 1, 1] },
 ];
 
 // TEXT y-offset: same breakpoints, slides up/down 30px
 const TEXT_Y = [
-  { input: [0, 0.12, 0.16, 1],                     output: [0, 0, -30, -30] },
-  { input: [0, 0.18, 0.22, 0.32, 0.36, 1],         output: [30, 30, 0, 0, -30, -30] },
-  { input: [0, 0.38, 0.42, 0.52, 0.56, 1],         output: [30, 30, 0, 0, -30, -30] },
-  { input: [0, 0.58, 0.62, 0.72, 0.76, 1],         output: [30, 30, 0, 0, -30, -30] },
-  { input: [0, 0.78, 0.82, 1],                     output: [30, 30, 0, 0] },
+  { input: [0, 0.12, 0.16, 1], output: [0, 0, -30, -30] },
+  { input: [0, 0.18, 0.22, 0.32, 0.36, 1], output: [30, 30, 0, 0, -30, -30] },
+  { input: [0, 0.38, 0.42, 0.52, 0.56, 1], output: [30, 30, 0, 0, -30, -30] },
+  { input: [0, 0.58, 0.62, 0.72, 0.76, 1], output: [30, 30, 0, 0, -30, -30] },
+  { input: [0, 0.78, 0.82, 1], output: [30, 30, 0, 0] },
 ];
 
 // IMAGE opacity: each stacks on top; once faded in it stays
 const IMG_OPACITY = [
-  { input: [0, 1],         output: [1, 1] },       // always visible (base layer)
-  { input: [0.16, 0.20],   output: [0, 1] },
-  { input: [0.36, 0.40],   output: [0, 1] },
-  { input: [0.56, 0.60],   output: [0, 1] },
-  { input: [0.76, 0.80],   output: [0, 1] },
+  { input: [0, 1], output: [1, 1] },       // always visible (base layer)
+  { input: [0.16, 0.20], output: [0, 1] },
+  { input: [0.36, 0.40], output: [0, 1] },
+  { input: [0.56, 0.60], output: [0, 1] },
+  { input: [0.76, 0.80], output: [0, 1] },
 ];
 
 // ── Per-item hook components ──

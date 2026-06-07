@@ -18,10 +18,10 @@ import {
 import cover from "../../assets/002.jpg";
 import photo1 from "../../assets/01.jpg";
 import photo2 from "../../assets/0G1A7726.jpg";
-import photo3 from "../../assets/IMG-20240423-WA0045.jpg";
+import photo3 from "../../assets/IMG_9561.JPG";
 import photo4 from "../../assets/IMG-20240423-WA0055.jpg";
-import photo5 from "../../assets/IMG-20240503-WA0019.jpg";
-import photo6 from "../../assets/IMG-20240503-WA0021.jpg";
+import photo5 from "../../assets/IMG_9561.JPG";
+import photo6 from "../../assets/IMG_9561.JPG";
 import photo7 from "../../assets/IMG-20240503-WA0022.jpg";
 import photo8 from "../../assets/IMG-20240503-WA0027.jpg";
 
@@ -50,8 +50,8 @@ function PageDots({ total, current, onGo }) {
           aria-label={`Go to page ${i}`}
           className="rounded-full transition-all duration-300 border-none cursor-pointer"
           style={{
-            width:  i === current || i === current - 1 ? 20 : 8,
-            height: i === current || i === current - 1 ? 6  : 8,
+            width: i === current || i === current - 1 ? 20 : 8,
+            height: i === current || i === current - 1 ? 6 : 8,
             borderRadius: i === current || i === current - 1 ? 3 : "50%",
             background: i === current || i === current - 1 ? "#d4af37" : "rgba(255,255,255,.35)",
             padding: 0,
@@ -85,7 +85,7 @@ function Btn({ children, onClick, label, active, disabled, danger }) {
       onMouseLeave={e => (e.currentTarget.style.background = active ? "rgba(212,175,55,.35)" : "transparent")}
     >
       {children}
-      {active && <span style={{ position:"absolute", top:7, right:7, width:5, height:5, borderRadius:"50%", background:"#d4af37" }} />}
+      {active && <span style={{ position: "absolute", top: 7, right: 7, width: 5, height: 5, borderRadius: "50%", background: "#d4af37" }} />}
     </button>
   );
 }
@@ -105,12 +105,12 @@ function ControlBar({ current, total, isPlaying, isMuted, isFullscreen, onPrev, 
     scrollbarWidth: "none",
     msOverflowStyle: "none"
   };
-  const vDiv = <div style={{ width:1, height:20, background:"rgba(255,255,255,.18)", margin:"0 4px", flexShrink:0 }} />;
+  const vDiv = <div style={{ width: 1, height: 20, background: "rgba(255,255,255,.18)", margin: "0 4px", flexShrink: 0 }} />;
 
   return (
     <motion.div
       initial={{ y: 60, opacity: 0 }}
-      animate={{ y: 0,  opacity: 1 }}
+      animate={{ y: 0, opacity: 1 }}
       exit={{ y: 60, opacity: 0 }}
       transition={{ type: "spring", stiffness: 260, damping: 28 }}
       className="absolute bottom-6 left-0 right-0 flex flex-col items-center gap-2 pointer-events-none z-50"
@@ -122,7 +122,7 @@ function ControlBar({ current, total, isPlaying, isMuted, isFullscreen, onPrev, 
         <Btn onClick={onExit} label="Exit" danger><LogOut size={15} /></Btn>
         {vDiv}
         <Btn onClick={onPrev} label="Previous" disabled={current === 0}><ChevronLeft size={18} /></Btn>
-        <span style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:13, color:"rgba(255,255,255,.65)", letterSpacing:"2px", padding:"0 8px", minWidth:52, textAlign:"center", userSelect:"none" }}>
+        <span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 13, color: "rgba(255,255,255,.65)", letterSpacing: "2px", padding: "0 8px", minWidth: 52, textAlign: "center", userSelect: "none" }}>
           {current === 0 || current === total - 1 ? current + 1 : `${current}-${current + 1}`} / {total}
         </span>
         <Btn onClick={onNext} label="Next" disabled={current >= total - 1}><ChevronRight size={18} /></Btn>
@@ -151,7 +151,7 @@ function MusicNote({ id, x, onDone }) {
       initial={{ opacity: 0, y: 0, scale: 0.5, rotate: -10 }}
       animate={{ opacity: [0, 0.7, 0], y: -100, scale: [0.5, 1.1, 0.9], rotate: [-10, 15] }}
       transition={{ duration: 2.8, ease: "easeOut" }}
-      style={{ position:"absolute", bottom:"15%", left:`${x}%`, pointerEvents:"none", zIndex:50, fontSize:22, color:"rgba(212,175,55,.55)", userSelect:"none" }}
+      style={{ position: "absolute", bottom: "15%", left: `${x}%`, pointerEvents: "none", zIndex: 50, fontSize: 22, color: "rgba(212,175,55,.55)", userSelect: "none" }}
     >
       ♪
     </motion.div>
@@ -162,18 +162,18 @@ function MusicNote({ id, x, onDone }) {
 // 7.  MAIN E-ALBUM COMPONENT
 // ──────────────────────────────────────────────────────────
 export default function EAlbum({ onExit }) {
-  const [current,        setCurrent]       = useState(0);
-  const [isPlaying,      setIsPlaying]     = useState(false);
-  const [isMuted,        setIsMuted]       = useState(true);
-  const [isFullscreen,   setIsFullscreen]  = useState(false);
-  const [showControls,   setShowControls]  = useState(true);
-  const [musicNotes,     setMusicNotes]    = useState([]);
+  const [current, setCurrent] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showControls, setShowControls] = useState(true);
+  const [musicNotes, setMusicNotes] = useState([]);
 
-  const containerRef    = useRef(null);
-  const bookRef         = useRef(null);
-  const audioRef        = useRef(null);
-  const hideTimerRef    = useRef(null);
-  const noteIdRef       = useRef(0);
+  const containerRef = useRef(null);
+  const bookRef = useRef(null);
+  const audioRef = useRef(null);
+  const hideTimerRef = useRef(null);
+  const noteIdRef = useRef(0);
 
   // ── Build Pages Array ─────────────────────────
   const pages = [];
@@ -261,8 +261,8 @@ export default function EAlbum({ onExit }) {
   useEffect(() => {
     const h = (e) => {
       if (e.key === "ArrowRight") { goNext(); revealControls(); }
-      if (e.key === "ArrowLeft")  { goPrev(); revealControls(); }
-      if (e.key === "Escape")     { onExit?.(); }
+      if (e.key === "ArrowLeft") { goPrev(); revealControls(); }
+      if (e.key === "Escape") { onExit?.(); }
     };
     window.addEventListener("keydown", h);
     return () => window.removeEventListener("keydown", h);
@@ -295,8 +295,8 @@ export default function EAlbum({ onExit }) {
     setIsMuted(m => {
       const audio = audioRef.current;
       if (audio) {
-        if (m) { audio.volume = 0.3; audio.play().catch(() => {}); }
-        else   { audio.pause(); }
+        if (m) { audio.volume = 0.3; audio.play().catch(() => { }); }
+        else { audio.pause(); }
       }
       if (m) {
         const id = ++noteIdRef.current;
@@ -328,17 +328,17 @@ export default function EAlbum({ onExit }) {
         ref={containerRef}
         onMouseMove={revealControls}
         style={{
-          position:"fixed", inset:0, width:"100%", height:"100vh",
-          background:"#0a0a0a",
-          display:"flex", alignItems:"center", justifyContent:"center",
-          overflow:"hidden", userSelect:"none",
+          position: "fixed", inset: 0, width: "100%", height: "100vh",
+          background: "#0a0a0a",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          overflow: "hidden", userSelect: "none",
           zIndex: 9999,
         }}
       >
         {/* Ambient glow */}
         <div style={{
-          position:"absolute", inset:0, pointerEvents:"none",
-          background:"radial-gradient(ellipse 80% 55% at 50% 50%, rgba(212,175,55,.08) 0%, transparent 70%)",
+          position: "absolute", inset: 0, pointerEvents: "none",
+          background: "radial-gradient(ellipse 80% 55% at 50% 50%, rgba(212,175,55,.08) 0%, transparent 70%)",
         }} />
 
         {/* HTMLFlipBook Container */}
@@ -377,7 +377,7 @@ export default function EAlbum({ onExit }) {
               onPrev={goPrev} onNext={goNext}
               onTogglePlay={togglePlay} onToggleMute={toggleMute}
               onToggleFullscreen={toggleFullscreen}
-              onExit={onExit || (() => {})}
+              onExit={onExit || (() => { })}
               onGo={goTo}
             />
           )}
@@ -387,19 +387,19 @@ export default function EAlbum({ onExit }) {
         <AnimatePresence>
           {!isMuted && (
             <motion.div
-              initial={{ opacity:0, scale:.8 }}
-              animate={{ opacity:1, scale:1 }}
-              exit={{ opacity:0, scale:.8 }}
+              initial={{ opacity: 0, scale: .8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: .8 }}
               style={{
-                position:"absolute", bottom:80, right:18, zIndex:30,
-                display:"flex", alignItems:"center", gap:6,
-                padding:"5px 12px", borderRadius:14,
-                background:"rgba(255,255,255,.08)", backdropFilter:"blur(16px)",
-                border:"1px solid rgba(255,255,255,.14)",
+                position: "absolute", bottom: 80, right: 18, zIndex: 30,
+                display: "flex", alignItems: "center", gap: 6,
+                padding: "5px 12px", borderRadius: 14,
+                background: "rgba(255,255,255,.08)", backdropFilter: "blur(16px)",
+                border: "1px solid rgba(255,255,255,.14)",
               }}
             >
               <Music2 size={13} color="#d4af37" />
-              <span style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:11, color:"rgba(255,255,255,.6)", letterSpacing:"1px" }}>Music on</span>
+              <span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 11, color: "rgba(255,255,255,.6)", letterSpacing: "1px" }}>Music on</span>
             </motion.div>
           )}
         </AnimatePresence>

@@ -6,7 +6,7 @@ const services = [
   {
     title: 'Cinematic Wedding Films',
     description: 'Beautifully crafted wedding highlights — film-grade storytelling that feels like a feature.',
-    image: 'src/assets/IMG-20240423-WA0045.jpg',
+    image: 'src/assets/IMG_9561.JPG',
   },
   {
     title: 'Candid Photography',
@@ -21,7 +21,7 @@ const services = [
   {
     title: 'Traditional Photography & Videography',
     description: 'Classic elegance — time-honoured rituals documented with grace and precision.',
-    image: 'src/assets/IMG-20240503-WA0019.jpg',
+    image: 'src/assets/IMG_9561.JPG',
   },
   {
     title: 'Pre & Post-Wedding Shoots',
