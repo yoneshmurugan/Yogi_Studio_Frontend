@@ -1,69 +1,85 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  LayoutDashboard, PlusCircle, Images, Users,
-  ChevronLeft, ChevronRight, LogOut, Camera
+  LayoutDashboard, UserPlus, Images, Users,
+  ChevronLeft, ChevronRight, LogOut, Camera,
 } from 'lucide-react';
-import AdminOverview from './AdminOverview';
-import EventCreatorSection from './EventCreatorSection';
+import AdminOverview    from './AdminOverview';
+import AddUserSection   from './AddUserSection';
 import PortfolioManager from './PortfolioManager';
-import UserManagement from './UserManagement';
+import UserManagement   from './UserManagement';
 
-// ── Shared mock data ────────────────────────────────────────────────────────
-export const mockUsers = [
-  {
-    id: 1, clientName: 'Sarah & James Henderson', phone: '+1 555-0101',
-    email: 'sarah@example.com', eventName: 'The Henderson Wedding',
-    eventType: 'Wedding', package: 'Elite', date: 'Oct 14, 2026',
-    status: 'pending', selected: 0, total: 200, accessToken: 'SJH-7842',
-  },
-  {
-    id: 2, clientName: 'Emily & Michael Torres', phone: '+1 555-0182',
-    email: 'emily@example.com', eventName: 'Sunset Garden Ceremony',
-    eventType: 'Wedding', package: 'Premium', date: 'Nov 2, 2026',
-    status: 'awaiting_approval', selected: 87, total: 150, accessToken: 'EMT-3391',
-  },
-  {
-    id: 3, clientName: 'Olivia & Daniel Park', phone: '+1 555-0247',
-    email: 'olivia@example.com', eventName: 'Rooftop Celebration',
-    eventType: 'Corporate', package: 'Premium', date: 'Sep 28, 2026',
-    status: 'complete', selected: 120, total: 120, accessToken: 'ODP-9910',
-  },
-  {
-    id: 4, clientName: 'Sophia & William Blake', phone: '+1 555-0308',
-    email: 'sophia@example.com', eventName: 'Vineyard Romance',
-    eventType: 'Wedding', package: 'Elite', date: 'Dec 5, 2026',
-    status: 'active', selected: 45, total: 180, accessToken: 'SWB-6621',
-  },
-  {
-    id: 5, clientName: 'Raj Mehta', phone: '+1 555-0439',
-    email: 'raj@example.com', eventName: 'Executive Headshots',
-    eventType: 'Portrait', package: 'Essential', date: 'Nov 20, 2026',
-    status: 'awaiting_approval', selected: 12, total: 30, accessToken: 'RM-4487',
-  },
-  {
-    id: 6, clientName: 'Clara & Luca Romano', phone: '+1 555-0574',
-    email: 'clara@example.com', eventName: 'Villa Garden Vows',
-    eventType: 'Wedding', package: 'Elite', date: 'Jan 10, 2027',
-    status: 'pending', selected: 0, total: 250, accessToken: 'CLR-2231',
-  },
+// ── Seed data ─────────────────────────────────────────────────────────────────
+export const seedUsers = [
+  { id: 1, name: 'Sarah Henderson', phone: '+91 98765 43210', createdAt: '2026-01-15', status: 'active' },
+  { id: 2, name: 'Raj Mehta',       phone: '+91 87654 32109', createdAt: '2026-02-20', status: 'active' },
+  { id: 3, name: 'Olivia Park',     phone: '+91 76543 21098', createdAt: '2026-03-10', status: 'active' },
 ];
 
-// ── Nav items ───────────────────────────────────────────────────────────────
+export const seedEvents = [
+  { id: 1, userId: 1, eventName: 'The Henderson Wedding', category: 'Wedding',     date: '2026-10-14', package: 'Elite',      notes: 'Beach ceremony at sunset.', accessToken: 'SJH-7842', status: 'awaiting_approval', downloadedAt: null },
+  { id: 2, userId: 1, eventName: 'Pre-Wedding Shoot',     category: 'Engagement',  date: '2026-09-01', package: 'Premium',    notes: '',                          accessToken: 'SJH-PRE1', status: 'complete',           downloadedAt: '2026-09-10' },
+  { id: 3, userId: 2, eventName: 'Executive Headshots',   category: 'Portrait',    date: '2026-11-20', package: 'Essential',  notes: '',                          accessToken: 'RM-4487',  status: 'active',             downloadedAt: null },
+  { id: 4, userId: 3, eventName: 'Rooftop Celebration',   category: 'Corporate',   date: '2026-09-28', package: 'Premium',    notes: '',                          accessToken: 'ODP-9910', status: 'pending',            downloadedAt: null },
+];
+
+export const seedFolders = [
+  { id: 1, eventId: 1, name: 'Ceremony',      photos: [] },
+  { id: 2, eventId: 1, name: 'Reception',     photos: [] },
+  { id: 3, eventId: 2, name: 'Outdoor Shoot', photos: [] },
+  { id: 4, eventId: 3, name: 'Studio Shots',  photos: [] },
+];
+
+// ── Nav items ─────────────────────────────────────────────────────────────────
 const navItems = [
-  { id: 'overview',   label: 'Dashboard',        icon: LayoutDashboard },
-  { id: 'create',     label: 'Create Event',      icon: PlusCircle },
-  { id: 'portfolio',  label: 'Portfolio',         icon: Images },
-  { id: 'users',      label: 'User Management',   icon: Users },
+  { id: 'overview',  label: 'Dashboard', icon: LayoutDashboard },
+  { id: 'adduser',   label: 'Add User',  icon: UserPlus },
+  { id: 'portfolio', label: 'Portfolio', icon: Images },
+  { id: 'users',     label: 'Users',     icon: Users },
 ];
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [users, setUsers] = useState(mockUsers);
 
-  const handleDeleteUser = (id) => setUsers((prev) => prev.filter((u) => u.id !== id));
-  const handleAddUser = (user) => setUsers((prev) => [user, ...prev]);
+  // ── Shared state ─────────────────────────────────────────────────────────
+  const [users,   setUsers]   = useState(seedUsers);
+  const [events,  setEvents]  = useState(seedEvents);
+  const [folders, setFolders] = useState(seedFolders);
+
+  // Users
+  const addUser    = (u)  => setUsers((p) => [u, ...p]);
+  const deleteUser = (id) => {
+    setUsers((p) => p.filter((u) => u.id !== id));
+    const evIds = events.filter((e) => e.userId === id).map((e) => e.id);
+    setEvents((p) => p.filter((e) => e.userId !== id));
+    setFolders((p) => p.filter((f) => !evIds.includes(f.eventId)));
+  };
+
+  // Events
+  const addEvent    = (ev) => setEvents((p) => [ev, ...p]);
+  const deleteEvent = (id) => {
+    setEvents((p) => p.filter((e) => e.id !== id));
+    setFolders((p) => p.filter((f) => f.eventId !== id));
+  };
+  const updateEvent = (id, patch) =>
+    setEvents((p) => p.map((e) => (e.id === id ? { ...e, ...patch } : e)));
+
+  // Folders
+  const addFolder   = (f)  => setFolders((p) => [...p, f]);
+  const deleteFolder = (id) => setFolders((p) => p.filter((f) => f.id !== id));
+  const renameFolder = (id, name) =>
+    setFolders((p) => p.map((f) => (f.id === id ? { ...f, name } : f)));
+  const addPhotosToFolder = (folderId, photos) =>
+    setFolders((p) =>
+      p.map((f) => (f.id === folderId ? { ...f, photos: [...f.photos, ...photos] } : f))
+    );
+  const deletePhotoFromFolder = (folderId, photoId) =>
+    setFolders((p) =>
+      p.map((f) =>
+        f.id === folderId ? { ...f, photos: f.photos.filter((ph) => ph.id !== photoId) } : f
+      )
+    );
 
   const currentLabel = navItems.find((n) => n.id === activeTab)?.label ?? '';
 
@@ -138,11 +154,9 @@ export default function AdminDashboard() {
             onClick={() => setSidebarOpen((s) => !s)}
             className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-silver/30 hover:text-white hover:bg-white/[0.04] transition-colors"
           >
-            {sidebarOpen ? (
-              <ChevronLeft className="w-5 h-5 flex-shrink-0" />
-            ) : (
-              <ChevronRight className="w-5 h-5 flex-shrink-0" />
-            )}
+            {sidebarOpen
+              ? <ChevronLeft className="w-5 h-5 flex-shrink-0" />
+              : <ChevronRight className="w-5 h-5 flex-shrink-0" />}
             <AnimatePresence>
               {sidebarOpen && (
                 <motion.span
@@ -159,11 +173,11 @@ export default function AdminDashboard() {
         </div>
       </motion.aside>
 
-      {/* ── Main content ── */}
+      {/* ── Main ── */}
       <div className="flex-1 flex flex-col overflow-hidden">
 
-        {/* Top header */}
-        <header className="flex items-center justify-between px-8 py-5 border-b border-white/[0.06] bg-[#0B0B0B]/80 backdrop-blur-sm">
+        {/* Header */}
+        <header className="flex items-center justify-between px-8 py-5 border-b border-white/[0.06] bg-[#0B0B0B]/80 backdrop-blur-sm flex-shrink-0">
           <div>
             <p className="text-gold/70 text-[10px] tracking-[0.35em] uppercase mb-0.5">Studio Control</p>
             <h1 className="font-serif text-xl text-white font-light">{currentLabel}</h1>
@@ -193,10 +207,36 @@ export default function AdminDashboard() {
               transition={{ duration: 0.3, ease: 'easeOut' }}
               className="p-8"
             >
-              {activeTab === 'overview'  && <AdminOverview users={users} onNavigate={setActiveTab} />}
-              {activeTab === 'create'    && <EventCreatorSection onUserAdded={handleAddUser} />}
+              {activeTab === 'overview' && (
+                <AdminOverview
+                  users={users}
+                  events={events}
+                  folders={folders}
+                  onNavigate={setActiveTab}
+                />
+              )}
+              {activeTab === 'adduser' && (
+                <AddUserSection
+                  onUserAdded={(u) => { addUser(u); setActiveTab('users'); }}
+                />
+              )}
               {activeTab === 'portfolio' && <PortfolioManager />}
-              {activeTab === 'users'     && <UserManagement users={users} onDeleteUser={handleDeleteUser} onNavigate={setActiveTab} />}
+              {activeTab === 'users' && (
+                <UserManagement
+                  users={users}
+                  events={events}
+                  folders={folders}
+                  onDeleteUser={deleteUser}
+                  onAddEvent={addEvent}
+                  onDeleteEvent={deleteEvent}
+                  onUpdateEvent={updateEvent}
+                  onAddFolder={addFolder}
+                  onDeleteFolder={deleteFolder}
+                  onRenameFolder={renameFolder}
+                  onAddPhotosToFolder={addPhotosToFolder}
+                  onDeletePhotoFromFolder={deletePhotoFromFolder}
+                />
+              )}
             </motion.div>
           </AnimatePresence>
         </main>
