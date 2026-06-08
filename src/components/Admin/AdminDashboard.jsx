@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard, UserPlus, Images, Users,
@@ -43,43 +43,179 @@ export default function AdminDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   // ── Shared state ─────────────────────────────────────────────────────────
-  const [users,   setUsers]   = useState(seedUsers);
-  const [events,  setEvents]  = useState(seedEvents);
-  const [folders, setFolders] = useState(seedFolders);
+  const [users,   setUsers]   = useState([]);
+  const [events,  setEvents]  = useState([]);
+  const [folders, setFolders] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const [usersRes, eventsRes] = await Promise.all([
+          fetch(`${import.meta.env.VITE_API_BASE_URL}/admin/users`),
+          fetch(`${import.meta.env.VITE_API_BASE_URL}/admin/events`)
+        ]);
+        
+        if (usersRes.ok) {
+          const usersData = await usersRes.json();
+          setUsers(usersData.users || []);
+        }
+        if (eventsRes.ok) {
+          const eventsData = await eventsRes.json();
+          const fetchedEvents = eventsData.events || [];
+          
+          // Map backend format to frontend UI format
+          // Frontend UI expects 'package' instead of 'packageType'
+          const mappedEvents = fetchedEvents.map(e => ({
+            ...e,
+            package: e.packageType || e.package,
+          }));
+          
+          setEvents(mappedEvents);
+          
+          // Flatten nested folders from events to match frontend flat-state
+          const allFolders = [];
+          mappedEvents.forEach(ev => {
+            if (ev.folders) {
+              ev.folders.forEach(f => {
+                allFolders.push({ ...f, eventId: ev.id });
+              });
+            }
+          });
+          setFolders(allFolders);
+        }
+      } catch (err) {
+        console.error("Failed to fetch dashboard data:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, []);
 
   // Users
   const addUser    = (u)  => setUsers((p) => [u, ...p]);
-  const deleteUser = (id) => {
-    setUsers((p) => p.filter((u) => u.id !== id));
-    const evIds = events.filter((e) => e.userId === id).map((e) => e.id);
-    setEvents((p) => p.filter((e) => e.userId !== id));
-    setFolders((p) => p.filter((f) => !evIds.includes(f.eventId)));
+  const deleteUser = async (id) => {
+    const userToDel = users.find(u => u.id === id);
+    if (!userToDel) return;
+
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/admin/users/${encodeURIComponent(userToDel.phone)}`, {
+        method: 'DELETE'
+      });
+      if (!res.ok) throw new Error("Failed to delete user");
+
+      setUsers((p) => p.filter((u) => u.id !== id));
+      const evIds = events.filter((e) => e.customerPhone === userToDel.phone).map((e) => e.id);
+      setEvents((p) => p.filter((e) => e.customerPhone !== userToDel.phone));
+      setFolders((p) => p.filter((f) => !evIds.includes(f.eventId)));
+    } catch (err) {
+      console.error(err);
+      alert("Error deleting user: " + err.message);
+    }
   };
 
   // Events
-  const addEvent    = (ev) => setEvents((p) => [ev, ...p]);
-  const deleteEvent = (id) => {
-    setEvents((p) => p.filter((e) => e.id !== id));
-    setFolders((p) => p.filter((f) => f.eventId !== id));
+  const addEvent = async (eventPayload) => {
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/admin/events`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(eventPayload)
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      
+      const newEvent = { ...data.event, package: data.event.packageType };
+      setEvents((p) => [newEvent, ...p]);
+    } catch (err) {
+      console.error("Failed to add event:", err);
+      alert("Error adding event: " + err.message);
+    }
   };
-  const updateEvent = (id, patch) =>
-    setEvents((p) => p.map((e) => (e.id === id ? { ...e, ...patch } : e)));
+  const deleteEvent = async (id) => {
+    const eventToDel = events.find(e => e.id === id);
+    if (!eventToDel) return;
 
-  // Folders
-  const addFolder   = (f)  => setFolders((p) => [...p, f]);
-  const deleteFolder = (id) => setFolders((p) => p.filter((f) => f.id !== id));
-  const renameFolder = (id, name) =>
-    setFolders((p) => p.map((f) => (f.id === id ? { ...f, name } : f)));
-  const addPhotosToFolder = (folderId, photos) =>
-    setFolders((p) =>
-      p.map((f) => (f.id === folderId ? { ...f, photos: [...f.photos, ...photos] } : f))
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/admin/events/${id}?phone=${encodeURIComponent(eventToDel.customerPhone)}`, {
+        method: 'DELETE'
+      });
+      if (!res.ok) throw new Error("Failed to delete event");
+
+      setEvents((p) => p.filter((e) => e.id !== id));
+      setFolders((p) => p.filter((f) => f.eventId !== id));
+    } catch (err) {
+      console.error(err);
+      alert("Error deleting event: " + err.message);
+    }
+  };
+  const updateEvent = async (id, patch) => {
+    const ev = events.find(e => e.id === id);
+    if (!ev) return;
+    setEvents((p) => p.map((e) => (e.id === id ? { ...e, ...patch } : e)));
+    try {
+      await fetch(`${import.meta.env.VITE_API_BASE_URL}/admin/events/${id}?phone=${encodeURIComponent(ev.customerPhone)}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(patch)
+      });
+    } catch(err) { console.error("Event patch error", err); }
+  };
+
+  // Folders & Photos - Sync to Backend
+  const syncEventFolders = async (eventId, newFlatFolders) => {
+    const ev = events.find(e => e.id === eventId);
+    if (!ev) return;
+    const eventFolders = newFlatFolders.filter(f => f.eventId === eventId);
+    try {
+      await fetch(`${import.meta.env.VITE_API_BASE_URL}/admin/events/${eventId}?phone=${encodeURIComponent(ev.customerPhone)}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ folders: eventFolders })
+      });
+    } catch(err) { console.error("Folder sync error:", err); }
+  };
+
+  const addFolder = (f) => {
+    const newFolders = [...folders, f];
+    setFolders(newFolders);
+    syncEventFolders(f.eventId, newFolders);
+  };
+
+  const deleteFolder = (id) => {
+    const folderToDel = folders.find(f => f.id === id);
+    if (!folderToDel) return;
+    const newFolders = folders.filter((f) => f.id !== id);
+    setFolders(newFolders);
+    syncEventFolders(folderToDel.eventId, newFolders);
+  };
+
+  const renameFolder = (id, name) => {
+    const folderToEdit = folders.find(f => f.id === id);
+    if (!folderToEdit) return;
+    const newFolders = folders.map((f) => (f.id === id ? { ...f, name } : f));
+    setFolders(newFolders);
+    syncEventFolders(folderToEdit.eventId, newFolders);
+  };
+
+  const addPhotosToFolder = (folderId, photos) => {
+    const folderToEdit = folders.find(f => f.id === folderId);
+    if (!folderToEdit) return;
+    const newFolders = folders.map((f) => (f.id === folderId ? { ...f, photos: [...f.photos, ...photos] } : f));
+    setFolders(newFolders);
+    syncEventFolders(folderToEdit.eventId, newFolders);
+  };
+
+  const deletePhotoFromFolder = (folderId, photoId) => {
+    const folderToEdit = folders.find(f => f.id === folderId);
+    if (!folderToEdit) return;
+    const newFolders = folders.map((f) =>
+      f.id === folderId ? { ...f, photos: f.photos.filter((ph) => ph.id !== photoId) } : f
     );
-  const deletePhotoFromFolder = (folderId, photoId) =>
-    setFolders((p) =>
-      p.map((f) =>
-        f.id === folderId ? { ...f, photos: f.photos.filter((ph) => ph.id !== photoId) } : f
-      )
-    );
+    setFolders(newFolders);
+    syncEventFolders(folderToEdit.eventId, newFolders);
+  };
 
   const currentLabel = navItems.find((n) => n.id === activeTab)?.label ?? '';
 

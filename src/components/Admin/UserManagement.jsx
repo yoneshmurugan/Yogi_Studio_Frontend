@@ -63,7 +63,7 @@ function Breadcrumb({ crumbs }) {
 }
 
 // ── Create Event Form ──────────────────────────────────────────────────────────
-function CreateEventForm({ userId, onSubmit, onCancel }) {
+function CreateEventForm({ user, onSubmit, onCancel }) {
   const [form, setForm] = useState({
     eventName: '', category: '', date: '', package: '', notes: '',
   });
@@ -72,20 +72,15 @@ function CreateEventForm({ userId, onSubmit, onCancel }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!form.eventName || !form.category || !form.package) return;
-    const token = btoa(`${userId}-${form.eventName}-${Date.now()}`)
-      .slice(0, 12)
-      .replace(/[^a-zA-Z0-9]/g, 'X');
+    
+    // We send the raw payload to AdminDashboard, which will POST it to the AWS backend
     onSubmit({
-      id: Date.now(),
-      userId,
+      customerPhone: user.phone,
       eventName: form.eventName,
       category: form.category,
       date: form.date || '',
-      package: form.package,
+      packageType: form.package,
       notes: form.notes,
-      accessToken: token,
-      status: 'pending',
-      downloadedAt: null,
     });
   };
 
@@ -695,8 +690,8 @@ function UserDetail({
         {showCreateEvent && (
           <div className="mb-4">
             <CreateEventForm
-              userId={user.id}
-              onSubmit={(ev) => { onAddEvent(ev); setShowCreateEvent(false); setSelectedEvent(ev); }}
+              user={user}
+              onSubmit={(ev) => { onAddEvent(ev); setShowCreateEvent(false); }}
               onCancel={() => setShowCreateEvent(false)}
             />
           </div>
@@ -824,7 +819,7 @@ export default function UserManagement({
   const [selectedUser, setSelectedUser] = useState(null);
 
   if (selectedUser) {
-    const userEvents = events.filter((e) => e.userId === selectedUser.id);
+    const userEvents = events.filter((e) => e.customerPhone === selectedUser.phone);
     // Keep selectedUser in sync if parent re-renders
     const liveUser = users.find((u) => u.id === selectedUser.id);
     if (!liveUser) { setSelectedUser(null); return null; }
@@ -894,7 +889,7 @@ export default function UserManagement({
       ) : (
         <div className="space-y-2">
           {filtered.map((user) => {
-            const eventCount = events.filter((e) => e.userId === user.id).length;
+            const eventCount = events.filter((e) => e.customerPhone === user.phone).length;
             return (
               <motion.button
                 key={user.id}
