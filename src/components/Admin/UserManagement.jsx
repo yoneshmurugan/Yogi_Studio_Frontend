@@ -1056,7 +1056,7 @@ function UserDetail({
                 </button>
                 <button
                   onClick={() => {
-                    if (deleteTarget.type === 'user') { navigate('/admin/users'); onDeleteUser(user.id); }
+                    if (deleteTarget.type === 'user') { onBack(); onDeleteUser(user.id); }
                     else onDeleteEvent(deleteTarget.id);
                     setDeleteTarget(null);
                   }}

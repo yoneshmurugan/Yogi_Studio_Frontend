@@ -99,8 +99,13 @@ export default function AdminDashboard() {
   // Users
   const addUser    = (u)  => setUsers((p) => [u, ...p]);
   const deleteUser = async (id) => {
-    const userToDel = users.find(u => u.id === id);
-    if (!userToDel) return;
+    console.log("Starting deleteUser for id:", id);
+    const userToDel = users.find(u => String(u.id) === String(id));
+    if (!userToDel) {
+      console.log("userToDel NOT FOUND!");
+      return;
+    }
+    console.log("userToDel found:", userToDel);
 
     // Cascade delete all photos in Firebase Storage for this user's events
     const evIds = events.filter((e) => e.customerPhone === userToDel.phone).map((e) => e.id);
@@ -108,18 +113,25 @@ export default function AdminDashboard() {
     for (const folder of userFolders) {
       if (folder.photos && folder.photos.length > 0) {
         for (const ph of folder.photos) {
-          try { await deleteObject(ref(storage, `events/folders/${folder.id}/${ph.id}`)); } catch(e) { console.error(e); }
+          try { 
+            console.log("Deleting photo:", ph.id);
+            await deleteObject(ref(storage, `events/folders/${folder.id}/${ph.id}`)); 
+          } catch(e) { 
+            console.error("Failed to delete photo:", e); 
+          }
         }
       }
     }
 
+    console.log("Finished deleting photos. Now sending DELETE fetch to backend...");
     try {
       const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/admin/users/${encodeURIComponent(userToDel.phone)}`, {
         method: 'DELETE'
       });
+      console.log("Delete response status:", res.status);
       if (!res.ok) throw new Error("Failed to delete user");
 
-      setUsers((p) => p.filter((u) => u.id !== id));
+      setUsers((p) => p.filter((u) => String(u.id) !== String(id)));
       setEvents((p) => p.filter((e) => e.customerPhone !== userToDel.phone));
       setFolders((p) => p.filter((f) => !evIds.includes(f.eventId)));
     } catch (err) {
@@ -147,7 +159,7 @@ export default function AdminDashboard() {
     }
   };
   const deleteEvent = async (id) => {
-    const eventToDel = events.find(e => e.id === id);
+    const eventToDel = events.find(e => String(e.id) === String(id));
     if (!eventToDel) return;
 
     // Cascade delete all photos in Firebase Storage for this event
@@ -166,8 +178,8 @@ export default function AdminDashboard() {
       });
       if (!res.ok) throw new Error("Failed to delete event");
 
-      setEvents((p) => p.filter((e) => e.id !== id));
-      setFolders((p) => p.filter((f) => f.eventId !== id));
+      setEvents((p) => p.filter((e) => String(e.id) !== String(id)));
+      setFolders((p) => p.filter((f) => String(f.eventId) !== String(id)));
     } catch (err) {
       console.error(err);
       alert("Error deleting event: " + err.message);
