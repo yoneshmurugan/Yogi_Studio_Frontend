@@ -11,7 +11,7 @@ const item = {
   visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 100, damping: 20 } },
 };
 
-export default function FolderGrid({ folders, onSelectFolder }) {
+export default function FolderGrid({ folders, onSelectFolder, customerProfileImage }) {
   return (
     <div className="mb-12">
       <div className="flex items-center justify-between mb-6">
@@ -38,9 +38,9 @@ export default function FolderGrid({ folders, onSelectFolder }) {
             >
               {/* Cover Image */}
               <div className="relative aspect-[4/3] rounded-2xl overflow-hidden mb-3 bg-charcoal/50 border border-white/[0.05] group-hover:border-gold/30 transition-colors">
-                {coverPhoto ? (
+                {coverPhoto || customerProfileImage ? (
                   <img
-                    src={coverPhoto.thumb}
+                    src={folder.coverImage || customerProfileImage || coverPhoto?.url}
                     alt={folder.name}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />

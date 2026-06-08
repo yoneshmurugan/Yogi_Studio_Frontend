@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LogIn, Eye, EyeOff, AlertCircle, Phone, KeyRound, ArrowLeft } from 'lucide-react';
 import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
@@ -31,6 +31,20 @@ export default function LoginPage({ onLoginSuccess, onBack }) {
   const [isLoading, setIsLoading] = useState(false);
 
   const otpInputRef = useRef(null);
+
+  // Clear stale reCAPTCHA instances (important for React Hot Reload)
+  useEffect(() => {
+    if (window.recaptchaVerifier) {
+      try { window.recaptchaVerifier.clear(); } catch (e) {}
+      window.recaptchaVerifier = null;
+    }
+    return () => {
+      if (window.recaptchaVerifier) {
+        try { window.recaptchaVerifier.clear(); } catch (e) {}
+        window.recaptchaVerifier = null;
+      }
+    };
+  }, []);
 
   const setupRecaptcha = () => {
     if (!window.recaptchaVerifier) {
@@ -107,6 +121,7 @@ export default function LoginPage({ onLoginSuccess, onBack }) {
         
         if (response.ok) {
           localStorage.setItem('studio_session_token', data.token);
+          setIsLoading(false);
           onLoginSuccess('customer');
         } else {
           setError(`Server Error: ${data.error}`);

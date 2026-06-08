@@ -10,7 +10,7 @@ function MiniPhotoCard({ photo, type, onRevert }) {
       exit={{ scale: 0.8, opacity: 0 }}
       className="relative group aspect-square rounded-lg overflow-hidden"
     >
-      <img src={photo.thumb} alt={photo.filename} className="w-full h-full object-cover" />
+      <img src={photo.url} alt={photo.filename} className="w-full h-full object-cover" />
       {/* Revert overlay */}
       <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
         <button
@@ -51,7 +51,7 @@ export default function SelectionSummaryDrawer({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/60 z-40 backdrop-blur-sm"
+            className="fixed inset-0 bg-black/60 z-[60] backdrop-blur-sm"
           />
 
           {/* Drawer */}
@@ -60,7 +60,7 @@ export default function SelectionSummaryDrawer({
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 28, stiffness: 280 }}
-            className="fixed bottom-0 left-0 right-0 z-50 glass-strong rounded-t-3xl border-t border-white/10 max-h-[85vh] flex flex-col"
+            className="fixed bottom-0 left-0 right-0 z-[70] glass-strong rounded-t-3xl border-t border-white/10 max-h-[85vh] flex flex-col"
           >
             {/* Handle */}
             <div className="flex justify-center pt-3 pb-2 flex-shrink-0">

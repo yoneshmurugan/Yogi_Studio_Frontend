@@ -1,8 +1,8 @@
-import { useEffect, useCallback, useState } from 'react';
+import { useEffect, useCallback, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Heart, X, ChevronLeft, ChevronRight, ZoomIn, ZoomOut,
-  RotateCcw, Keyboard
+  RotateCcw, Keyboard, MessageSquare, Check, ChevronDown, ChevronUp, Smartphone
 } from 'lucide-react';
 
 // ── Haptic-like burst animation for select/reject ─────────────────────────────
@@ -21,21 +21,32 @@ function ActionBurst({ type }) {
 }
 
 export default function GalleryLightbox({
-  photos, startIndex, selectedIds, rejectedIds,
-  onSelect, onReject, onClose,
+  photos, startIndex,
+  selectedIds, rejectedIds, comments = {},
+  onSelect, onReject, onComment,
+  onClose
 }) {
   const [index, setIndex]     = useState(startIndex);
   const [burst, setBurst]     = useState(null);   // 'select' | 'reject' | null
+  const [commentOpen, setCommentOpen] = useState(false);
+  const [commentText, setCommentText] = useState('');
+  const [showActions, setShowActions] = useState(true);
   const [zoomed, setZoomed]   = useState(false);
   const [showHints, setShowHints] = useState(true);
   const [dir, setDir]         = useState(0);      // -1 prev, 1 next
+
+  // When changing photo, load its comment and close comment box
+  useEffect(() => {
+    setCommentText(comments[photos[index]?.id] || '');
+    setCommentOpen(false);
+  }, [index, photos, comments]);
 
   const photo      = photos[index];
   const isSelected = selectedIds.has(photo.id);
   const isRejected = rejectedIds.has(photo.id);
   const total      = photos.length;
 
-  // Hide keyboard hints after 4s
+  // Hide hints after 4s on all devices
   useEffect(() => {
     const t = setTimeout(() => setShowHints(false), 4000);
     return () => clearTimeout(t);
@@ -70,9 +81,25 @@ export default function GalleryLightbox({
     setTimeout(goNext, 300);
   }, [photo.id, onReject, goNext]);
 
+  // Mobile-friendly double tap detection
+  const lastTapRef = useRef(0);
+  const handleImageTap = useCallback(() => {
+    const now = Date.now();
+    const DOUBLE_TAP_DELAY = 300; // ms
+    if (now - lastTapRef.current < DOUBLE_TAP_DELAY) {
+      handleSelect();
+      lastTapRef.current = 0;
+    } else {
+      lastTapRef.current = now;
+    }
+  }, [handleSelect]);
+
   // Keyboard nav
   useEffect(() => {
     const handler = (e) => {
+      // Ignore keyboard shortcuts if the user is typing in an input field or textarea
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
       if (e.key === 'ArrowRight' || e.key === 'd') goNext();
       if (e.key === 'ArrowLeft'  || e.key === 'a') goPrev();
       if (e.key === 'Escape')                        onClose();
@@ -92,9 +119,9 @@ export default function GalleryLightbox({
     : '';
 
   const slideVariants = {
-    enter: (d) => ({ x: d > 0 ? '30%' : '-30%', opacity: 0, scale: 0.96 }),
-    center: { x: 0, opacity: 1, scale: 1 },
-    exit:  (d) => ({ x: d > 0 ? '-20%' : '20%', opacity: 0, scale: 0.96 }),
+    enter: (d) => ({ x: d > 0 ? '100%' : '-100%', opacity: 0 }),
+    center: { x: 0, opacity: 1 },
+    exit:  (d) => ({ x: d > 0 ? '-100%' : '100%', opacity: 0 }),
   };
 
   return (
@@ -103,63 +130,31 @@ export default function GalleryLightbox({
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.25 }}
-      className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl flex flex-col"
+      className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl flex items-center justify-center"
     >
-      {/* ── Top bar ── */}
-      <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.06] flex-shrink-0">
-        {/* Counter */}
-        <span className="text-silver/60 text-sm font-mono">
-          <span className="text-white">{index + 1}</span> / {total}
-        </span>
-
-        {/* Status pill */}
-        <AnimatePresence mode="wait">
-          {isSelected && (
-            <motion.div key="sel" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.8, opacity: 0 }}
-              className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-gold/15 border border-gold/30">
-              <Heart className="w-3.5 h-3.5 text-gold fill-current" />
-              <span className="text-gold text-xs font-medium">Selected</span>
-            </motion.div>
-          )}
-          {isRejected && (
-            <motion.div key="rej" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.8, opacity: 0 }}
-              className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-500/15 border border-red-500/30">
-              <X className="w-3.5 h-3.5 text-red-400" />
-              <span className="text-red-400 text-xs font-medium">Rejected</span>
-            </motion.div>
-          )}
-          {!isSelected && !isRejected && (
-            <motion.div key="none" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="px-3 py-1 rounded-full bg-white/5 border border-white/10">
-              <span className="text-silver/40 text-xs">Unreviewed</span>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Right actions */}
-        <div className="flex items-center gap-2">
-          <button onClick={() => setZoomed((z) => !z)}
-            className="p-2 rounded-lg text-silver/40 hover:text-white hover:bg-white/5 transition-colors">
-            {zoomed ? <ZoomOut className="w-4 h-4" /> : <ZoomIn className="w-4 h-4" />}
-          </button>
-          <button onClick={onClose}
-            className="p-2 rounded-lg text-silver/40 hover:text-white hover:bg-white/5 transition-colors">
-            <X className="w-5 h-5" />
-          </button>
-        </div>
+      {/* ── Floating Top Actions ── */}
+      <div className="absolute top-4 right-4 md:top-6 md:right-8 z-50 flex items-center gap-2">
+        <button onClick={() => setZoomed((z) => !z)}
+          className="p-3 rounded-full bg-black/40 border border-white/10 text-white hover:bg-white/10 transition-colors shadow-2xl backdrop-blur-md">
+          {zoomed ? <ZoomOut className="w-5 h-5" /> : <ZoomIn className="w-5 h-5" />}
+        </button>
+        <button onClick={onClose}
+          className="p-3 rounded-full bg-black/40 border border-white/10 text-white hover:bg-white/10 transition-colors shadow-2xl backdrop-blur-md">
+          <X className="w-6 h-6" />
+        </button>
       </div>
 
       {/* ── Main image area ── */}
-      <div className="flex-1 relative flex items-center justify-center overflow-hidden min-h-0">
+      <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
 
         {/* Prev arrow */}
         <button onClick={goPrev}
-          className="absolute left-4 z-20 w-12 h-12 rounded-full glass-strong flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 transition-all">
+          className="absolute left-4 z-20 w-12 h-12 rounded-full glass-strong hidden sm:flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 transition-all">
           <ChevronLeft className="w-6 h-6" />
         </button>
 
         {/* Photo */}
-        <AnimatePresence mode="wait" custom={dir}>
+        <AnimatePresence mode="popLayout" custom={dir}>
           <motion.div
             key={photo.id}
             custom={dir}
@@ -167,8 +162,8 @@ export default function GalleryLightbox({
             initial="enter"
             animate="center"
             exit="exit"
-            transition={{ duration: 0.3, ease: 'easeInOut' }}
-            className="relative flex items-center justify-center w-full h-full px-20"
+            transition={{ type: 'tween', ease: 'easeOut', duration: 0.25 }}
+            className="absolute inset-0 flex items-center justify-center w-full h-full"
           >
             {/* Burst animation */}
             <AnimatePresence>
@@ -176,13 +171,31 @@ export default function GalleryLightbox({
             </AnimatePresence>
 
             <motion.img
-              src={photo.src}
+              src={photo.url}
               alt={photo.filename}
               animate={zoomed ? { scale: 1.6 } : { scale: 1 }}
               transition={{ duration: 0.3 }}
-              className={`max-w-full max-h-full object-contain rounded-xl select-none transition-all duration-300 ${borderColor}`}
-              style={{ maxHeight: 'calc(100vh - 220px)' }}
+              className={`max-w-full max-h-full object-contain rounded-xl select-none cursor-grab active:cursor-grabbing transition-all duration-300 ${borderColor}`}
+              style={{ maxHeight: '100%', touchAction: 'none' }}
               draggable={false}
+              drag={!zoomed}
+              dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
+              dragElastic={0.7}
+              onTap={handleImageTap}
+              onDragEnd={(e, { offset }) => {
+                if (zoomed) return;
+                const swipeX = Math.abs(offset.x);
+                const swipeY = Math.abs(offset.y);
+                
+                if (swipeX > swipeY && swipeX > 50) {
+                  // Horizontal Swipe
+                  if (offset.x > 50) goPrev();
+                  else if (offset.x < -50) goNext();
+                } else if (swipeY > swipeX && swipeY > 80) {
+                  // Vertical Swipe (Up or Down) -> Reject
+                  handleReject();
+                }
+              }}
             />
 
             {/* Select/Reject state overlay on image */}
@@ -205,23 +218,26 @@ export default function GalleryLightbox({
 
         {/* Next arrow */}
         <button onClick={goNext}
-          className="absolute right-4 z-20 w-12 h-12 rounded-full glass-strong flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 transition-all">
+          className="absolute right-4 z-20 w-12 h-12 rounded-full glass-strong hidden sm:flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 transition-all">
           <ChevronRight className="w-6 h-6" />
         </button>
       </div>
 
-      {/* ── Bottom action bar ── */}
-      <div className="flex-shrink-0 px-4 py-4 border-t border-white/[0.06]">
-        <div className="max-w-lg mx-auto">
-          {/* Action buttons */}
-          <div className="flex items-center justify-center gap-2 sm:gap-4 mb-4">
-
+      {/* ── Floating Bottom Actions ── */}
+      <AnimatePresence>
+        {showActions && (
+          <motion.div
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 100, opacity: 0 }}
+            className="absolute bottom-6 md:bottom-10 left-1/2 -translate-x-1/2 z-50 flex items-center justify-center gap-1.5 sm:gap-4 p-1.5 sm:p-3 bg-black/60 backdrop-blur-xl border border-white/10 rounded-[2rem] sm:rounded-3xl shadow-2xl"
+          >
             {/* Reject */}
             <motion.button
               onClick={handleReject}
               whileHover={{ scale: 1.08 }}
               whileTap={{ scale: 0.92 }}
-              className={`flex items-center gap-1.5 sm:gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-2xl font-medium text-xs sm:text-sm transition-all
+              className={`flex items-center gap-1 sm:gap-2 px-3 sm:px-6 py-2 sm:py-3 rounded-2xl font-medium text-xs sm:text-sm transition-all
                 ${isRejected
                   ? 'bg-red-500 text-white shadow-lg shadow-red-500/30 border border-red-400'
                   : 'bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500/20'}`}
@@ -232,16 +248,67 @@ export default function GalleryLightbox({
 
             {/* Skip */}
             <button onClick={goNext}
-              className="px-3 sm:px-5 py-2.5 sm:py-3 rounded-2xl border border-white/10 text-silver/50 text-xs sm:text-sm hover:text-white hover:border-white/20 transition-all">
+              className="px-2.5 sm:px-5 py-2 sm:py-3 rounded-2xl border border-white/10 text-silver/50 text-xs sm:text-sm hover:text-white hover:border-white/20 transition-all">
               Skip →
             </button>
+
+            {/* Comment */}
+            <div className="relative z-50">
+              <button
+                disabled={!isSelected}
+                onClick={() => setCommentOpen(!commentOpen)}
+                title={!isSelected ? "Select the photo first to add a note" : ""}
+                className={`px-2.5 sm:px-5 py-2 sm:py-3 rounded-2xl border transition-all flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm
+                  ${!isSelected
+                    ? 'opacity-40 cursor-not-allowed border-white/5 text-silver/40'
+                    : comments[photo.id] 
+                      ? 'border-blue-400/50 text-blue-400 bg-blue-400/10 hover:bg-blue-400/20' 
+                      : 'border-white/10 text-silver/50 hover:text-white hover:border-white/20'}`}
+              >
+                <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="hidden sm:inline">{comments[photo.id] ? 'Edit Note' : 'Add Note'}</span>
+              </button>
+
+              <AnimatePresence>
+                {commentOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                    className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 w-64 p-3 rounded-2xl glass-strong border border-white/10 shadow-2xl origin-bottom"
+                  >
+                    <textarea
+                      autoFocus
+                      value={commentText}
+                      onChange={(e) => setCommentText(e.target.value)}
+                      placeholder="Add a note for the photographer..."
+                      className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm text-white placeholder:text-silver/40 focus:outline-none focus:border-gold/50 resize-none h-24 mb-2"
+                    />
+                    <div className="flex gap-2">
+                      <button 
+                        onClick={() => { setCommentText(''); onComment && onComment(photo.id, ''); setCommentOpen(false); }}
+                        className="flex-1 py-2 rounded-lg border border-white/10 text-xs text-silver/50 hover:bg-white/5 hover:text-white"
+                      >
+                        Clear
+                      </button>
+                      <button 
+                        onClick={() => { onComment && onComment(photo.id, commentText); setCommentOpen(false); }}
+                        className="flex-1 py-2 rounded-lg bg-gold text-black text-xs font-semibold hover:bg-gold/90"
+                      >
+                        Save
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
 
             {/* Select */}
             <motion.button
               onClick={handleSelect}
               whileHover={{ scale: 1.08 }}
               whileTap={{ scale: 0.92 }}
-              className={`flex items-center gap-1.5 sm:gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-2xl font-medium text-xs sm:text-sm transition-all
+              className={`flex items-center gap-1 sm:gap-2 px-3 sm:px-6 py-2 sm:py-3 rounded-2xl font-medium text-xs sm:text-sm transition-all
                 ${isSelected
                   ? 'bg-gold text-black shadow-lg shadow-gold/30 border border-gold'
                   : 'bg-gold/10 border border-gold/30 text-gold hover:bg-gold/20'}`}
@@ -249,27 +316,30 @@ export default function GalleryLightbox({
               <Heart className={`w-4 h-4 sm:w-5 sm:h-5 ${isSelected ? 'text-black fill-current' : ''}`} />
               {isSelected ? 'Selected ✓' : 'Select'}
             </motion.button>
-          </div>
 
-          {/* Thumbnail filmstrip */}
-          <div className="flex gap-1.5 overflow-x-auto hide-scrollbar justify-center">
-            {photos.map((p, i) => {
-              const sel = selectedIds.has(p.id);
-              const rej = rejectedIds.has(p.id);
-              return (
-                <button
-                  key={p.id}
-                  onClick={() => { setDir(i > index ? 1 : -1); setIndex(i); setZoomed(false); }}
-                  className={`flex-shrink-0 w-10 h-10 rounded-lg overflow-hidden border-2 transition-all
-                    ${i === index ? 'border-white scale-110' : sel ? 'border-gold' : rej ? 'border-red-500' : 'border-transparent opacity-50 hover:opacity-80'}`}
-                >
-                  <img src={p.thumb} alt="" className="w-full h-full object-cover" draggable={false} />
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </div>
+            {/* Hide Toggle */}
+            <div className="w-px h-8 bg-white/10 mx-0.5 sm:mx-1" />
+            <button onClick={() => setShowActions(false)}
+              className="p-2 sm:p-2.5 rounded-full hover:bg-white/10 text-silver/50 hover:text-white transition-colors" title="Hide Toolbar">
+              <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5" />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {!showActions && (
+          <motion.button
+            initial={{ y: 50, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 50, opacity: 0 }}
+            onClick={() => setShowActions(true)}
+            className="absolute bottom-6 left-1/2 -translate-x-1/2 z-50 p-3 rounded-full bg-black/60 backdrop-blur-xl border border-white/10 text-white shadow-2xl hover:bg-white/10 transition-colors"
+          >
+            <ChevronUp className="w-5 h-5" />
+          </motion.button>
+        )}
+      </AnimatePresence>
 
       {/* ── Keyboard hints tooltip ── */}
       <AnimatePresence>
@@ -278,10 +348,16 @@ export default function GalleryLightbox({
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}
-            className="fixed bottom-28 left-1/2 -translate-x-1/2 flex items-center gap-2 px-4 py-2 rounded-full glass-strong border border-white/10 text-silver/50 text-xs"
+            className="fixed top-20 left-1/2 -translate-x-1/2 flex flex-col md:flex-row items-center gap-2 md:gap-3 px-4 md:px-6 py-2 md:py-2.5 rounded-2xl md:rounded-full glass-strong border border-white/10 text-silver/50 text-xs md:text-sm font-medium text-center z-50 pointer-events-none w-[90%] md:w-auto"
           >
-            <Keyboard className="w-3 h-3" />
-            <span>← → Navigate · S Select · R Reject · Esc Close</span>
+            <div className="hidden md:flex items-center gap-3 whitespace-nowrap">
+              <Keyboard className="w-4 h-4" />
+              <span>← → Navigate · S Select · R Reject · Esc Close</span>
+            </div>
+            <div className="flex md:hidden items-center justify-center gap-2">
+              <Smartphone className="w-4 h-4 flex-shrink-0" />
+              <span>Double tap to select and swipe up or down to reject.</span>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

@@ -29,7 +29,7 @@ function PhotoCard({ photo, isSelected, isRejected, onToggleSelect, onToggleReje
       {/* Main image — click opens lightbox */}
       <div className="w-full h-full">
         <motion.img
-          src={photo.thumb}
+          src={photo.url}
           alt={photo.filename}
           loading="lazy"
           className={`w-full h-full object-cover transition-all duration-300
@@ -97,11 +97,14 @@ export default function PhotoGrid({ photos, selectedIds, rejectedIds, onToggleSe
     return true;
   });
 
+  const folderSelectedCount = photos.filter(p => selectedIds.has(p.id)).length;
+  const folderRejectedCount = photos.filter(p => rejectedIds.has(p.id)).length;
+
   const counts = {
     all:        photos.length,
-    selected:   selectedIds.size,
-    rejected:   rejectedIds.size,
-    unreviewed: photos.length - selectedIds.size - rejectedIds.size,
+    selected:   folderSelectedCount,
+    rejected:   folderRejectedCount,
+    unreviewed: photos.length - folderSelectedCount - folderRejectedCount,
   };
 
   return (
@@ -143,7 +146,7 @@ export default function PhotoGrid({ photos, selectedIds, rejectedIds, onToggleSe
             variants={container}
             initial="hidden"
             animate="visible"
-            className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3"
+            className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-1.5 md:gap-3"
           >
             {filteredPhotos.map((photo) => (
               <PhotoCard

@@ -9,7 +9,7 @@ export default function WelcomeHeader({ coupleName, eventName, eventDate, eventT
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, ease: 'easeOut' }}
-      className="text-center mb-12"
+      className="text-center mb-8 md:mb-12 px-4"
     >
       {/* Tag line */}
       <motion.p
@@ -34,17 +34,17 @@ export default function WelcomeHeader({ coupleName, eventName, eventDate, eventT
 
       {/* Event meta pills */}
       <motion.div
-        className="flex flex-wrap items-center justify-center gap-3 mt-4 mb-5"
+        className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mt-4 mb-5"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.6 }}
       >
         {[
-          { icon: CalendarDays, label: eventDate },
+          { icon: CalendarDays, label: eventDate ? new Date(eventDate).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }) : null },
+          { icon: Package, label: eventType },
           { icon: Camera, label: photographerName },
-          { icon: Package, label: pkg },
-        ].map(({ icon: Icon, label }) => label ? (
-          <span key={label} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full glass border border-white/[0.08] text-silver/60 text-xs">
+        ].map(({ icon: Icon, label }, idx) => label ? (
+          <span key={idx} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full glass border border-white/[0.08] text-silver/60 text-xs">
             <Icon className="w-3 h-3" />
             {label}
           </span>
@@ -66,12 +66,12 @@ export default function WelcomeHeader({ coupleName, eventName, eventDate, eventT
 
       {/* Photographer note */}
       <motion.p
-        className="text-silver/40 text-sm max-w-xl mx-auto mt-5 leading-relaxed"
+        className="text-silver/40 text-xs sm:text-sm max-w-xl mx-auto mt-5 leading-relaxed px-4"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1 }}
       >
-        Browse your photos and use ❤️ to select the ones you love and ✕ to reject the ones you don't. Click any photo for fullscreen view.
+        Tap any photo for fullscreen view. Double tap to select and swipe up or down to reject.
       </motion.p>
     </motion.div>
   );

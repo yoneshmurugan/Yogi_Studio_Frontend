@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import Navigation from './components/Navigation/Navigation';
 import LandingPage from './components/Landing/LandingPage';
@@ -14,43 +14,36 @@ const pageTransition = {
 };
 
 function App() {
-  const [activeView, setActiveView] = useState('landing');
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const handleNavigateHome = () => {
-    setActiveView('landing');
+    navigate('/');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleLogin = () => {
-    setActiveView('login');
+    navigate('/login');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleLoginSuccess = (role) => {
-    // role is 'admin' or 'customer'
-    setActiveView(role);
+    if (role === 'admin') {
+      navigate('/admin/overview');
+    } else {
+      const redirectUrl = sessionStorage.getItem('redirectUrl');
+      if (redirectUrl) {
+        sessionStorage.removeItem('redirectUrl');
+        navigate(redirectUrl);
+      } else {
+        navigate('/client');
+      }
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const renderView = () => {
-    switch (activeView) {
-      case 'landing':
-        return <LandingPage />;
-      case 'login':
-        return <LoginPage onLoginSuccess={handleLoginSuccess} onBack={handleNavigateHome} />;
-      case 'admin':
-        return <AdminDashboard />;
-      case 'customer':
-        return <CustomerPortal />;
-      default:
-        return <LandingPage />;
-    }
-  };
-
-  // Nav only on landing; admin/customer have their own internal navigation
-  const showNav    = activeView === 'landing';
-  // Both admin and customer take full control of the screen
-  const isFullPage = activeView === 'admin' || activeView === 'customer';
+  const isFullPage = location.pathname.startsWith('/admin') || location.pathname.startsWith('/client');
+  const showNav = location.pathname === '/' || location.pathname === '/login';
 
   return (
     <div className={`${isFullPage ? '' : 'min-h-screen bg-black text-white'}`}>
@@ -59,28 +52,23 @@ function App() {
       )}
 
       {isFullPage ? (
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeView}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            {activeView === 'admin'    && <AdminDashboard />}
-            {activeView === 'customer' && <CustomerPortal />}
-          </motion.div>
-        </AnimatePresence>
+        <Routes location={location} key={location.pathname.split('/')[1]}>
+          <Route path="/admin/*" element={<AdminDashboard />} />
+          <Route path="/client/*" element={<CustomerPortal />} />
+        </Routes>
       ) : (
         <AnimatePresence mode="wait">
           <motion.main
-            key={activeView}
+            key={location.pathname}
             initial={pageTransition.initial}
             animate={pageTransition.animate}
             exit={pageTransition.exit}
             transition={pageTransition.transition}
           >
-            {renderView()}
+            <Routes location={location} key={location.pathname}>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/login" element={<LoginPage onLoginSuccess={handleLoginSuccess} onBack={handleNavigateHome} />} />
+            </Routes>
           </motion.main>
         </AnimatePresence>
       )}

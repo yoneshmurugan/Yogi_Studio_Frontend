@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { CheckCircle2, Heart, X, Camera, Star } from 'lucide-react';
 
-export default function SuccessScreen({ selectedCount, rejectedCount, totalCount, coupleName }) {
+export default function SuccessScreen({ selectedCount, rejectedCount, totalCount, coupleName, onEditResponse }) {
   const stars = Array.from({ length: 5 });
 
   return (
@@ -95,7 +95,7 @@ export default function SuccessScreen({ selectedCount, rejectedCount, totalCount
 
       {/* Studio message */}
       <motion.div
-        className="glass rounded-2xl p-6 max-w-sm border border-white/[0.06]"
+        className="glass rounded-2xl p-6 max-w-sm border border-white/[0.06] mb-6"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.9 }}
@@ -107,8 +107,16 @@ export default function SuccessScreen({ selectedCount, rejectedCount, totalCount
         <p className="text-silver/60 text-sm leading-relaxed italic">
           "It was an absolute honour to capture your special day. We can't wait to deliver your final album."
         </p>
-        <p className="text-silver/30 text-xs mt-2">— Yogi Nesh</p>
+        <p className="text-silver/30 text-xs mt-2 mb-4">— Yogi Balu</p>
+        
+        <div className="pt-4 border-t border-white/[0.05]">
+          <p className="text-silver/50 text-xs mb-1">For any further edits, please contact:</p>
+          <a href="tel:+919842775676" className="inline-flex items-center gap-1.5 text-gold hover:text-white transition-colors text-sm font-medium">
+            +91 98427 75676
+          </a>
+        </div>
       </motion.div>
+
     </motion.div>
   );
 }
