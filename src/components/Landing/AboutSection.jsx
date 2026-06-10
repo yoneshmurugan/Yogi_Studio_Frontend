@@ -4,6 +4,9 @@ import { MapPin, Phone } from 'lucide-react';
 import ScrollReveal from '../ui/ScrollReveal';
 import yogiLogo from '../../assets/yogi-logo-removebg-preview.png';
 import ImageSwiper from './ImageSwiper';
+import img1 from '../../assets/yogi_balu (1).png';
+import img2 from '../../assets/yogi_balu (4).jpg';
+import img3 from '../../assets/yogi_balu (2).jpg';
 
 const InstagramIcon = ({ className }) => (
   <svg className={className} fill="currentColor" viewBox="0 0 24 24">
@@ -24,9 +27,9 @@ const WhatsappIcon = ({ className }) => (
 );
 
 // Placeholder images until you add your own
-const aboutImg1 = 'src/assets/yogi_balu (1).png';
-const aboutImg2 = 'src/assets/yogi_balu (4).jpg';
-const aboutImg3 = 'src/assets/yogi_balu (2).jpg';
+const aboutImg1 = img1;
+const aboutImg2 = img2;
+const aboutImg3 = img3;
 const aboutImg4 = '';
 const aboutImg5 = '';
 

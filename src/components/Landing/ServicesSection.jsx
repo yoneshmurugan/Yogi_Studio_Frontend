@@ -2,36 +2,43 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import ScrollReveal from '../ui/ScrollReveal';
 
+import img1 from '../../assets/AG_00223.JPG';
+import img2 from '../../assets/C_0528.jpg';
+import img3 from '../../assets/AG_00153.JPG';
+import img4 from '../../assets/C-1670copy.jpg';
+import img5 from '../../assets/14.jpg';
+import img6 from '../../assets/yonesh-48.JPG';
+
 const services = [
   {
     title: 'Cinematic Wedding Films',
     description: 'Beautifully crafted wedding highlights — film-grade storytelling that feels like a feature.',
-    image: 'src/assets/AG_00223.JPG',
+    image: img1,
   },
   {
     title: 'Candid Photography',
     description: 'Capturing raw emotions & real moments with an editorial, unposed eye.',
-    image: 'src/assets/C_0528.jpg',
+    image: img2,
   },
   {
     title: 'Coming of Age Ceremonies',
     description: 'Beautifully documenting cultural milestones like Half-Saree functions with warmth, elegance, and tradition.',
-    image: 'src/assets/AG_00153.JPG',
+    image: img3,
   },
   {
     title: 'Traditional Photography & Videography',
     description: 'Classic elegance — time-honoured rituals documented with grace and precision.',
-    image: 'src/assets/C-1670copy.jpg',
+    image: img4,
   },
   {
     title: 'Pre & Post-Wedding Shoots',
     description: 'Romantic & artistic storytelling before and after the big day.',
-    image: 'src/assets/14.jpg',
+    image: img5,
   },
   {
     title: 'Baby & Family Portraits',
     description: 'Treasured milestones — newborns, maternity, couples, and family gatherings.',
-    image: 'src/assets/yonesh-48.JPG',
+    image: img6,
   },
 ];
 

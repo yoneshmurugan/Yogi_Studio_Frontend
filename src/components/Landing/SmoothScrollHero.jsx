@@ -9,6 +9,11 @@ import {
 import { FiArrowRight, FiMapPin } from "react-icons/fi";
 import { useRef, useEffect } from "react";
 import yogiLogo from "../../assets/yogi-logo-removebg-preview.png";
+import imgHero from "../../assets/Hero.jpg";
+import imgWedding from "../../assets/IMG_5775.JPG";
+import imgVideo1 from "../../assets/2406.JPG";
+import imgEvent from "../../assets/ALA_7149.jpg";
+import vidSample from "../../assets/ReelIMG_9343.mp4";
 import SplashCursor from "./SplashCursor";
 
 // Inject shimmer / particle keyframes once
@@ -117,7 +122,7 @@ const CenterImage = () => {
         backgroundSize,
         opacity,
         backgroundImage:
-          "url(src/assets/Hero.jpg)",
+          `url(${imgHero})`,
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
       }}
@@ -136,21 +141,21 @@ const ParallaxImages = () => {
   return (
     <div className="mx-auto max-w-5xl px-4 pt-[200px] pointer-events-none relative z-10">
       <ParallaxMedia
-        src="src/assets/IMG_5775.JPG"
+        src={imgWedding}
         alt="Wedding photography"
         start={-200}
         end={200}
         className="w-1/3 rounded-xl shadow-[0_0_40px_rgba(0,0,0,0.5)]"
       />
       <ParallaxMedia
-        src="src/assets/2406.JPG"
+        src={imgVideo1}
         alt="Sample Video 1"
         start={200}
         end={-250}
         className="mx-auto w-2/3 rounded-xl shadow-[0_0_40px_rgba(0,0,0,0.5)]"
       />
       <ParallaxMedia
-        src="src/assets/ALA_7149.jpg"
+        src={imgEvent}
         alt="Event photography"
         start={-200}
         end={200}
@@ -158,7 +163,7 @@ const ParallaxImages = () => {
       />
       <ParallaxMedia
         isVideo={true}
-        src="src/assets/ReelIMG_9343.mp4"
+        src={vidSample}
         alt="Sample Video 2"
         start={0}
         end={-500}
