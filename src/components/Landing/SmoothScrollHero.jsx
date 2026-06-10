@@ -9,6 +9,7 @@ import {
 import { FiArrowRight, FiMapPin } from "react-icons/fi";
 import { useRef, useEffect } from "react";
 import yogiLogo from "../../assets/yogi-logo-removebg-preview.png";
+import SplashCursor from "./SplashCursor";
 
 // Inject shimmer / particle keyframes once
 const shimmerCSS = `
@@ -74,7 +75,7 @@ export const SmoothScrollHero = () => {
   );
 };
 
-const SECTION_HEIGHT = 1500;
+const SECTION_HEIGHT = 2500;
 
 const Hero = () => {
   return (
@@ -110,17 +111,24 @@ const CenterImage = () => {
 
   return (
     <motion.div
-      className="sticky top-0 h-screen w-full"
+      className="sticky top-0 h-screen w-full overflow-hidden relative"
       style={{
         clipPath,
         backgroundSize,
         opacity,
         backgroundImage:
-          "url(/src/assets/Hero.jpg)",
+          "url(src/assets/Hero.jpg)",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
       }}
-    />
+    >
+      {/* Watermark Logo */}
+      <img 
+        src={yogiLogo} 
+        alt="Yogi Studio Watermark" 
+        className="absolute bottom-6 right-6 md:bottom-12 md:right-12 w-32 md:w-40 opacity-[0.3] pointer-events-none select-none drop-shadow-md" 
+      />
+    </motion.div>
   );
 };
 
@@ -128,21 +136,21 @@ const ParallaxImages = () => {
   return (
     <div className="mx-auto max-w-5xl px-4 pt-[200px] pointer-events-none relative z-10">
       <ParallaxMedia
-        src="src/assets/ALA_7149.jpg"
+        src="src/assets/IMG_5775.JPG"
         alt="Wedding photography"
         start={-200}
         end={200}
         className="w-1/3 rounded-xl shadow-[0_0_40px_rgba(0,0,0,0.5)]"
       />
       <ParallaxMedia
-        src="src/assets/IMG_5775.JPG"
+        src="src/assets/2406.JPG"
         alt="Sample Video 1"
         start={200}
         end={-250}
         className="mx-auto w-2/3 rounded-xl shadow-[0_0_40px_rgba(0,0,0,0.5)]"
       />
       <ParallaxMedia
-        src="/src/assets/DK_433.jpg"
+        src="src/assets/ALA_7149.jpg"
         alt="Event photography"
         start={-200}
         end={200}
@@ -150,7 +158,7 @@ const ParallaxImages = () => {
       />
       <ParallaxMedia
         isVideo={true}
-        src="src/assets/IMG_9343.MP4"
+        src="src/assets/ReelIMG_9343.mp4"
         alt="Sample Video 2"
         start={0}
         end={-500}
@@ -211,10 +219,21 @@ const PARTICLES = Array.from({ length: 18 }, (_, i) => ({
 
 const StudioDetails = () => {
   return (
-    <section
-      id="studio-details"
-      className="relative mx-auto max-w-5xl px-4 py-48 text-white flex flex-col items-center text-center z-20 overflow-hidden"
-    >
+    <div className="relative w-full overflow-hidden">
+      <SplashCursor 
+        COLOR="#d4af37" 
+        SIM_RESOLUTION={64}
+        DYE_RESOLUTION={512}
+        SPLAT_RADIUS={0.08}
+        SPLAT_FORCE={3000}
+        DENSITY_DISSIPATION={4.5}
+        VELOCITY_DISSIPATION={3.0}
+        PRESSURE_ITERATIONS={10}
+      />
+      <section
+        id="studio-details"
+        className="relative mx-auto max-w-5xl px-4 py-48 text-white flex flex-col items-center text-center z-20"
+      >
       {/* ── Ambient radial glow behind logo ── */}
       <div
         aria-hidden
@@ -340,10 +359,20 @@ const StudioDetails = () => {
         initial={{ y: 48, opacity: 0 }}
         whileInView={{ y: 0, opacity: 1 }}
         transition={{ ease: "easeInOut", duration: 0.75, delay: 0.2 }}
-        className="mb-8 text-4xl md:text-6xl font-serif text-[#d4af37] font-light drop-shadow-lg"
+        className="mb-0 text-4xl md:text-6xl font-serif text-[#d4af37] font-light drop-shadow-lg"
       >
         Yogi Digital Studio
       </motion.h1>
+      <motion.div
+        initial={{ y: 48, opacity: 0 }}
+        whileInView={{ y: 0, opacity: 1 }}
+        transition={{ ease: "easeInOut", duration: 0.75, delay: 0.3 }}
+        className="mt-4 mb-12 block"
+      >
+        <span className="text-[#d4af37] opacity-80 tracking-[0.4em] text-xs uppercase">
+          Since 2001
+        </span>
+      </motion.div>
       <motion.p
         initial={{ y: 48, opacity: 0 }}
         whileInView={{ y: 0, opacity: 1 }}
@@ -354,6 +383,7 @@ const StudioDetails = () => {
         Experience the opulent digital studio — crafting future memories through high-fashion wedding photography &amp; cinematic videography.
       </motion.p>
     </section>
+    </div>
   );
 };
 

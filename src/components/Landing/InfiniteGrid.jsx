@@ -153,15 +153,27 @@ const InfiniteDraggableGrid = ({
       momentumRef.current.y = applyDamping(momentumRef.current.y, deltaTime);
       if (Math.abs(momentumRef.current.x) < 0.01) momentumRef.current.x = 0;
       if (Math.abs(momentumRef.current.y) < 0.01) momentumRef.current.y = 0;
-      setTargetOffset(prev => ({
-        x: prev.x + momentumRef.current.x,
-        y: prev.y + momentumRef.current.y
-      }));
+      
+      setTargetOffset(prev => {
+        if (momentumRef.current.x === 0 && momentumRef.current.y === 0) return prev;
+        return {
+          x: prev.x + momentumRef.current.x,
+          y: prev.y + momentumRef.current.y
+        };
+      });
     }
-    setOffset(prev => ({
-      x: smoothStep(prev.x, targetOffset.x, deltaTime, isDraggingRef.current ? 0.4 : 0.18),
-      y: smoothStep(prev.y, targetOffset.y, deltaTime, isDraggingRef.current ? 0.4 : 0.18)
-    }));
+    
+    setOffset(prev => {
+      const target = targetOffset;
+      const speed = isDraggingRef.current ? 0.4 : 0.18;
+      const nextX = smoothStep(prev.x, target.x, deltaTime, speed);
+      const nextY = smoothStep(prev.y, target.y, deltaTime, speed);
+      
+      if (Math.abs(nextX - prev.x) < 0.01 && Math.abs(nextY - prev.y) < 0.01) {
+        return prev; // Skip React state update if not moving
+      }
+      return { x: nextX, y: nextY };
+    });
   }, [targetOffset]));
 
   const handleDragStart = useCallback(e => {
@@ -335,25 +347,19 @@ const InfiniteDraggableGrid = ({
   );
 };
 
-// Local gallery built from Yogi Studio assets
-const LOCAL_GALLERY = [
-  { id: 0, src: "src/assets/002.jpg", title: "Yogi Studio Photo 1" },
-  { id: 1, src: "src/assets/01.jpg", title: "Yogi Studio Photo 2" },
-  { id: 2, src: "src/assets/0G1A7726.jpg", title: "Yogi Studio Photo 3" },
-  { id: 3, src: "src/assets/IMG_9561.JPG", title: "Yogi Studio Photo 4" },
-  { id: 4, src: "src/assets/IMG-20240423-WA0055.jpg", title: "Yogi Studio Photo 5" },
-  { id: 5, src: "src/assets/IMG_9561.JPG", title: "Yogi Studio Photo 6" },
-  { id: 6, src: "src/assets/IMG_9561.JPG", title: "Yogi Studio Photo 7" },
-  { id: 7, src: "src/assets/IMG-20240503-WA0022.jpg", title: "Yogi Studio Photo 8" },
-  { id: 8, src: "src/assets/IMG-20240503-WA0027.jpg", title: "Yogi Studio Photo 9" },
-  { id: 9, src: "src/assets/yogi-card-2.jpg", title: "Yogi Studio Photo 10" },
-  { id: 10, src: "src/assets/yogi-card.jpg", title: "Yogi Studio Photo 11" }
-];
+export default function Infinitegrid({ photos = [] }) {
+  // Use a maximum of 20 random photos to prevent excessive network/cache usage 
+  // as the user drags infinitely. It will loop through these gracefully.
+  const gallery = React.useMemo(() => {
+    if (photos.length === 0) return [];
+    const shuffled = [...photos].sort(() => 0.5 - Math.random());
+    const subset = shuffled.slice(0, 20);
+    return subset.map((p, i) => ({ id: p.id || i, src: p.url, title: p.title || `Photo ${i}` }));
+  }, [photos]);
 
-export default function Infinitegrid() {
   return (
     <div className="w-full h-full bg-zinc-950 overflow-hidden m-0 min-h-[400px]">
-      <InfiniteDraggableGrid gallery={LOCAL_GALLERY} />
+      <InfiniteDraggableGrid gallery={gallery} />
     </div>
   );
 }

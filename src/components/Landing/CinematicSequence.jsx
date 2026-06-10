@@ -1,26 +1,32 @@
 import { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 
+import img0 from '../../assets/A46A5802 copy.jpg';
+import img1 from '../../assets/C-2285 copy.jpg';
+import img2 from '../../assets/CM_1694.JPG';
+import img3 from '../../assets/IMG_9561.JPG';
+import img4 from '../../assets/0G1A7726.jpg';
+
 const sequenceData = [
   {
-    title: "Cinematic Wedding Films",
-    image: "src/assets/0G1A7726.jpg"
-  },
-  {
-    title: "Candid Photography",
-    image: ""
+    title: "Coming of Age Ceremony",
+    image: img0
   },
   {
     title: "Traditional Photography & Videography",
-    image: "src/assets/IMG_9561.JPG"
+    image: img1
+  },
+  {
+    title: "Candid Photography",
+    image: img2
   },
   {
     title: "Pre & Post-Wedding Shoots",
-    image: "src/assets/IMG-20240503-WA0022.jpg"
+    image: img3
   },
   {
-    title: "Baby & Family Portraits",
-    image: "src/assets/IMG-20240423-WA0055.jpg"
+    title: "Cinematic Wedding Films",
+    image: img4
   }
 ];
 
@@ -55,11 +61,11 @@ const TEXT_Y = [
 
 // IMAGE opacity: each stacks on top; once faded in it stays
 const IMG_OPACITY = [
-  { input: [0, 1], output: [1, 1] },       // always visible (base layer)
-  { input: [0.16, 0.20], output: [0, 1] },
-  { input: [0.36, 0.40], output: [0, 1] },
-  { input: [0.56, 0.60], output: [0, 1] },
-  { input: [0.76, 0.80], output: [0, 1] },
+  { input: [0, 1], output: [1, 1] },
+  { input: [0, 0.16, 0.20, 1], output: [0, 0, 1, 1] },
+  { input: [0, 0.36, 0.40, 1], output: [0, 0, 1, 1] },
+  { input: [0, 0.56, 0.60, 1], output: [0, 0, 1, 1] },
+  { input: [0, 0.76, 0.80, 1], output: [0, 0, 1, 1] },
 ];
 
 // ── Per-item hook components ──
@@ -71,7 +77,7 @@ function SlideText({ index, scrollYProgress }) {
   return (
     <motion.div
       className="absolute text-center px-6"
-      style={{ opacity, y }}
+      style={{ opacity, y, willChange: 'opacity, transform' }}
     >
       <h3 className="font-serif text-3xl md:text-5xl lg:text-6xl font-light text-white drop-shadow-2xl">
         {sequenceData[index].title}
@@ -84,11 +90,13 @@ function SlideImage({ index, scrollYProgress }) {
   const opacity = useTransform(scrollYProgress, IMG_OPACITY[index].input, IMG_OPACITY[index].output);
 
   return (
-    <motion.div className="absolute inset-0 w-full h-full" style={{ opacity }}>
+    <motion.div className="absolute inset-0 w-full h-full bg-zinc-950" style={{ opacity, willChange: 'opacity' }}>
       <img
         src={sequenceData[index].image}
         alt={sequenceData[index].title}
         className="w-full h-full object-cover"
+        loading={index === 0 ? "eager" : "lazy"}
+        decoding="async"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/40" />
     </motion.div>
@@ -111,7 +119,7 @@ export default function CinematicSequence() {
       <div className="sticky top-0 h-screen w-full overflow-hidden">
 
         {/* Images stacked */}
-        <motion.div className="w-full h-full" style={{ scale: globalScale }}>
+        <motion.div className="w-full h-full" style={{ scale: globalScale, willChange: 'transform' }}>
           <SlideImage index={0} scrollYProgress={scrollYProgress} />
           <SlideImage index={1} scrollYProgress={scrollYProgress} />
           <SlideImage index={2} scrollYProgress={scrollYProgress} />

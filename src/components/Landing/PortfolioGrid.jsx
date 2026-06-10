@@ -7,7 +7,7 @@ const container = {
   },
 };
 
-export default function PortfolioGrid({ photos }) {
+export default function PortfolioGrid({ items, onOpenMedia }) {
   return (
     <motion.div
       layout
@@ -17,9 +17,9 @@ export default function PortfolioGrid({ photos }) {
       className="columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4"
     >
       <AnimatePresence mode="popLayout">
-        {photos.map((photo) => (
-          <div key={photo.id} className="break-inside-avoid">
-            <PortfolioCard photo={photo} />
+        {items.map((item) => (
+          <div key={item.id} className="break-inside-avoid">
+            <PortfolioCard item={item} onOpenMedia={onOpenMedia} />
           </div>
         ))}
       </AnimatePresence>

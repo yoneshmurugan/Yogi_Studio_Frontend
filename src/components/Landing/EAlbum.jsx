@@ -13,19 +13,8 @@ import {
 } from "lucide-react";
 
 // ──────────────────────────────────────────────────────────
-// 1.  ALBUM DATA — Using Yogi Studio local assets
+// 1.  ALBUM DATA (Passed via props)
 // ──────────────────────────────────────────────────────────
-import cover from "../../assets/002.jpg";
-import photo1 from "../../assets/01.jpg";
-import photo2 from "../../assets/0G1A7726.jpg";
-import photo3 from "../../assets/IMG_9561.JPG";
-import photo4 from "../../assets/IMG-20240423-WA0055.jpg";
-import photo5 from "../../assets/IMG_9561.JPG";
-import photo6 from "../../assets/IMG_9561.JPG";
-import photo7 from "../../assets/IMG-20240503-WA0022.jpg";
-import photo8 from "../../assets/IMG-20240503-WA0027.jpg";
-
-const spreads = [photo1, photo2, photo3, photo4, photo5, photo6, photo7];
 
 // ──────────────────────────────────────────────────────────
 // 2.  PAGE COMPONENT
@@ -161,7 +150,7 @@ function MusicNote({ id, x, onDone }) {
 // ──────────────────────────────────────────────────────────
 // 7.  MAIN E-ALBUM COMPONENT
 // ──────────────────────────────────────────────────────────
-export default function EAlbum({ onExit }) {
+export default function EAlbum({ onExit, photos = [], musicUrl }) {
   const [current, setCurrent] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
@@ -179,10 +168,14 @@ export default function EAlbum({ onExit }) {
   const pages = [];
 
   // Front Cover
+  const coverUrl = photos.length > 0 ? photos[0].url : "";
+  const spreadPhotos = photos.length > 1 ? photos.slice(1, photos.length - 1) : [];
+  const backCoverUrl = photos.length > 1 ? photos[photos.length - 1].url : coverUrl;
+
   pages.push(
     <Page key="cover-front" density="hard">
       <div className="relative w-full h-full overflow-hidden">
-        <img src={cover} alt="Cover" className="w-full h-full object-cover" loading="eager" />
+        {coverUrl && <img src={coverUrl} alt="Cover" className="w-full h-full object-cover" loading="eager" />}
         <div className="absolute inset-0 bg-gradient-to-b from-black/20 to-black/65" />
         <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-center px-8">
           <Heart className="w-7 h-7 mb-3 fill-[#d4af37] text-[#d4af37]" style={{ filter: "drop-shadow(0 0 8px #d4af37)" }} />
@@ -199,17 +192,17 @@ export default function EAlbum({ onExit }) {
   );
 
   // Spreads
-  spreads.forEach((url, i) => {
+  spreadPhotos.forEach((photoObj, i) => {
     // Left half
     pages.push(
       <Page key={`spread-${i}-left`}>
-        <div className="w-full h-full border-r border-black/20" style={{ backgroundImage: `url(${url})`, backgroundSize: '200% 100%', backgroundPosition: 'left center' }} />
+        <div className="w-full h-full border-r border-black/20" style={{ backgroundImage: `url(${photoObj.url})`, backgroundSize: '200% 100%', backgroundPosition: 'left center' }} />
       </Page>
     );
     // Right half
     pages.push(
       <Page key={`spread-${i}-right`}>
-        <div className="w-full h-full border-l border-white/5" style={{ backgroundImage: `url(${url})`, backgroundSize: '200% 100%', backgroundPosition: 'right center' }} />
+        <div className="w-full h-full border-l border-white/5" style={{ backgroundImage: `url(${photoObj.url})`, backgroundSize: '200% 100%', backgroundPosition: 'right center' }} />
       </Page>
     );
   });
@@ -218,7 +211,7 @@ export default function EAlbum({ onExit }) {
   pages.push(
     <Page key="cover-back" density="hard">
       <div className="relative w-full h-full overflow-hidden">
-        <img src={photo8} alt="Back Cover" className="w-full h-full object-cover" loading="lazy" />
+        {backCoverUrl && <img src={backCoverUrl} alt="Back Cover" className="w-full h-full object-cover" loading="lazy" />}
         <div className="absolute inset-0 bg-gradient-to-b from-black/20 to-black/65" />
         <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-center px-8">
           <Heart className="w-7 h-7 mb-3 fill-[#d4af37] text-[#d4af37]" style={{ filter: "drop-shadow(0 0 8px #d4af37)" }} />
@@ -321,7 +314,7 @@ export default function EAlbum({ onExit }) {
 
   return (
     <>
-      <audio ref={audioRef} loop src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" preload="none" />
+      <audio ref={audioRef} loop src={musicUrl || "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"} preload="none" />
 
       {/* Root */}
       <div

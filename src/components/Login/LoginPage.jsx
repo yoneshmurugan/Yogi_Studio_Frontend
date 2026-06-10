@@ -4,7 +4,7 @@ import { LogIn, Eye, EyeOff, AlertCircle, Phone, KeyRound, ArrowLeft } from 'luc
 import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
 import { auth } from '../../lib/firebase';
 import GoldButton from '../ui/GoldButton';
-import yogiLogo from '../../assets/yogi-logo.jpg';
+import yogiLogo from '../../assets/headerlogo.png';
 
 const ADMIN_DEMO = {
   email: 'admin@gmail',
@@ -142,10 +142,14 @@ export default function LoginPage({ onLoginSuccess, onBack }) {
 
     await new Promise((r) => setTimeout(r, 800)); // Simulate API
 
-    if (email.toLowerCase() === ADMIN_DEMO.email && password === ADMIN_DEMO.password) {
+    const adminEmail = import.meta.env.VITE_ADMIN_EMAIL || ADMIN_DEMO.email;
+    const adminPassword = import.meta.env.VITE_ADMIN_PASSWORD || ADMIN_DEMO.password;
+
+    if (email.toLowerCase() === adminEmail && password === adminPassword) {
+      sessionStorage.setItem('adminAuth', 'true');
       onLoginSuccess('admin');
     } else {
-      setError('Invalid admin credentials. (Try admin@yogi.studio / admin)');
+      setError('Invalid admin credentials.');
       setIsLoading(false);
     }
   };
@@ -191,8 +195,8 @@ export default function LoginPage({ onLoginSuccess, onBack }) {
           {/* Top Toggles */}
           <div className="flex gap-2 p-1 bg-black/40 rounded-xl border border-white/5 mb-8 relative">
             <div 
-              className="absolute inset-y-1 w-[calc(50%-4px)] bg-gold/10 border border-gold/20 rounded-lg transition-all duration-300 ease-out"
-              style={{ left: loginMode === 'client' ? '4px' : 'calc(50%)' }}
+              className="absolute inset-y-1 w-[calc(50%-8px)] bg-gold/10 border border-gold/20 rounded-lg transition-all duration-300 ease-out"
+              style={{ left: loginMode === 'client' ? '4px' : 'calc(50% + 4px)' }}
             />
             <button
               onClick={() => { setLoginMode('client'); resetForm(); }}
@@ -254,9 +258,8 @@ export default function LoginPage({ onLoginSuccess, onBack }) {
                         type="tel"
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
-                        placeholder="98765 43210"
                         required
-                        className="w-full bg-obsidian border border-white/8 rounded-xl py-3.5 pl-[4.5rem] pr-4 text-sm text-white placeholder:text-silver/20 focus:outline-none focus:border-gold/40 transition-colors"
+                        className="w-full bg-obsidian border border-white/8 rounded-xl py-3.5 pl-[4.5rem] pr-4 text-sm text-white focus:outline-none focus:border-gold/40 transition-colors"
                       />
                     </div>
                   </div>
@@ -352,9 +355,8 @@ export default function LoginPage({ onLoginSuccess, onBack }) {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="admin@yogi.studio"
                     required
-                    className="w-full bg-obsidian border border-white/8 rounded-xl py-3.5 px-4 text-sm text-white placeholder:text-silver/20 focus:outline-none focus:border-gold/40 transition-colors"
+                    className="w-full bg-obsidian border border-white/8 rounded-xl py-3.5 px-4 text-sm text-white focus:outline-none focus:border-gold/40 transition-colors"
                   />
                 </div>
 

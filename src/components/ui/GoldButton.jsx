@@ -26,7 +26,7 @@ export default function GoldButton({ children, onClick, disabled = false, classN
           transition={{ duration: 0.6 }}
         />
       )}
-      <span className="relative z-10">{children}</span>
+      <span className="relative z-10 flex items-center justify-center gap-2 h-full w-full">{children}</span>
     </motion.button>
   );
 }

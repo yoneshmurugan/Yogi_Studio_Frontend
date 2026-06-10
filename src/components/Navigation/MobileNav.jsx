@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, useScroll, useMotionValueEvent } from 'framer-motion';
 import { LogIn } from 'lucide-react';
-import yogiLogo from '../../assets/yogi-logo.jpg';
+import yogiLogo from '../../assets/headerlogo.png';
 
 export default function MobileNav({ onLogin, onHome }) {
   const { scrollY } = useScroll();
@@ -24,18 +24,16 @@ export default function MobileNav({ onLogin, onHome }) {
       className="fixed top-0 left-0 right-0 z-50 md:hidden safe-top"
     >
       <div className="glass-strong border-b border-white/5">
-        <div className="flex items-center justify-between px-4 h-14">
-          {/* Logo */}
+        <div className="flex items-center justify-between px-4 h-16">
+          {/* Logo Only */}
           <motion.button
             onClick={onHome}
             whileTap={{ scale: 0.95 }}
             className="flex items-center gap-2 cursor-pointer"
           >
-            <img src={yogiLogo} alt="Yogi Digital Studio" className="h-8 w-auto" />
-            <span className="font-serif text-sm text-white">
-              Yogi <span className="gold-text">Studio</span>
-            </span>
+            <img src={yogiLogo} alt="Yogi Digital Studio" className="h-12 w-auto object-contain py-1" />
           </motion.button>
+
 
           {/* Login */}
           <motion.button

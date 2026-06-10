@@ -11,7 +11,7 @@ import PortfolioManager from './PortfolioManager';
 import UserManagement   from './UserManagement';
 import { ref, deleteObject } from 'firebase/storage';
 import { storage } from '../../lib/firebase';
-import yogiLogo from '../../assets/yogi-logo.jpg';
+import yogiLogo from '../../assets/yogi-logo-removebg-preview.png';
 
 // ── Seed data ─────────────────────────────────────────────────────────────────
 export const seedUsers = [

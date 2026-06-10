@@ -2,9 +2,12 @@ import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import Navigation from './components/Navigation/Navigation';
 import LandingPage from './components/Landing/LandingPage';
+import TestimonialsPage from './components/Landing/TestimonialsPage';
+import ContactPage from './components/Landing/ContactPage';
 import LoginPage from './components/Login/LoginPage';
 import AdminDashboard from './components/Admin/AdminDashboard';
 import CustomerPortal from './components/Customer/CustomerPortal';
+import ProtectedRoute from './components/ProtectedRoute';
 
 const pageTransition = {
   initial: { opacity: 0, y: 20 },
@@ -43,7 +46,7 @@ function App() {
   };
 
   const isFullPage = location.pathname.startsWith('/admin') || location.pathname.startsWith('/client');
-  const showNav = location.pathname === '/' || location.pathname === '/login';
+  const showNav = !isFullPage;
 
   return (
     <div className={`${isFullPage ? '' : 'min-h-screen bg-black text-white'}`}>
@@ -53,7 +56,14 @@ function App() {
 
       {isFullPage ? (
         <Routes location={location} key={location.pathname.split('/')[1]}>
-          <Route path="/admin/*" element={<AdminDashboard />} />
+          <Route 
+            path="/admin/*" 
+            element={
+              <ProtectedRoute>
+                <AdminDashboard />
+              </ProtectedRoute>
+            } 
+          />
           <Route path="/client/*" element={<CustomerPortal />} />
         </Routes>
       ) : (
@@ -67,6 +77,8 @@ function App() {
           >
             <Routes location={location} key={location.pathname}>
               <Route path="/" element={<LandingPage />} />
+              <Route path="/testimonials" element={<TestimonialsPage />} />
+              <Route path="/contact" element={<ContactPage />} />
               <Route path="/login" element={<LoginPage onLoginSuccess={handleLoginSuccess} onBack={handleNavigateHome} />} />
             </Routes>
           </motion.main>

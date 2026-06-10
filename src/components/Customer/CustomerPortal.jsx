@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Camera, Calendar, Folder, FileImage, CheckCircle2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Camera, Calendar, Folder, FileImage, CheckCircle2, ArrowLeft } from 'lucide-react';
 import WelcomeHeader from './WelcomeHeader';
 import FolderGrid from './FolderGrid';
 import PhotoGrid from './PhotoGrid';
@@ -11,6 +11,7 @@ import FinaliseModal from './FinaliseModal';
 import SuccessScreen from './SuccessScreen';
 import UndoToast from './UndoToast';
 import { Routes, Route, useNavigate, useParams, Navigate } from 'react-router-dom';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 export default function CustomerPortal() {
   return (
@@ -26,9 +27,26 @@ export default function CustomerPortal() {
 function CustomerPortalInner() {
   const navigate = useNavigate();
   const { eventId, folderId } = useParams();
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [events, setEvents] = useState([]);
+  const queryClient = useQueryClient();
+  const token = localStorage.getItem('studio_session_token');
+
+  const { data: eventsData, isLoading, error: queryError } = useQuery({
+    queryKey: ['customer', 'events'],
+    queryFn: async () => {
+      if (!token) throw new Error('No session token');
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/customer/events/current`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to fetch events');
+      return data.events || [];
+    },
+    enabled: !!token,
+  });
+
+  const events = eventsData || [];
+  const error = queryError?.message || '';
+
   const [activeEvent, setActiveEvent] = useState(null);
 
   const activeFolderId = folderId ? parseInt(folderId, 10) : null;
@@ -89,40 +107,13 @@ function CustomerPortalInner() {
   const [undoToast, setUndoToast]       = useState({ visible: false, message: '', action: null });
   const undoTimerRef = useRef(null);
 
-  // Fetch events on mount
+  // Redirect if no token
   useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        const token = localStorage.getItem('studio_session_token');
-        if (!token) {
-          sessionStorage.setItem('redirectUrl', window.location.pathname);
-          navigate('/login', { replace: true });
-          return;
-        }
-
-        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/customer/events/current`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Failed to fetch events');
-
-        const fetchedEvents = data.events || [];
-        setEvents(fetchedEvents);
-
-        if (fetchedEvents.length === 1) {
-          setActiveEvent(fetchedEvents[0]);
-        }
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchEvents();
-  }, []);
+    if (!token) {
+      sessionStorage.setItem('redirectUrl', window.location.pathname);
+      navigate('/login', { replace: true });
+    }
+  }, [token, navigate]);
 
   // Sync URL eventId with activeEvent
   useEffect(() => {
@@ -217,11 +208,8 @@ function CustomerPortalInner() {
   }, []);
 
   // ── Finalise ──────────────────────────────────────────────────────────────
-  const handleFinalise = async () => {
-    setFinaliseOpen(false);
-    
-    try {
-      const token = localStorage.getItem('studio_session_token');
+  const finaliseMutation = useMutation({
+    mutationFn: async () => {
       const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/customer/events/${activeEvent.id}/submit-selections`, {
         method: 'POST',
         headers: { 
@@ -230,38 +218,50 @@ function CustomerPortalInner() {
         },
         body: JSON.stringify({ selectedPhotoIds: [...selectedIds], photoComments: comments })
       });
-      
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to submit selections");
-      
+      return data;
+    },
+    onSuccess: () => {
       setSubmitted(true);
       setActiveEvent(prev => ({ ...prev, status: 'awaiting_approval' }));
-    } catch(err) {
+      queryClient.invalidateQueries({ queryKey: ['customer', 'events'] });
+    },
+    onError: (err) => {
       console.error(err);
       alert("Error submitting selections: " + err.message);
     }
+  });
+
+  const handleFinalise = () => {
+    setFinaliseOpen(false);
+    finaliseMutation.mutate();
   };
 
   // ── Edit Response ──────────────────────────────────────────────────────────
-  const handleEditResponse = async () => {
-    try {
-      const token = localStorage.getItem('studio_session_token');
+  const editResponseMutation = useMutation({
+    mutationFn: async () => {
       const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/customer/events/${activeEvent.id}/revert-selections`, {
         method: 'POST',
-        headers: { 
-          'Authorization': `Bearer ${token}`
-        }
+        headers: { 'Authorization': `Bearer ${token}` }
       });
-      
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to revert selections");
-      
+      return data;
+    },
+    onSuccess: () => {
       setSubmitted(false);
       setActiveEvent(prev => ({ ...prev, status: 'selection_in_progress' }));
-    } catch(err) {
+      queryClient.invalidateQueries({ queryKey: ['customer', 'events'] });
+    },
+    onError: (err) => {
       console.error(err);
       alert("Error editing response: " + err.message);
     }
+  });
+
+  const handleEditResponse = () => {
+    editResponseMutation.mutate();
   };
 
   const validSelectedCount = [...selectedIds].filter(id => allPhotos.some(p => p.id === id)).length;
@@ -277,25 +277,55 @@ function CustomerPortalInner() {
     );
   }
 
-  if (error) {
+  const isNoEvents = events.length === 0 || (error && error.toLowerCase().includes('no active events'));
+
+  if (isNoEvents) {
+    return (
+      <div className="min-h-screen bg-[#050505] relative flex flex-col items-center justify-center p-6 text-center overflow-hidden">
+        {/* Background Effects */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gold/5 rounded-full blur-[100px] pointer-events-none" />
+        
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="relative z-10 glass rounded-3xl p-10 max-w-lg w-full border border-gold/10 shadow-2xl shadow-gold/5"
+        >
+          <div className="w-20 h-20 bg-gold/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-gold/20">
+            <Camera className="w-10 h-10 text-gold" />
+          </div>
+          
+          <h2 className="font-serif text-3xl text-white font-light mb-4">
+            Curating Your Memories
+          </h2>
+          
+          <p className="text-silver/60 text-base leading-relaxed mb-8">
+            Your gallery is currently being carefully processed and curated by our studio team. 
+            We are adding the final touches to ensure every moment looks perfect. 
+            We will notify you as soon as your photos are ready to be viewed!
+          </p>
+          
+          <button 
+            onClick={() => navigate('/')} 
+            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-gold text-black font-medium tracking-wide uppercase text-sm hover:bg-gold-light transition-colors shadow-lg shadow-gold/20 cursor-pointer"
+          >
+            <ArrowLeft className="w-4 h-4" /> Return to Website
+          </button>
+        </motion.div>
+      </div>
+    );
+  }
+
+  if (error && !isNoEvents) {
     return (
       <div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center p-6 text-center">
         <p className="text-red-400 mb-4">{error}</p>
         <button 
           onClick={() => window.location.reload()} 
-          className="px-6 py-2 bg-white/10 hover:bg-white/15 rounded-lg text-white transition-colors"
+          className="px-6 py-2 bg-white/10 hover:bg-white/15 rounded-lg text-white transition-colors cursor-pointer"
         >
           Try Again
         </button>
-      </div>
-    );
-  }
-
-  if (events.length === 0) {
-    return (
-      <div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center p-6 text-center">
-        <p className="text-silver/50 mb-2 text-lg">No active events found.</p>
-        <p className="text-silver/30 text-sm">Please contact Yogi Studio if you believe this is an error.</p>
       </div>
     );
   }
