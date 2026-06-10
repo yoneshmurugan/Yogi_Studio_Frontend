@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, useScroll, useMotionValueEvent } from 'framer-motion';
 import { LogIn } from 'lucide-react';
-import yogiLogo from '../../assets/headerlogo.png';
+import yogiLogo from '../../assets/Headerlogo.png';
 
 export default function MobileNav({ onLogin, onHome }) {
   const { scrollY } = useScroll();

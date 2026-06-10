@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import ScrollReveal from '../ui/ScrollReveal';
 
 import img1 from '../../assets/AG_00223.JPG';
-import img2 from '../../assets/C_0528.jpg';
+import img2 from '../../assets/C_0528.JPG';
 import img3 from '../../assets/AG_00153.JPG';
 import img4 from '../../assets/C-1670copy.jpg';
 import img5 from '../../assets/14.jpg';
