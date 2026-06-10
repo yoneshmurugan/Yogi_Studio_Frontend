@@ -6,7 +6,7 @@ export const RevealLinks = () => {
     <section className="grid place-content-center gap-4 px-8 py-12 text-white">
       <FlipLink href="https://www.instagram.com/yogistudio_official?igsh=NXFlM3RpOG82M2R0">Instagram</FlipLink>
       <FlipLink href="https://youtube.com/@yogistudio-official?si=w81KIpSqR3SXeSWk">YouTube</FlipLink>
-      <FlipLink href="#">WhatsApp</FlipLink>
+      <FlipLink href="https://wa.me/919842775676">WhatsApp</FlipLink>
     </section>
   );
 };

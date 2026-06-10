@@ -58,15 +58,20 @@ export default function ContactPage() {
                 </div>
               </a>
 
-              <div className="flex items-center gap-6 group">
-                <div className="w-12 h-12 rounded-full border border-gold/30 flex items-center justify-center text-gold group-hover:bg-gold group-hover:text-black transition-all">
+              <a 
+                href="https://www.google.com/maps/search/?api=1&query=Yogi+Digital+Studio+Erode" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="flex items-center gap-6 group"
+              >
+                <div className="w-12 h-12 rounded-full border border-gold/30 flex items-center justify-center text-gold group-hover:bg-gold group-hover:text-black transition-all cursor-pointer">
                   <MapPin className="w-5 h-5" />
                 </div>
                 <div>
                   <p className="text-silver/60 text-xs tracking-[0.2em] uppercase mb-1">Visit Studio</p>
                   <p className="text-lg text-white group-hover:text-gold transition-colors">Yogi Digital Studio, Erode, Tamil Nadu</p>
                 </div>
-              </div>
+              </a>
             </div>
           </ScrollReveal>
         </div>
