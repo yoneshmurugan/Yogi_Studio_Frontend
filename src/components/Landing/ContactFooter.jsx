@@ -53,7 +53,7 @@ export default function ContactFooter() {
                 </a>
                 <div className="flex items-center gap-3">
                   <Phone className="w-4 h-4 text-gold/60 flex-shrink-0" />
-                  <a href="https://wa.me/919842775676" target="_blank" rel="noreferrer" className="text-silver/50 text-sm hover:text-gold transition-colors">
+                  <a href="javascript:void(0)" onClick={() => window.open('https://wa.me/919842775676', '_blank')} className="text-silver/50 text-sm hover:text-gold transition-colors">
                     +91 98427 75676
                   </a>
                 </div>
@@ -85,7 +85,7 @@ export default function ContactFooter() {
                   title="Instagram">
                   <InstagramIcon className="w-3.5 h-3.5 text-silver/30 group-hover:text-gold transition-colors" />
                 </a>
-                <a href="https://wa.me/919842775676" target="_blank" rel="noreferrer"
+                <a href="javascript:void(0)" onClick={() => window.open('https://wa.me/919842775676', '_blank')}
                   className="w-9 h-9 rounded-full border border-white/8 flex items-center justify-center hover:border-gold/30 hover:bg-gold/5 transition-all group"
                   title="WhatsApp">
                   <WhatsappIcon className="w-3.5 h-3.5 text-silver/30 group-hover:text-gold transition-colors" />

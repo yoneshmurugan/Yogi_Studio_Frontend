@@ -6,7 +6,7 @@ export const RevealLinks = () => {
     <section className="grid place-content-center gap-4 px-8 py-12 text-white">
       <FlipLink href="https://www.instagram.com/yogistudio_official?igsh=NXFlM3RpOG82M2R0">Instagram</FlipLink>
       <FlipLink href="https://youtube.com/@yogistudio-official?si=w81KIpSqR3SXeSWk">YouTube</FlipLink>
-      <FlipLink href="https://wa.me/919842775676">WhatsApp</FlipLink>
+      <FlipLink href="javascript:void(0)" onClick={() => window.open('https://wa.me/919842775676', '_blank')}>WhatsApp</FlipLink>
     </section>
   );
 };
@@ -14,15 +14,16 @@ export const RevealLinks = () => {
 const DURATION = 0.25;
 const STAGGER = 0.025;
 
-const FlipLink = ({ children, href }) => {
+const FlipLink = ({ children, href, onClick }) => {
   return (
     <motion.a
       initial="initial"
       whileHover="hovered"
       href={href}
+      onClick={onClick}
       target="_blank"
       rel="noopener noreferrer"
-      className="relative block overflow-hidden whitespace-nowrap text-3xl font-serif font-light uppercase sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl hover:text-gold transition-colors duration-300"
+      className="relative block overflow-hidden whitespace-nowrap text-3xl font-serif font-light uppercase sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl hover:text-gold transition-colors duration-300 cursor-pointer"
       style={{
         lineHeight: 1.1,
       }}

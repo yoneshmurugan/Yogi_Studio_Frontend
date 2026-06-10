@@ -2,7 +2,7 @@ import { useRef, useState, useEffect } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { MapPin, Phone } from 'lucide-react';
 import ScrollReveal from '../ui/ScrollReveal';
-import yogiLogo from '../../assets/yogi-logo-removebg-preview.png';
+import yogiLogo from '../../assets/Headerlogo.png';
 import ImageSwiper from './ImageSwiper';
 import img1 from '../../assets/yogi_balu (1).PNG';
 import img2 from '../../assets/yogi_balu (4).jpg';
@@ -117,7 +117,7 @@ export default function AboutSection() {
                 <MapPin className="w-4 h-4 text-gold mt-0.5 flex-shrink-0" />
                 <p className="text-silver/50 text-sm hover:text-gold transition-colors">#H96, Shop no.4, Periyar Nagar Main Road, Erode - 1</p>
               </a>
-              <a href="https://wa.me/919842775676" target="_blank" rel="noreferrer" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+              <a href="javascript:void(0)" onClick={() => window.open('https://wa.me/919842775676', '_blank')} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
                 <Phone className="w-4 h-4 text-gold flex-shrink-0" />
                 <p className="text-silver/50 text-sm hover:text-gold transition-colors">+91 98427 75676</p>
               </a>
@@ -132,7 +132,7 @@ export default function AboutSection() {
                 title="Instagram">
                 <InstagramIcon className="w-4 h-4 text-silver/40 group-hover:text-gold transition-colors" />
               </a>
-              <a href="https://wa.me/919842775676" target="_blank" rel="noreferrer"
+              <a href="javascript:void(0)" onClick={() => window.open('https://wa.me/919842775676', '_blank')}
                 className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:border-gold/40 hover:bg-gold/5 transition-all group"
                 title="WhatsApp">
                 <WhatsappIcon className="w-4 h-4 text-silver/40 group-hover:text-gold transition-colors" />
