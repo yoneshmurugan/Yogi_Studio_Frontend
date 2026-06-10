@@ -4,7 +4,7 @@ import { LogIn, Eye, EyeOff, AlertCircle, Phone, KeyRound, ArrowLeft } from 'luc
 import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
 import { auth } from '../../lib/firebase';
 import GoldButton from '../ui/GoldButton';
-import yogiLogo from '../../assets/headerlogo.png';
+import yogiLogo from '../../assets/Headerlogo.png';
 
 const ADMIN_DEMO = {
   email: 'admin@gmail',

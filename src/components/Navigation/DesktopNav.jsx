@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion, useScroll, useMotionValueEvent } from 'framer-motion';
 import { LogIn } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import yogiLogo from '../../assets/headerlogo.png';
+import yogiLogo from '../../assets/Headerlogo.png';
 
 export default function DesktopNav({ onLogin, onHome }) {
   const { scrollY } = useScroll();
