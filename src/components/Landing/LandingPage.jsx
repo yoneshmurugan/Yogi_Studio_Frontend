@@ -24,7 +24,10 @@ import preloaderFallback from '../../assets/Loader.mp4';
 const PRELOADER_VIDEO_URL = "https://ik.imagekit.io/yogistudio/Loader.mp4";
 
 export default function LandingPage() {
-  const [showPreloader, setShowPreloader] = useState(true);
+  const [showPreloader, setShowPreloader] = useState(() => {
+    // Only show preloader once per session
+    return !sessionStorage.getItem('preloaderShown');
+  });
   const [activeCategory, setActiveCategory] = useState('All');
   const [albumOpen, setAlbumOpen] = useState(false);
   const [activeAlbumPhotos, setActiveAlbumPhotos] = useState([]);
@@ -109,7 +112,10 @@ export default function LandingPage() {
           <VideoPreloader 
             videoUrl={PRELOADER_VIDEO_URL} 
             fallbackUrl={preloaderFallback}
-            onComplete={() => setShowPreloader(false)} 
+            onComplete={() => {
+              sessionStorage.setItem('preloaderShown', 'true');
+              setShowPreloader(false);
+            }} 
           />
         )}
       </AnimatePresence>
