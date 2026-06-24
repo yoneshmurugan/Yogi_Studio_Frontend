@@ -15,8 +15,16 @@ import PublicPhotoLightbox from './PublicPhotoLightbox';
 import AboutSection from './AboutSection';
 import ContactFooter from './ContactFooter';
 import ScrollReveal from '../ui/ScrollReveal';
+import VideoPreloader from './VideoPreloader';
+
+// ==========================================
+// PLACE YOUR PRELOADER VIDEO URL HERE!
+// ==========================================
+import preloaderFallback from '../../assets/Loader.mp4';
+const PRELOADER_VIDEO_URL = "https://ik.imagekit.io/yogistudio/Loader.mp4";
 
 export default function LandingPage() {
+  const [showPreloader, setShowPreloader] = useState(true);
   const [activeCategory, setActiveCategory] = useState('All');
   const [albumOpen, setAlbumOpen] = useState(false);
   const [activeAlbumPhotos, setActiveAlbumPhotos] = useState([]);
@@ -95,71 +103,87 @@ export default function LandingPage() {
   };
 
   return (
-    <div>
-      <Hero />
-      <ServicesSection />
-      <CinematicSequence />
-
-      <section ref={portfolioRef} id="portfolio" className="px-6 md:px-12 lg:px-20 py-24 md:py-32 max-w-7xl mx-auto">
-        <ScrollReveal className="text-center mb-16">
-          <p className="text-gold/80 text-xs tracking-[0.4em] uppercase mb-4">Portfolio</p>
-          <h2 className="font-serif text-3xl md:text-5xl font-light text-white">
-            Our Finest Work
-          </h2>
-        </ScrollReveal>
-
-        <ScrollReveal delay={0.2}>
-          <FilterPills
-            categories={categories}
-            activeCategory={activeCategory}
-            onFilter={setActiveCategory}
+    <div className={showPreloader ? "h-screen overflow-hidden bg-black" : ""}>
+      <AnimatePresence>
+        {showPreloader && (
+          <VideoPreloader 
+            videoUrl={PRELOADER_VIDEO_URL} 
+            fallbackUrl={preloaderFallback}
+            onComplete={() => setShowPreloader(false)} 
           />
-        </ScrollReveal>
+        )}
+      </AnimatePresence>
 
-        {portfolioItems.length === 0 ? (
-          <div className="text-center py-20 text-silver/40">
-            <p>Portfolio is currently being curated.</p>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: showPreloader ? 0 : 1 }}
+        transition={{ duration: 0.8, ease: "easeInOut" }}
+      >
+        <Hero />
+          <ServicesSection />
+          <CinematicSequence />
+
+          <section ref={portfolioRef} id="portfolio" className="px-4 md:px-12 lg:px-20 py-16 md:py-32 max-w-7xl mx-auto">
+            <ScrollReveal className="text-center mb-10 md:mb-16">
+              <p className="text-gold/80 text-xs tracking-[0.4em] uppercase mb-4">Portfolio</p>
+              <h2 className="font-serif text-3xl md:text-5xl font-light text-white">
+                Our Finest Work
+              </h2>
+            </ScrollReveal>
+
+            <ScrollReveal delay={0.2}>
+              <FilterPills
+                categories={categories}
+                activeCategory={activeCategory}
+                onFilter={setActiveCategory}
+              />
+            </ScrollReveal>
+
+            {portfolioItems.length === 0 ? (
+              <div className="text-center py-20 text-silver/40">
+                <p>Portfolio is currently being curated.</p>
+              </div>
+            ) : (
+              <PortfolioGrid items={filteredItems} onOpenMedia={handleOpenMedia} />
+            )}
+          </section>
+
+          <TextMarquee />
+          <div className="h-[50vh] md:h-[70vh] w-full">
+            <Infinitegrid photos={portfolioItems.filter(p => p.category === 'photo')} />
           </div>
-        ) : (
-          <PortfolioGrid items={filteredItems} onOpenMedia={handleOpenMedia} />
-        )}
-      </section>
+          <AboutSection />
+          <ContactFooter />
 
-      <TextMarquee />
-      <div className="h-[70vh] w-full">
-        <Infinitegrid photos={portfolioItems.filter(p => p.category === 'photo')} />
-      </div>
-      <AboutSection />
-      <ContactFooter />
+          <AnimatePresence>
+            {albumOpen && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <EAlbum photos={activeAlbumPhotos} musicUrl={activeAlbumMusic} onExit={() => setAlbumOpen(false)} />
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-      <AnimatePresence>
-        {albumOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            <EAlbum photos={activeAlbumPhotos} musicUrl={activeAlbumMusic} onExit={() => setAlbumOpen(false)} />
-          </motion.div>
-        )}
-      </AnimatePresence>
+          <AnimatePresence>
+            {activeVideoUrl && (
+              <VideoModal url={activeVideoUrl} onClose={() => setActiveVideoUrl(null)} />
+            )}
+          </AnimatePresence>
 
-      <AnimatePresence>
-        {activeVideoUrl && (
-          <VideoModal url={activeVideoUrl} onClose={() => setActiveVideoUrl(null)} />
-        )}
-      </AnimatePresence>
-
-      <AnimatePresence>
-        {photoLightboxOpen && (
-          <PublicPhotoLightbox 
-            photos={filteredItems.filter(i => i.category === 'photo')} 
-            initialIndex={photoLightboxIndex} 
-            onClose={() => setPhotoLightboxOpen(false)} 
-          />
-        )}
-      </AnimatePresence>
+          <AnimatePresence>
+            {photoLightboxOpen && (
+              <PublicPhotoLightbox 
+                photos={filteredItems.filter(i => i.category === 'photo')} 
+                initialIndex={photoLightboxIndex} 
+                onClose={() => setPhotoLightboxOpen(false)} 
+              />
+            )}
+          </AnimatePresence>
+        </motion.div>
     </div>
   );
 }

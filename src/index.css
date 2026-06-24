@@ -106,3 +106,41 @@ body {
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
+/* ─── Mobile Performance ─── */
+@media (max-width: 767px) {
+  ::-webkit-scrollbar {
+    width: 3px;
+  }
+
+  /* Force GPU compositing for smooth scrolling on iOS */
+  .gpu-mobile {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+}
+
+/* ─── Reduced Motion ─── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ─── iOS Momentum Scrolling ─── */
+.scroll-touch {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ─── Mobile Touch Utilities ─── */
+.touch-pan-x {
+  touch-action: pan-x;
+}
+.touch-pan-y {
+  touch-action: pan-y;
+}

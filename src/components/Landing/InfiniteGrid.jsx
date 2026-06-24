@@ -2,10 +2,13 @@
 
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 
-const CARD_WIDTH = 256;
-const CARD_HEIGHT = 171;
+const CARD_WIDTH_DESKTOP = 256;
+const CARD_HEIGHT_DESKTOP = 171;
+const CARD_WIDTH_MOBILE = 180;
+const CARD_HEIGHT_MOBILE = 120;
 const NEIGHBOURS = [[0, -1], [0, 1], [1, 0], [-1, 0], [1, 1], [-1, 1], [-1, -1], [1, -1]];
 const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+const isMobileDevice = () => typeof window !== 'undefined' && window.innerWidth < 768;
 const applyDamping = (velocity, deltaTime) => {
   const dampingRate = 0.0028;
   return velocity * Math.exp(-dampingRate * deltaTime);
@@ -53,7 +56,9 @@ const useAnimationFrame = callback => {
 const Card = React.memo(({
   descriptor,
   x,
-  y
+  y,
+  width,
+  height
 }) => {
   const [opacity, setOpacity] = useState(0);
   const imgRef = useRef(null);
@@ -85,8 +90,8 @@ const Card = React.memo(({
       style={{
         transform: `translate3d(${x}px, ${y}px, 0)`,
         willChange: 'transform',
-        width: CARD_WIDTH,
-        height: CARD_HEIGHT,
+        width: width,
+        height: height,
         contain: 'layout style paint'
       }}
     >
@@ -108,13 +113,17 @@ const Card = React.memo(({
       </div>
     </div>
   );
-}, (prevProps, nextProps) => prevProps.descriptor === nextProps.descriptor && prevProps.x === nextProps.x && prevProps.y === nextProps.y);
+}, (prevProps, nextProps) => prevProps.descriptor === nextProps.descriptor && prevProps.x === nextProps.x && prevProps.y === nextProps.y && prevProps.width === nextProps.width && prevProps.height === nextProps.height);
 
 Card.displayName = 'Card';
 
 const InfiniteDraggableGrid = ({
   gallery
 }) => {
+  const mobile = isMobileDevice();
+  const CARD_WIDTH = mobile ? CARD_WIDTH_MOBILE : CARD_WIDTH_DESKTOP;
+  const CARD_HEIGHT = mobile ? CARD_HEIGHT_MOBILE : CARD_HEIGHT_DESKTOP;
+  const BUFFER = mobile ? 50 : 100;
   const viewportSize = useViewportSize();
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [targetOffset, setTargetOffset] = useState({ x: 0, y: 0 });
@@ -277,8 +286,7 @@ const InfiniteDraggableGrid = ({
       return [x, y];
     };
     const isVisible = (x, y) => {
-      const buffer = 100;
-      return x + CARD_WIDTH > -buffer && y + CARD_HEIGHT > -buffer && x < viewportSize.width + buffer && y < viewportSize.height + buffer;
+      return x + CARD_WIDTH > -BUFFER && y + CARD_HEIGHT > -BUFFER && x < viewportSize.width + BUFFER && y < viewportSize.height + BUFFER;
     };
     const viewCols = Math.ceil(viewportSize.width / CARD_WIDTH) + 4;
     const viewRows = Math.ceil(viewportSize.height / CARD_HEIGHT) + 4;
@@ -334,12 +342,12 @@ const InfiniteDraggableGrid = ({
         }}
       >
         {visibleCards.map(card => (
-          <Card key={card.key} descriptor={card.descriptor} x={card.x} y={card.y} />
+          <Card key={card.key} descriptor={card.descriptor} x={card.x} y={card.y} width={CARD_WIDTH} height={CARD_HEIGHT} />
         ))}
       </div>
 
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
-        <h1 className="font-serif text-gold text-5xl md:text-7xl font-light tracking-widest opacity-60 select-none mix-blend-plus-lighter pointer-events-none">
+        <h1 className="font-serif text-gold text-3xl md:text-5xl lg:text-7xl font-light tracking-widest opacity-60 select-none mix-blend-plus-lighter pointer-events-none">
           EXPLORE
         </h1>
       </div>
@@ -353,7 +361,7 @@ export default function Infinitegrid({ photos = [] }) {
   const gallery = React.useMemo(() => {
     if (photos.length === 0) return [];
     const shuffled = [...photos].sort(() => 0.5 - Math.random());
-    const subset = shuffled.slice(0, 20);
+    const subset = shuffled.slice(0, isMobileDevice() ? 10 : 20);
     return subset.map((p, i) => ({ id: p.id || i, src: p.url, title: p.title || `Photo ${i}` }));
   }, [photos]);
 
