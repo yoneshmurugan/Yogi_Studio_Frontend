@@ -55,7 +55,7 @@ function ServiceCard({ service, index, isMobile }) {
     <motion.div
       initial={{ opacity: 0, y: 40 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.05 }}
+      viewport={{ once: true, amount: 0.05, margin: "150px" }}
       transition={{ duration: 0.5, delay: (index % (isMobile ? 1 : 3)) * 0.1, ease: [0.25, 0.1, 0.25, 1] }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -77,8 +77,8 @@ function ServiceCard({ service, index, isMobile }) {
             backgroundImage: `url(${service.image})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
-            filter: 'brightness(0.55)',
-            willChange: 'transform',
+            backgroundColor: '#000',
+            opacity: 0.55,
           }}
         />
       ) : (

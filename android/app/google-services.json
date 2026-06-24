@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "956024111859",
+    "project_id": "sib-ceb2d",
+    "storage_bucket": "sib-ceb2d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:956024111859:android:4b544294f0429f3988ed86",
+        "android_client_info": {
+          "package_name": "com.yogistudio.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDrXzGiuVg6A_eSsY58yXg6qIHPDTzBjlk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

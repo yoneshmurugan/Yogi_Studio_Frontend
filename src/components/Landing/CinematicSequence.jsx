@@ -51,7 +51,7 @@ function SlideText({ index, scrollYProgress }) {
       className="absolute text-center px-6"
       style={{ opacity, y, willChange: 'opacity, transform' }}
     >
-      <h3 className="font-serif text-2xl md:text-5xl lg:text-6xl font-light text-white drop-shadow-2xl">
+      <h3 className="font-serif text-4xl md:text-6xl lg:text-7xl font-light text-white drop-shadow-2xl px-4">
         {sequenceData[index].title}
       </h3>
     </motion.div>
@@ -101,7 +101,7 @@ export default function CinematicSequence() {
   return (
     <section
       ref={containerRef}
-      className={`relative bg-black ${isMobile ? 'h-[250vh]' : 'h-[350vh]'}`}
+      className={`relative bg-black ${isMobile ? 'h-[400vh]' : 'h-[600vh]'}`}
     >
       <div className="sticky top-0 h-screen w-full overflow-hidden">
         {/* Images stacked */}

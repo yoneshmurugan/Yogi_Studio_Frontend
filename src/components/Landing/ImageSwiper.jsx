@@ -86,8 +86,17 @@ export default function ImageSwiper({
       card.style.setProperty('--swipe-x', `${swipeOutX}px`);
       card.style.setProperty('--swipe-rotate', `${direction * 15}deg`);
       card.style.opacity = '0';
+      
       setTimeout(() => {
+        card.style.transition = 'none'; // Instantly teleport to back
         setCardOrder(prev => [...prev.slice(1), prev[0]]);
+        
+        // Re-enable transitions safely after teleport
+        setTimeout(() => {
+          if (card) {
+            card.style.transition = 'transform 0.5s ease, opacity 0.5s ease';
+          }
+        }, 50);
       }, 300);
     } else {
       applySwipeStyles(0);

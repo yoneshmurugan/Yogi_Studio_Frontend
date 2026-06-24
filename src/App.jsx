@@ -1,5 +1,8 @@
 import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useEffect } from 'react';
+import { App as CapacitorApp } from '@capacitor/app';
+import { StatusBar } from '@capacitor/status-bar';
 import Navigation from './components/Navigation/Navigation';
 import LandingPage from './components/Landing/LandingPage';
 import TestimonialsPage from './components/Landing/TestimonialsPage';
@@ -19,6 +22,26 @@ const pageTransition = {
 function App() {
   const location = useLocation();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleBackButton = ({ canGoBack }) => {
+      if (!canGoBack || location.pathname === '/') {
+        CapacitorApp.exitApp();
+      } else {
+        navigate(-1);
+      }
+    };
+    
+    // Add listener only if CapacitorApp is available (native mobile)
+    CapacitorApp.addListener('backButton', handleBackButton).catch(() => {});
+    
+    // Hide the native status bar to make the app fully immersive
+    StatusBar.hide().catch(() => {});
+    
+    return () => {
+      CapacitorApp.removeAllListeners().catch(() => {});
+    };
+  }, [location, navigate]);
 
   const handleNavigateHome = () => {
     navigate('/');

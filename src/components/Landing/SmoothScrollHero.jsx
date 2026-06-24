@@ -94,13 +94,14 @@ function DesktopSplashCursor() {
   return (
     <Comp
       COLOR="#d4af37"
-      SIM_RESOLUTION={64}
-      DYE_RESOLUTION={512}
-      SPLAT_RADIUS={0.08}
-      SPLAT_FORCE={3000}
-      DENSITY_DISSIPATION={4.5}
-      VELOCITY_DISSIPATION={3.0}
-      PRESSURE_ITERATIONS={10}
+      SIM_RESOLUTION={128}
+      DYE_RESOLUTION={1024}
+      SPLAT_RADIUS={0.4}
+      SPLAT_FORCE={6000}
+      DENSITY_DISSIPATION={2.5}
+      VELOCITY_DISSIPATION={1.5}
+      PRESSURE_ITERATIONS={15}
+      COLOR_UPDATE_SPEED={10}
     />
   );
 }
@@ -154,6 +155,9 @@ const Hero = () => {
 const CenterImage = ({ sectionHeight, isMobile }) => {
   const { scrollY } = useScroll();
 
+  // Scroll hint fades out quickly within the first 100px of scrolling
+  const hintOpacity = useTransform(scrollY, [0, 100], [1, 0]);
+
   // ClipPath polygon reveal — starts as centered box, expands to full screen
   const clip1 = useTransform(scrollY, [0, isMobile ? 800 : 1500], [25, 0]);
   const clip2 = useTransform(scrollY, [0, isMobile ? 800 : 1500], [75, 100]);
@@ -181,50 +185,73 @@ const CenterImage = ({ sectionHeight, isMobile }) => {
 
   if (isMobile) {
     return (
-      <motion.div
-        className="sticky top-0 h-[100dvh] w-full overflow-hidden relative"
-        style={{ clipPath, opacity }}
-      >
-        <motion.img
-          src={imgHeroMobile}
-          alt="Hero"
-          className="w-full h-full object-cover"
-          style={{
-            scale: imgScale,
-            objectPosition: 'center top',
-            willChange: 'transform',
-          }}
-        />
+      <div className="sticky top-0 h-[100dvh] w-full overflow-hidden relative">
+        <motion.div
+          className="absolute inset-0 w-full h-full"
+          style={{ clipPath, opacity }}
+        >
+          <motion.img
+            src={imgHeroMobile}
+            alt="Hero"
+            className="w-full h-full object-cover"
+            style={{
+              scale: imgScale,
+              objectPosition: 'center top',
+              willChange: 'transform',
+            }}
+          />
+        </motion.div>
+        
         {/* Watermark Logo */}
         <img
           src={yogiLogo}
           alt="Yogi Studio Watermark"
           className="absolute bottom-6 right-6 w-36 opacity-[0.3] pointer-events-none select-none drop-shadow-md z-10"
         />
-      </motion.div>
+        
+        {/* Scroll Hint Mobile */}
+        <motion.div 
+          style={{ opacity: hintOpacity }}
+          className="absolute bottom-20 left-1/2 -translate-x-1/2 flex flex-col items-center justify-center animate-bounce z-20 pointer-events-none"
+        >
+          <span className="text-[10px] text-[#d4af37] font-semibold uppercase tracking-[0.2em] mb-2 drop-shadow-md">Scroll to Explore</span>
+          <div className="w-px h-8 bg-gradient-to-b from-[#d4af37] to-transparent" />
+        </motion.div>
+      </div>
     );
   }
 
   // Desktop path: original fancy clipPath + backgroundSize
   return (
-    <motion.div
-      className="sticky top-0 h-screen w-full overflow-hidden relative"
-      style={{
-        clipPath,
-        backgroundSize,
-        opacity,
-        backgroundImage: `url(${imgHero})`,
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
-      }}
-    >
+    <div className="sticky top-0 h-screen w-full overflow-hidden relative">
+      <motion.div
+        className="absolute inset-0 w-full h-full"
+        style={{
+          clipPath,
+          backgroundSize,
+          opacity,
+          backgroundImage: `url(${imgHero})`,
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        }}
+      />
+      
       {/* Watermark Logo */}
       <img
         src={yogiLogo}
         alt="Yogi Studio Watermark"
-        className="absolute bottom-12 right-12 w-40 opacity-[0.3] pointer-events-none select-none drop-shadow-md"
+        className="absolute bottom-12 right-12 w-40 opacity-[0.3] pointer-events-none select-none drop-shadow-md z-10"
       />
-    </motion.div>
+      
+      {/* Scroll Hint Desktop */}
+      <motion.div 
+        style={{ opacity: hintOpacity }}
+        className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center justify-center animate-bounce z-20 pointer-events-none"
+      >
+        <span className="text-xs text-[#d4af37] font-semibold uppercase tracking-[0.3em] mb-3 drop-shadow-md">Scroll to Explore</span>
+        <div className="w-px h-12 bg-gradient-to-b from-[#d4af37] to-transparent" />
+      </motion.div>
+    </div>
   );
 };
 
@@ -323,14 +350,13 @@ const StudioDetails = () => {
   const ringSize = isMobile ? 240 : 520;
 
   if (isMobile) {
-    // Mobile: sticky section with SplashCursor enabled for touch interaction
+    // Mobile: static section without SplashCursor pause
     return (
-      <div className="relative w-full" style={{ height: '200vh' }}>
-        <div className="sticky top-0 h-[100dvh] w-full overflow-hidden">
-          {/* SplashCursor enabled on mobile for touch play */}
-          <DesktopSplashCursor />
+      <div className="relative w-full h-[100dvh] overflow-hidden">
+        {/* Use static glow on mobile to save GPU rendering */}
+        <MobileGlow />
 
-          <section
+        <section
             id="studio-details"
             className="relative h-full w-full flex flex-col items-center justify-center text-white text-center z-20 px-4 py-12"
           >
@@ -379,6 +405,7 @@ const StudioDetails = () => {
               <motion.div
                 initial={{ opacity: 0, scale: 0.88 }}
                 whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true, margin: "150px" }}
                 transition={{ ease: "easeInOut", duration: 1.2 }}
                 className="w-full flex flex-col items-center gap-4"
               >
@@ -387,6 +414,7 @@ const StudioDetails = () => {
                   <motion.div
                     initial={{ scaleX: 0, opacity: 0 }}
                     whileInView={{ scaleX: 1, opacity: 0.4 }}
+                    viewport={{ once: true, margin: "150px" }}
                     transition={{ duration: 1.4, ease: "easeOut", delay: 0.3 }}
                     style={{ transformOrigin: "right" }}
                     className="h-px flex-1 max-w-[120px] bg-gradient-to-l from-[#d4af37] to-transparent"
@@ -395,6 +423,7 @@ const StudioDetails = () => {
                   <motion.div
                     initial={{ scaleX: 0, opacity: 0 }}
                     whileInView={{ scaleX: 1, opacity: 0.4 }}
+                    viewport={{ once: true, margin: "150px" }}
                     transition={{ duration: 1.4, ease: "easeOut", delay: 0.3 }}
                     style={{ transformOrigin: "left" }}
                     className="h-px flex-1 max-w-[120px] bg-gradient-to-r from-[#d4af37] to-transparent"
@@ -412,6 +441,7 @@ const StudioDetails = () => {
                   <motion.div
                     initial={{ scaleX: 0, opacity: 0 }}
                     whileInView={{ scaleX: 1, opacity: 0.4 }}
+                    viewport={{ once: true, margin: "150px" }}
                     transition={{ duration: 1.4, ease: "easeOut", delay: 0.5 }}
                     style={{ transformOrigin: "right" }}
                     className="h-px flex-1 max-w-[120px] bg-gradient-to-l from-[#d4af37] to-transparent"
@@ -422,6 +452,7 @@ const StudioDetails = () => {
                         key={d}
                         initial={{ opacity: 0, scale: 0 }}
                         whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true, margin: "150px" }}
                         transition={{ delay: 0.6 + d * 0.07, duration: 0.4 }}
                         style={{
                           display: "inline-block",
@@ -437,6 +468,7 @@ const StudioDetails = () => {
                   <motion.div
                     initial={{ scaleX: 0, opacity: 0 }}
                     whileInView={{ scaleX: 1, opacity: 0.4 }}
+                    viewport={{ once: true, margin: "150px" }}
                     transition={{ duration: 1.4, ease: "easeOut", delay: 0.5 }}
                     style={{ transformOrigin: "left" }}
                     className="h-px flex-1 max-w-[120px] bg-gradient-to-r from-[#d4af37] to-transparent"
@@ -447,6 +479,7 @@ const StudioDetails = () => {
               <motion.h1
                 initial={{ y: 48, opacity: 0 }}
                 whileInView={{ y: 0, opacity: 1 }}
+                viewport={{ once: true, margin: "150px" }}
                 transition={{ ease: "easeInOut", duration: 0.75, delay: 0.2 }}
                 className="mb-0 text-3xl font-serif text-[#d4af37] font-light drop-shadow-lg mt-4"
               >
@@ -455,6 +488,7 @@ const StudioDetails = () => {
               <motion.div
                 initial={{ y: 48, opacity: 0 }}
                 whileInView={{ y: 0, opacity: 1 }}
+                viewport={{ once: true, margin: "150px" }}
                 transition={{ ease: "easeInOut", duration: 0.75, delay: 0.3 }}
                 className="mt-2 block"
               >
@@ -468,6 +502,7 @@ const StudioDetails = () => {
             <motion.p
               initial={{ y: 48, opacity: 0 }}
               whileInView={{ y: 0, opacity: 1 }}
+                viewport={{ once: true, margin: "150px" }}
               transition={{ ease: "easeInOut", duration: 0.75, delay: 0.4 }}
               className="mt-12 text-gray-300 text-base max-w-2xl mx-auto leading-relaxed px-2 flex-shrink-0"
             >
@@ -475,7 +510,6 @@ const StudioDetails = () => {
               Experience the opulent digital studio — crafting future memories through high-fashion wedding photography &amp; cinematic videography.
             </motion.p>
           </section>
-        </div>
       </div>
     );
   }
@@ -531,6 +565,7 @@ const StudioDetails = () => {
         <motion.div
           initial={{ opacity: 0, scale: 0.88 }}
           whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true, margin: "150px" }}
           transition={{ ease: "easeInOut", duration: 1.2 }}
           className="mb-8 w-full flex flex-col items-center gap-5"
         >
@@ -539,6 +574,7 @@ const StudioDetails = () => {
             <motion.div
               initial={{ scaleX: 0, opacity: 0 }}
               whileInView={{ scaleX: 1, opacity: 0.4 }}
+                    viewport={{ once: true, margin: "150px" }}
               transition={{ duration: 1.4, ease: "easeOut", delay: 0.3 }}
               style={{ transformOrigin: "right" }}
               className="h-px flex-1 max-w-[180px] bg-gradient-to-l from-[#d4af37] to-transparent"
@@ -547,6 +583,7 @@ const StudioDetails = () => {
             <motion.div
               initial={{ scaleX: 0, opacity: 0 }}
               whileInView={{ scaleX: 1, opacity: 0.4 }}
+                    viewport={{ once: true, margin: "150px" }}
               transition={{ duration: 1.4, ease: "easeOut", delay: 0.3 }}
               style={{ transformOrigin: "left" }}
               className="h-px flex-1 max-w-[180px] bg-gradient-to-r from-[#d4af37] to-transparent"
@@ -566,6 +603,7 @@ const StudioDetails = () => {
             <motion.div
               initial={{ scaleX: 0, opacity: 0 }}
               whileInView={{ scaleX: 1, opacity: 0.4 }}
+                    viewport={{ once: true, margin: "150px" }}
               transition={{ duration: 1.4, ease: "easeOut", delay: 0.5 }}
               style={{ transformOrigin: "right" }}
               className="h-px flex-1 max-w-[180px] bg-gradient-to-l from-[#d4af37] to-transparent"
@@ -576,6 +614,7 @@ const StudioDetails = () => {
                   key={d}
                   initial={{ opacity: 0, scale: 0 }}
                   whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true, margin: "150px" }}
                   transition={{ delay: 0.6 + d * 0.07, duration: 0.4 }}
                   style={{
                     display: "inline-block",
@@ -591,6 +630,7 @@ const StudioDetails = () => {
             <motion.div
               initial={{ scaleX: 0, opacity: 0 }}
               whileInView={{ scaleX: 1, opacity: 0.4 }}
+                    viewport={{ once: true, margin: "150px" }}
               transition={{ duration: 1.4, ease: "easeOut", delay: 0.5 }}
               style={{ transformOrigin: "left" }}
               className="h-px flex-1 max-w-[180px] bg-gradient-to-r from-[#d4af37] to-transparent"
@@ -601,6 +641,7 @@ const StudioDetails = () => {
         <motion.h1
           initial={{ y: 48, opacity: 0 }}
           whileInView={{ y: 0, opacity: 1 }}
+                viewport={{ once: true, margin: "150px" }}
           transition={{ ease: "easeInOut", duration: 0.75, delay: 0.2 }}
           className="mb-0 text-6xl font-serif text-[#d4af37] font-light drop-shadow-lg"
         >
@@ -609,6 +650,7 @@ const StudioDetails = () => {
         <motion.div
           initial={{ y: 48, opacity: 0 }}
           whileInView={{ y: 0, opacity: 1 }}
+                viewport={{ once: true, margin: "150px" }}
           transition={{ ease: "easeInOut", duration: 0.75, delay: 0.3 }}
           className="mt-4 mb-12 block"
         >
@@ -619,6 +661,7 @@ const StudioDetails = () => {
         <motion.p
           initial={{ y: 48, opacity: 0 }}
           whileInView={{ y: 0, opacity: 1 }}
+                viewport={{ once: true, margin: "150px" }}
           transition={{ ease: "easeInOut", duration: 0.75, delay: 0.4 }}
           className="text-gray-300 text-xl max-w-2xl mx-auto leading-relaxed px-2"
         >

@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { LogIn, Eye, EyeOff, AlertCircle, Phone, KeyRound, ArrowLeft } from 'lucide-react';
 import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
 import { auth } from '../../lib/firebase';
+import { Capacitor } from '@capacitor/core';
+import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
 import GoldButton from '../ui/GoldButton';
 import yogiLogo from '../../assets/yogi-logo-removebg-preview.png';
 
@@ -20,6 +22,7 @@ export default function LoginPage({ onLoginSuccess, onBack }) {
   const [otpSent, setOtpSent] = useState(false);
   const [otpCode, setOtpCode] = useState('');
   const [confirmationResult, setConfirmationResult] = useState(null);
+  const [cooldown, setCooldown] = useState(0);
   
   // Admin States
   const [email, setEmail] = useState('');
@@ -46,6 +49,15 @@ export default function LoginPage({ onLoginSuccess, onBack }) {
     };
   }, []);
 
+  // Cooldown timer
+  useEffect(() => {
+    let timer;
+    if (cooldown > 0) {
+      timer = setInterval(() => setCooldown((c) => c - 1), 1000);
+    }
+    return () => clearInterval(timer);
+  }, [cooldown]);
+
   const setupRecaptcha = () => {
     if (!window.recaptchaVerifier) {
       window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
@@ -57,47 +69,87 @@ export default function LoginPage({ onLoginSuccess, onBack }) {
     }
   };
 
-  const handleClientSubmit = async (e) => {
-    e.preventDefault();
+  const sendOTP = async () => {
+    if (cooldown > 0) return;
     setError('');
     setIsLoading(true);
 
-    if (!otpSent) {
-      if (phone.length < 8) {
-        setError('Please enter a valid phone number');
+    if (phone.length < 8) {
+      setError('Please enter a valid phone number');
+      setIsLoading(false);
+      return;
+    }
+    
+    const formattedPhone = phone.startsWith('+') ? phone : `+91${phone}`;
+
+    try {
+      // Pre-check phone number
+      const checkRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/customer/auth/check-phone`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: formattedPhone })
+      });
+      
+      if (!checkRes.ok) {
+        setError('Phone number not registered. Please contact the studio.');
         setIsLoading(false);
         return;
       }
-      
-      const formattedPhone = phone.startsWith('+') ? phone : `+91${phone}`;
 
-      try {
-        // Pre-check phone number
-        const checkRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/customer/auth/check-phone`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phone: formattedPhone })
+      if (Capacitor.isNativePlatform()) {
+        // --- Native Flow (Bypasses reCAPTCHA) ---
+        // Native plugin returns void and fires an event when the code is sent
+        const verificationId = await new Promise((resolve, reject) => {
+          let sentListener = null;
+          let errListener = null;
+
+          const cleanup = () => {
+            if (sentListener) sentListener.remove();
+            if (errListener) errListener.remove();
+          };
+
+          FirebaseAuthentication.addListener('phoneCodeSent', (event) => {
+            cleanup();
+            resolve(event.verificationId);
+          }).then(l => sentListener = l);
+
+          FirebaseAuthentication.addListener('phoneVerificationFailed', (event) => {
+            cleanup();
+            reject(new Error(event.message));
+          }).then(l => errListener = l);
+
+          FirebaseAuthentication.signInWithPhoneNumber({
+            phoneNumber: formattedPhone,
+          }).catch((err) => {
+            cleanup();
+            reject(err);
+          });
         });
         
-        if (!checkRes.ok) {
-          setError('Phone number not registered. Please contact the studio.');
-          setIsLoading(false);
-          return;
-        }
-
+        setConfirmationResult(verificationId);
+      } else {
+        // --- Web Flow (Requires reCAPTCHA) ---
         setupRecaptcha();
         const appVerifier = window.recaptchaVerifier;
-
         const confirmation = await signInWithPhoneNumber(auth, formattedPhone, appVerifier);
         setConfirmationResult(confirmation);
-        setOtpSent(true);
-        setIsLoading(false);
-        setTimeout(() => otpInputRef.current?.focus(), 100);
-      } catch (err) {
-        console.error("Login Flow Error:", err);
-        setError("Failed to process request. Check terminal console logs.");
-        setIsLoading(false);
       }
+      
+      setOtpSent(true);
+      setCooldown(60);
+      setIsLoading(false);
+      setTimeout(() => otpInputRef.current?.focus(), 100);
+    } catch (err) {
+      console.error("Login Flow Error:", err);
+      setError("Failed to process request. Check terminal console logs.");
+      setIsLoading(false);
+    }
+  };
+
+  const handleClientSubmit = async (e) => {
+    e.preventDefault();
+    if (!otpSent) {
+      await sendOTP();
     } else {
       // Verify OTP
       if (otpCode.length < 4) {
@@ -107,14 +159,26 @@ export default function LoginPage({ onLoginSuccess, onBack }) {
       }
       
       try {
-        const result = await confirmationResult.confirm(otpCode);
-        const user = result.user;
+        let userPhoneNumber = '';
+        
+        if (Capacitor.isNativePlatform()) {
+          // --- Native OTP Verification ---
+          const result = await FirebaseAuthentication.confirmVerificationCode({
+            verificationId: confirmationResult,
+            verificationCode: otpCode,
+          });
+          userPhoneNumber = result?.user?.phoneNumber || `+91${phone.replace(/^\+91/, '')}`;
+        } else {
+          // --- Web OTP Verification ---
+          const result = await confirmationResult.confirm(otpCode);
+          userPhoneNumber = result.user.phoneNumber;
+        }
         
         // AWS Backend Handshake
         const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/customer/auth/verify-otp`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phone: user.phoneNumber })
+          body: JSON.stringify({ phone: userPhoneNumber })
         });
         
         const data = await response.json();
@@ -169,7 +233,7 @@ export default function LoginPage({ onLoginSuccess, onBack }) {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
-      className="min-h-screen flex items-center justify-center px-6 py-20 relative"
+      className="min-h-screen-safe flex items-center justify-center px-6 pt-32 pb-20 relative safe-top safe-bottom"
     >
       {/* Background */}
       <div className="absolute inset-0">
@@ -188,7 +252,7 @@ export default function LoginPage({ onLoginSuccess, onBack }) {
         initial={{ opacity: 0, y: 30, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.6, delay: 0.2 }}
-        className="relative z-10 w-full max-w-md"
+        className="relative z-10 w-full max-w-md mt-24 md:mt-16"
       >
         <div className="glass rounded-3xl p-8 md:p-10 border border-white/[0.05]">
           
@@ -295,6 +359,16 @@ export default function LoginPage({ onLoginSuccess, onBack }) {
                     <p className="text-xs text-silver/40 mt-3 text-center">
                       We've sent a code to <span className="text-white font-medium">{phone}</span>
                     </p>
+                    <div className="flex justify-center mt-3">
+                      <button
+                        type="button"
+                        onClick={sendOTP}
+                        disabled={cooldown > 0 || isLoading}
+                        className={`text-xs ${cooldown > 0 ? 'text-silver/40 cursor-not-allowed' : 'text-gold hover:text-gold-light'} transition-colors font-medium`}
+                      >
+                        {cooldown > 0 ? `Resend code in ${cooldown}s` : 'Resend Code'}
+                      </button>
+                    </div>
                   </div>
                 )}
 
@@ -316,7 +390,7 @@ export default function LoginPage({ onLoginSuccess, onBack }) {
                 {/* Submit */}
                 <GoldButton
                   type="submit"
-                  disabled={isLoading || (!otpSent && !phone) || (otpSent && !otpCode)}
+                  disabled={isLoading || (!otpSent && (!phone || cooldown > 0)) || (otpSent && !otpCode)}
                   className="w-full flex items-center justify-center gap-2"
                 >
                   {isLoading ? (
@@ -328,7 +402,11 @@ export default function LoginPage({ onLoginSuccess, onBack }) {
                   ) : (
                     <>
                       <LogIn className="w-4 h-4" />
-                      {otpSent ? 'Verify & Sign In' : 'Send OTP'}
+                      {!otpSent && cooldown > 0 
+                        ? `Resend OTP in ${cooldown}s` 
+                        : otpSent 
+                          ? 'Verify & Sign In' 
+                          : 'Send OTP'}
                     </>
                   )}
                 </GoldButton>

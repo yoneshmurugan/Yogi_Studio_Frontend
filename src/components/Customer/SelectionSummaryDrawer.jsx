@@ -1,5 +1,6 @@
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Heart, X, RotateCcw, ChevronDown } from 'lucide-react';
+import { Heart, X, RotateCcw, ChevronDown, AlertTriangle } from 'lucide-react';
 
 function MiniPhotoCard({ photo, type, onRevert }) {
   return (
@@ -8,13 +9,13 @@ function MiniPhotoCard({ photo, type, onRevert }) {
       initial={{ scale: 0.8, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       exit={{ scale: 0.8, opacity: 0 }}
-      className="relative group aspect-square rounded-lg overflow-hidden"
+      className="relative group aspect-square rounded-lg overflow-hidden cursor-pointer"
+      onClick={() => onRevert(photo)}
     >
       <img src={photo.url} alt={photo.filename} className="w-full h-full object-cover" />
       {/* Revert overlay */}
       <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
         <button
-          onClick={() => onRevert(photo.id)}
           className="flex items-center gap-1 px-2 py-1 rounded-lg bg-white/10 text-white text-[10px] hover:bg-white/20 transition-colors"
         >
           <RotateCcw className="w-2.5 h-2.5" />
@@ -22,12 +23,8 @@ function MiniPhotoCard({ photo, type, onRevert }) {
         </button>
       </div>
       {/* State dot */}
-      <div className={`absolute top-1.5 right-1.5 w-4 h-4 rounded-full flex items-center justify-center
-        ${type === 'selected' ? 'bg-gold' : 'bg-red-500'}`}>
-        {type === 'selected'
-          ? <Heart className="w-2 h-2 text-black fill-current" />
-          : <X className="w-2 h-2 text-white" strokeWidth={3} />
-        }
+      <div className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full flex items-center justify-center bg-gold">
+        <Heart className="w-2 h-2 text-black fill-current" />
       </div>
     </motion.div>
   );
@@ -39,7 +36,14 @@ export default function SelectionSummaryDrawer({
   onRevertSelect, onRevertReject,
 }) {
   const selectedPhotos = photos.filter((p) => selectedIds.has(p.id));
-  const rejectedPhotos = photos.filter((p) => rejectedIds.has(p.id));
+  const [photoToRevert, setPhotoToRevert] = useState(null);
+
+  const confirmRevert = () => {
+    if (photoToRevert) {
+      onRevertSelect(photoToRevert.id);
+      setPhotoToRevert(null);
+    }
+  };
 
   return (
     <AnimatePresence>
@@ -73,14 +77,13 @@ export default function SelectionSummaryDrawer({
                 <h3 className="font-serif text-xl text-white font-light">Your Review</h3>
                 <p className="text-silver/40 text-xs mt-0.5">Tap any photo to undo its selection</p>
               </div>
-              <button onClick={onClose} className="p-2 rounded-lg text-silver/40 hover:text-white hover:bg-white/5 transition-colors">
+              <button onClick={onClose} className="p-2 rounded-lg text-silver/40 hover:text-white hover:bg-white/5 transition-colors cursor-pointer">
                 <ChevronDown className="w-5 h-5" />
               </button>
             </div>
 
             {/* Content */}
-            <div className="flex-1 overflow-y-auto px-6 pb-8 space-y-6 min-h-0">
-
+            <div className="flex-1 overflow-y-auto px-6 pb-8 space-y-6 min-h-0 safe-bottom">
               {/* Selected */}
               <div>
                 <div className="flex items-center gap-2 mb-3">
@@ -92,7 +95,7 @@ export default function SelectionSummaryDrawer({
                   <motion.div layout className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2">
                     <AnimatePresence>
                       {selectedPhotos.map((p) => (
-                        <MiniPhotoCard key={p.id} photo={p} type="selected" onRevert={onRevertSelect} />
+                        <MiniPhotoCard key={p.id} photo={p} type="selected" onRevert={setPhotoToRevert} />
                       ))}
                     </AnimatePresence>
                   </motion.div>
@@ -102,30 +105,49 @@ export default function SelectionSummaryDrawer({
                   </div>
                 )}
               </div>
-
-              {/* Rejected */}
-              <div>
-                <div className="flex items-center gap-2 mb-3">
-                  <X className="w-4 h-4 text-red-400" strokeWidth={2.5} />
-                  <span className="text-red-400 text-sm font-medium">Rejected</span>
-                  <span className="text-red-400/50 text-xs font-mono ml-auto">{rejectedPhotos.length} photos</span>
-                </div>
-                {rejectedPhotos.length > 0 ? (
-                  <motion.div layout className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2">
-                    <AnimatePresence>
-                      {rejectedPhotos.map((p) => (
-                        <MiniPhotoCard key={p.id} photo={p} type="rejected" onRevert={onRevertReject} />
-                      ))}
-                    </AnimatePresence>
-                  </motion.div>
-                ) : (
-                  <div className="py-6 text-center rounded-xl border border-dashed border-white/10">
-                    <p className="text-silver/30 text-xs">No photos rejected</p>
-                  </div>
-                )}
-              </div>
             </div>
           </motion.div>
+
+          {/* Revert Confirmation Modal */}
+          {photoToRevert && (
+            <div className="fixed inset-0 z-[80] flex items-center justify-center p-4">
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setPhotoToRevert(null)}
+                className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+              />
+              <motion.div
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.95, opacity: 0 }}
+                className="relative bg-[#111] border border-white/10 rounded-2xl p-6 max-w-sm w-full shadow-2xl"
+              >
+                <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mb-4 border border-red-500/20">
+                  <AlertTriangle className="w-5 h-5 text-red-400" />
+                </div>
+                <h3 className="text-lg font-serif text-white mb-2">Remove Photo?</h3>
+                <p className="text-sm text-silver/60 mb-6">
+                  Are you sure you want to remove this photo from your selected list?
+                </p>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setPhotoToRevert(null)}
+                    className="flex-1 py-3 rounded-xl border border-white/10 text-white text-sm font-medium hover:bg-white/5 transition-colors cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={confirmRevert}
+                    className="flex-1 py-3 rounded-xl bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition-colors cursor-pointer shadow-lg shadow-red-500/20"
+                  >
+                    Remove
+                  </button>
+                </div>
+              </motion.div>
+            </div>
+          )}
         </>
       )}
     </AnimatePresence>

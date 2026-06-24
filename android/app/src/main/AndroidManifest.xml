@@ -33,6 +33,11 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths"></meta-data>
         </provider>
+
+        <!-- Force 120Hz Refresh Rate on Supported Devices -->
+        <meta-data android:name="android.vendor.display.refreshRate" android:value="120" />
+        <meta-data android:name="com.samsung.android.refreshRate" android:value="120" />
+        <meta-data android:name="com.oneplus.screen.refreshRate" android:value="120" />
     </application>
 
     <!-- Permissions -->

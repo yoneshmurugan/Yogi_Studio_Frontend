@@ -12,6 +12,7 @@ import SuccessScreen from './SuccessScreen';
 import UndoToast from './UndoToast';
 import { Routes, Route, useNavigate, useParams, Navigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
 
 export default function CustomerPortal() {
   return (
@@ -163,6 +164,7 @@ function CustomerPortalInner() {
 
   // ── Select (toggle) ───────────────────────────────────────────────────────
   const handleToggleSelect = useCallback((id) => {
+    Haptics.impact({ style: ImpactStyle.Light }).catch(() => {});
     setSelectedIds((prev) => {
       const next = new Set(prev);
       if (next.has(id)) {
@@ -183,6 +185,7 @@ function CustomerPortalInner() {
     setComments(prev => ({ ...prev, [id]: text }));
   }, []);
   const handleToggleReject = useCallback((id) => {
+    Haptics.impact({ style: ImpactStyle.Light }).catch(() => {});
     setRejectedIds((prev) => {
       const next = new Set(prev);
       if (next.has(id)) {
@@ -234,6 +237,7 @@ function CustomerPortalInner() {
   });
 
   const handleFinalise = () => {
+    Haptics.notification({ type: NotificationType.Success }).catch(() => {});
     setFinaliseOpen(false);
     finaliseMutation.mutate();
   };
@@ -331,7 +335,15 @@ function CustomerPortalInner() {
   }
 
   // ── Event Selection Screen ────────────────────────────────────────────────
-  if (events.length > 1 && !activeEvent) {
+  if (!activeEvent) {
+    if (events.length === 1) {
+      return (
+        <div className="min-h-screen-safe bg-[#050505] flex items-center justify-center">
+          <div className="w-8 h-8 border-4 border-gold border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      );
+    }
+
     const containerVariants = {
       hidden: { opacity: 0 },
       show: {
@@ -345,7 +357,7 @@ function CustomerPortalInner() {
     };
 
     return (
-      <div className="min-h-screen bg-[#050505] relative flex flex-col items-center justify-start px-4 py-24 sm:py-32 overflow-hidden">
+      <div className="min-h-screen-safe bg-[#050505] relative flex flex-col items-center justify-start px-4 py-24 sm:py-32 overflow-hidden safe-top">
         {/* Dynamic Animated Background Elements */}
         <motion.div 
           animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.5, 0.3] }}
@@ -497,7 +509,7 @@ function CustomerPortalInner() {
   // ── Main Portal ───────────────────────────────────────────────────────────
   if (!activeEvent) {
     return (
-      <div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center p-6 text-center">
+      <div className="min-h-screen-safe bg-[#050505] flex flex-col items-center justify-center p-6 text-center safe-top">
         <p className="text-silver/50 mb-2 text-lg">No active events found.</p>
         <p className="text-silver/30 text-sm">Please contact Yogi Studio if you believe this is an error.</p>
       </div>
@@ -510,12 +522,12 @@ function CustomerPortalInner() {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
-      className="min-h-screen bg-[#050505]"
+      className="min-h-screen-safe bg-[#050505]"
     >
       {/* Subtle top gradient ambient */}
       <div className="fixed top-0 left-0 right-0 h-64 bg-gradient-to-b from-gold/[0.03] to-transparent pointer-events-none z-0" />
 
-      <div className="relative z-10 px-4 md:px-8 lg:px-16 pt-16 pb-36 max-w-7xl mx-auto">
+      <div className="relative z-10 px-4 md:px-8 lg:px-16 pt-16 pb-[calc(9rem+env(safe-area-inset-bottom))] max-w-7xl mx-auto safe-top">
         
         {/* Event Header is always visible at the top */}
         <WelcomeHeader
