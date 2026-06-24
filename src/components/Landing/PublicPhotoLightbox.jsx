@@ -114,6 +114,10 @@ export default function PublicPhotoLightbox({ photos, initialIndex, onClose }) {
         >
           <ChevronRight className="w-6 h-6" />
         </button>
+
+        {/* Mobile touch zones */}
+        <div className="absolute inset-y-0 left-0 w-1/4 z-10 sm:hidden" onClick={goPrev} />
+        <div className="absolute inset-y-0 right-0 w-1/4 z-10 sm:hidden" onClick={goNext} />
       </div>
     </motion.div>
   );

@@ -14,7 +14,8 @@ const cardVariant = {
 
 function getYoutubeThumbnail(url) {
   try {
-    const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))((\\w|-){11})/);
+    if (!url) return null;
+    const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([\w-]{11})/);
     const id = match ? match[1] : null;
     return id ? `https://img.youtube.com/vi/${id}/hqdefault.jpg` : null;
   } catch { return null; }
@@ -57,8 +58,8 @@ export default function PortfolioCard({ item, onOpenMedia }) {
         alt={item.title}
         loading="lazy"
         decoding="async"
-        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-        style={{ minHeight: isVideo ? '180px' : (isMobile ? '220px' : '300px') }}
+        className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-110"
+        style={isVideo ? { aspectRatio: '16/9' } : {}}
       />
 
       {/* Media Type Icon Overlay */}
@@ -83,13 +84,13 @@ export default function PortfolioCard({ item, onOpenMedia }) {
 
       {/* Bottom Gradient & Text — always visible on mobile */}
       <div className={`absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent transition-opacity duration-500 pointer-events-none z-10 ${isMobile ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
-        <div className="absolute bottom-0 left-0 right-0 p-4 md:p-5">
-          <p className="text-[10px] tracking-[0.3em] uppercase text-gold/80 mb-1">
+        <div className="absolute bottom-0 left-0 right-0 p-3 md:p-5">
+          <p className="text-[9px] md:text-[10px] tracking-[0.3em] uppercase text-gold/80 mb-1">
             {isAlbum ? 'E-ALBUM' : item.eventName}
           </p>
-          <h3 className="font-serif text-base md:text-lg text-white">{item.title}</h3>
+          <h3 className="font-serif text-sm md:text-lg text-white leading-tight">{item.title}</h3>
           {isAlbum && (
-            <p className="text-white/40 text-[10px] tracking-widest uppercase mt-2">Click to open album</p>
+            <p className="text-white/40 text-[9px] tracking-widest uppercase mt-2 hidden sm:block">Click to open</p>
           )}
         </div>
       </div>

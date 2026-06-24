@@ -28,15 +28,15 @@ export default function ContactFooter() {
     <footer id="contact" className="relative border-t border-white/5">
       {/* Main Footer Content */}
       <div className="px-4 md:px-12 lg:px-20 py-16 md:py-28 max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-16 md:gap-8 text-center md:text-left">
           {/* Brand Column */}
           <ScrollReveal direction="up" delay={0}>
-            <div className="text-center md:text-left">
-              <img src={yogiLogo} alt="Yogi Digital Studio" className="w-28 md:w-36 mb-4 mx-auto md:mx-0" />
-              <p className="text-silver/60 text-sm leading-relaxed max-w-xs mb-4">
+            <div className="flex flex-col items-center md:items-start">
+              <img src={yogiLogo} alt="Yogi Digital Studio" className="w-32 md:w-36 mb-6 mx-auto md:mx-0" />
+              <p className="text-silver/60 text-sm leading-relaxed max-w-xs mb-6">
                 The opulent digital studio — capturing future memories with artistry and passion.
               </p>
-              <div className="inline-block px-3 py-1 rounded border border-gold/20 bg-gold/5">
+              <div className="inline-block px-4 py-1.5 rounded-full border border-gold/20 bg-gold/5">
                 <p className="text-gold/80 text-[10px] tracking-[0.2em] uppercase">{experienceYears}+ Years Experience</p>
               </div>
             </div>
@@ -44,22 +44,22 @@ export default function ContactFooter() {
 
           {/* Contact Column */}
           <ScrollReveal direction="up" delay={0.15}>
-            <div>
-              <p className="text-gold/80 text-[10px] tracking-[0.3em] uppercase mb-5">Contact</p>
-              <div className="space-y-3">
-                <a href="https://www.google.com/maps/search/?api=1&query=Periyar+Nagar+Main+Road,+Erode" target="_blank" rel="noreferrer" className="flex items-start gap-3 hover:opacity-80 transition-opacity">
-                  <MapPin className="w-4 h-4 text-gold/60 mt-0.5 flex-shrink-0" />
+            <div className="flex flex-col items-center md:items-start">
+              <p className="text-gold/80 text-[10px] tracking-[0.3em] uppercase mb-6">Contact</p>
+              <div className="space-y-5 flex flex-col items-center md:items-start">
+                <a href="https://www.google.com/maps/search/?api=1&query=Periyar+Nagar+Main+Road,+Erode" target="_blank" rel="noreferrer" className="flex flex-col md:flex-row items-center md:items-start gap-3 hover:opacity-80 transition-opacity">
+                  <MapPin className="w-5 h-5 text-gold/60 flex-shrink-0" />
                   <p className="text-silver/50 text-sm hover:text-gold transition-colors">#H96, Shop no.4, Periyar Nagar<br />Main Road, Erode - 1</p>
                 </a>
-                <div className="flex items-center gap-3">
-                  <Phone className="w-4 h-4 text-gold/60 flex-shrink-0" />
-                  <a href="javascript:void(0)" onClick={() => window.open('https://wa.me/919842775676', '_blank')} className="text-silver/50 text-sm hover:text-gold transition-colors">
+                <div className="flex flex-col md:flex-row items-center md:items-start gap-3">
+                  <Phone className="w-5 h-5 text-gold/60 flex-shrink-0" />
+                  <a href="javascript:void(0)" onClick={() => window.open('https://wa.me/919842775676', '_blank')} className="text-silver/50 text-sm hover:text-gold transition-colors tracking-wide">
                     +91 98427 75676
                   </a>
                 </div>
-                <div className="flex items-center gap-3">
-                  <Mail className="w-4 h-4 text-gold/60 flex-shrink-0" />
-                  <a href="mailto:snapyogibalu@gmail.com" className="text-silver/50 text-sm hover:text-gold transition-colors">
+                <div className="flex flex-col md:flex-row items-center md:items-start gap-3">
+                  <Mail className="w-5 h-5 text-gold/60 flex-shrink-0" />
+                  <a href="mailto:snapyogibalu@gmail.com" className="text-silver/50 text-sm hover:text-gold transition-colors tracking-wide">
                     snapyogibalu@gmail.com
                   </a>
                 </div>
@@ -69,9 +69,9 @@ export default function ContactFooter() {
 
           {/* CTA Column */}
           <ScrollReveal direction="up" delay={0.3}>
-            <div>
-              <p className="text-gold/80 text-[10px] tracking-[0.3em] uppercase mb-5">Book a Session</p>
-              <p className="text-silver/50 text-sm leading-relaxed mb-6">
+            <div className="flex flex-col items-center md:items-start">
+              <p className="text-gold/80 text-[10px] tracking-[0.3em] uppercase mb-6">Book a Session</p>
+              <p className="text-silver/50 text-sm leading-relaxed mb-8 max-w-xs">
                 Ready to create timeless memories? Let&apos;s discuss your vision.
               </p>
               <GoldButton onClick={() => window.open('https://wa.me/919842775676')}>
@@ -79,21 +79,21 @@ export default function ContactFooter() {
               </GoldButton>
 
               {/* Social Row */}
-              <div className="flex items-center gap-3 mt-6 md:mt-8">
+              <div className="flex items-center gap-4 mt-10 md:mt-8">
                 <a href="https://www.instagram.com/yogistudio_official?igsh=NXFlM3RpOG82M2R0" target="_blank" rel="noreferrer"
-                  className="w-11 h-11 md:w-9 md:h-9 rounded-full border border-white/8 flex items-center justify-center hover:border-gold/30 hover:bg-gold/5 transition-all group"
+                  className="w-12 h-12 md:w-9 md:h-9 rounded-full border border-white/8 flex items-center justify-center hover:border-gold/30 hover:bg-gold/5 transition-all group"
                   title="Instagram">
-                  <InstagramIcon className="w-3.5 h-3.5 text-silver/30 group-hover:text-gold transition-colors" />
+                  <InstagramIcon className="w-4 h-4 md:w-3.5 md:h-3.5 text-silver/30 group-hover:text-gold transition-colors" />
                 </a>
                 <a href="javascript:void(0)" onClick={() => window.open('https://wa.me/919842775676', '_blank')}
-                  className="w-11 h-11 md:w-9 md:h-9 rounded-full border border-white/8 flex items-center justify-center hover:border-gold/30 hover:bg-gold/5 transition-all group"
+                  className="w-12 h-12 md:w-9 md:h-9 rounded-full border border-white/8 flex items-center justify-center hover:border-gold/30 hover:bg-gold/5 transition-all group"
                   title="WhatsApp">
-                  <WhatsappIcon className="w-3.5 h-3.5 text-silver/30 group-hover:text-gold transition-colors" />
+                  <WhatsappIcon className="w-4 h-4 md:w-3.5 md:h-3.5 text-silver/30 group-hover:text-gold transition-colors" />
                 </a>
                 <a href="https://youtube.com/@yogistudio-official?si=w81KIpSqR3SXeSWk" target="_blank" rel="noreferrer"
-                  className="w-11 h-11 md:w-9 md:h-9 rounded-full border border-white/8 flex items-center justify-center hover:border-gold/30 hover:bg-gold/5 transition-all group"
+                  className="w-12 h-12 md:w-9 md:h-9 rounded-full border border-white/8 flex items-center justify-center hover:border-gold/30 hover:bg-gold/5 transition-all group"
                   title="YouTube">
-                  <YoutubeIcon className="w-3.5 h-3.5 text-silver/30 group-hover:text-gold transition-colors" />
+                  <YoutubeIcon className="w-4 h-4 md:w-3.5 md:h-3.5 text-silver/30 group-hover:text-gold transition-colors" />
                 </a>
               </div>
             </div>
@@ -102,12 +102,12 @@ export default function ContactFooter() {
       </div>
 
       {/* Bottom Bar */}
-      <div className="border-t border-white/5 px-6 py-5">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
-          <p className="text-silver/20 text-xs">
+      <div className="border-t border-white/5 px-6 py-6">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+          <p className="text-silver/20 text-[10px] tracking-widest uppercase text-center md:text-left">
             © {new Date().getFullYear()} Yogi Digital Studio. All rights reserved.
           </p>
-          <p className="text-silver/20 text-xs">
+          <p className="text-silver/20 text-[10px] tracking-widest uppercase text-center md:text-right">
             Photography Executive — <span className="text-gold/40">Yogi Balu</span>
           </p>
         </div>

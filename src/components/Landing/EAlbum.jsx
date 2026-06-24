@@ -9,7 +9,7 @@ import HTMLFlipBook from "react-pageflip";
 import {
   Play, Pause, Maximize, Minimize,
   Volume2, VolumeX, ChevronLeft, ChevronRight,
-  LogOut, Music2, Heart,
+  LogOut, Music2, Heart, RotateCw
 } from "lucide-react";
 
 // ──────────────────────────────────────────────────────────
@@ -54,10 +54,11 @@ function PageDots({ total, current, onGo }) {
 // ──────────────────────────────────────────────────────────
 // 4.  CONTROL BAR BUTTON
 // ──────────────────────────────────────────────────────────
-function Btn({ children, onClick, label, active, disabled, danger }) {
+function Btn({ children, onClick, label, active, disabled, danger, className = "" }) {
   return (
     <button
       onClick={onClick} disabled={disabled} aria-label={label} title={label}
+      className={className}
       style={{
         width: 36, height: 36, borderRadius: 12, border: "none",
         background: active ? "rgba(212,175,55,.35)" : "transparent",
@@ -82,7 +83,7 @@ function Btn({ children, onClick, label, active, disabled, danger }) {
 // ──────────────────────────────────────────────────────────
 // 5.  GLASSMORPHISM CONTROL BAR
 // ──────────────────────────────────────────────────────────
-function ControlBar({ current, total, isPlaying, isMuted, isFullscreen, onPrev, onNext, onTogglePlay, onToggleMute, onToggleFullscreen, onExit, onGo }) {
+function ControlBar({ current, total, isPlaying, isMuted, isFullscreen, onPrev, onNext, onTogglePlay, onToggleMute, onToggleFullscreen, onToggleRotate, onExit, onGo }) {
   const barStyle = {
     display: "flex", alignItems: "center", gap: 2,
     padding: "8px 14px", borderRadius: 20,
@@ -104,9 +105,6 @@ function ControlBar({ current, total, isPlaying, isMuted, isFullscreen, onPrev, 
       transition={{ type: "spring", stiffness: 260, damping: 28 }}
       className="absolute bottom-6 left-0 right-0 flex flex-col items-center gap-2 pointer-events-none z-50"
     >
-      <div className="pointer-events-auto">
-        <PageDots total={total} current={current} onGo={onGo} />
-      </div>
       <div style={barStyle} className="pointer-events-auto scale-90 md:scale-100 origin-bottom overflow-x-auto max-w-[95vw] hide-scrollbar">
         <Btn onClick={onExit} label="Exit" danger><LogOut size={15} /></Btn>
         {vDiv}
@@ -122,7 +120,10 @@ function ControlBar({ current, total, isPlaying, isMuted, isFullscreen, onPrev, 
         <Btn onClick={onToggleMute} label={isMuted ? "Unmute" : "Mute"} active={!isMuted}>
           {isMuted ? <VolumeX size={15} /> : <Volume2 size={15} />}
         </Btn>
-        <Btn onClick={onToggleFullscreen} label={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}>
+        <Btn onClick={onToggleRotate} label="Rotate Screen" className="md:hidden">
+          <RotateCw size={15} />
+        </Btn>
+        <Btn onClick={onToggleFullscreen} label={isFullscreen ? "Exit Fullscreen" : "Fullscreen"} className="hidden md:flex">
           {isFullscreen ? <Minimize size={15} /> : <Maximize size={15} />}
         </Btn>
       </div>
@@ -301,11 +302,27 @@ export default function EAlbum({ onExit, photos = [], musicUrl }) {
 
   const removeNote = useCallback((id) => setMusicNotes(n => n.filter(x => x.id !== id)), []);
 
-  // ── Fullscreen ────────────────────────────
+  // ── Fullscreen & Rotate ────────────────────────────
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) containerRef.current?.requestFullscreen?.();
     else document.exitFullscreen?.();
   };
+  
+  const handleToggleRotate = async () => {
+    try {
+      if (!document.fullscreenElement && containerRef.current?.requestFullscreen) {
+        await containerRef.current.requestFullscreen();
+      }
+      if (window.screen?.orientation?.lock) {
+        await window.screen.orientation.lock("landscape");
+      } else {
+        alert("Please turn your device sideways for the best viewing experience.");
+      }
+    } catch (e) {
+      alert("Please turn your device sideways for the best viewing experience.");
+    }
+  };
+
   useEffect(() => {
     const h = () => setIsFullscreen(!!document.fullscreenElement);
     document.addEventListener("fullscreenchange", h);
@@ -320,8 +337,9 @@ export default function EAlbum({ onExit, photos = [], musicUrl }) {
       <div
         ref={containerRef}
         onMouseMove={revealControls}
+        onTouchStart={revealControls}
         style={{
-          position: "fixed", inset: 0, width: "100%", height: "100vh",
+          position: "fixed", inset: 0, width: "100%", height: "100%",
           background: "#0a0a0a",
           display: "flex", alignItems: "center", justifyContent: "center",
           overflow: "hidden", userSelect: "none",
@@ -335,7 +353,7 @@ export default function EAlbum({ onExit, photos = [], musicUrl }) {
         }} />
 
         {/* HTMLFlipBook Container */}
-        <div className="w-[95vw] md:w-[85vw] max-w-5xl aspect-[3/2] max-h-[75vh] flex items-center justify-center">
+        <div className="w-[98%] h-[90%] md:w-[85vw] md:h-[80vh] max-w-[1600px] md:max-w-5xl flex items-center justify-center">
           <HTMLFlipBook
             width={550}
             height={733}
@@ -370,6 +388,7 @@ export default function EAlbum({ onExit, photos = [], musicUrl }) {
               onPrev={goPrev} onNext={goNext}
               onTogglePlay={togglePlay} onToggleMute={toggleMute}
               onToggleFullscreen={toggleFullscreen}
+              onToggleRotate={handleToggleRotate}
               onExit={onExit || (() => { })}
               onGo={goTo}
             />

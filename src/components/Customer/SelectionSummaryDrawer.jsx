@@ -89,7 +89,7 @@ export default function SelectionSummaryDrawer({
                   <span className="text-gold/50 text-xs font-mono ml-auto">{selectedPhotos.length} photos</span>
                 </div>
                 {selectedPhotos.length > 0 ? (
-                  <motion.div layout className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-2">
+                  <motion.div layout className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2">
                     <AnimatePresence>
                       {selectedPhotos.map((p) => (
                         <MiniPhotoCard key={p.id} photo={p} type="selected" onRevert={onRevertSelect} />
@@ -111,7 +111,7 @@ export default function SelectionSummaryDrawer({
                   <span className="text-red-400/50 text-xs font-mono ml-auto">{rejectedPhotos.length} photos</span>
                 </div>
                 {rejectedPhotos.length > 0 ? (
-                  <motion.div layout className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-2">
+                  <motion.div layout className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2">
                     <AnimatePresence>
                       {rejectedPhotos.map((p) => (
                         <MiniPhotoCard key={p.id} photo={p} type="rejected" onRevert={onRevertReject} />

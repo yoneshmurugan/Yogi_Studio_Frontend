@@ -90,60 +90,62 @@ export default function AboutSection() {
         </ScrollReveal>
 
         {/* Right — Text reveals */}
-        <div className="flex flex-col gap-6">
-          <ScrollReveal delay={0.1}>
-            <p className="text-gold/80 text-xs tracking-[0.4em] uppercase mb-2">About Us • Since 2001</p>
-            <h2 className="font-serif text-3xl md:text-4xl font-light text-white leading-snug">
+        <div className="flex flex-col gap-6 lg:gap-8 items-center lg:items-start text-center lg:text-left mt-12 lg:mt-0 px-2 lg:px-0">
+          <ScrollReveal delay={0.1} className="w-full">
+            <p className="text-gold/80 text-[10px] lg:text-xs tracking-[0.4em] uppercase mb-3">About Us • Since 2001</p>
+            <h2 className="font-serif text-4xl lg:text-5xl font-light text-white leading-tight">
               Where Art Meets<br />
-              <span className="italic gold-text">Emotion</span>
+              <span className="italic text-[#d4af37]">Emotion</span>
             </h2>
           </ScrollReveal>
 
-          <ScrollReveal delay={0.2}>
-            <p className="text-silver/60 text-sm leading-relaxed">
+          <ScrollReveal delay={0.2} className="w-full">
+            <p className="text-silver/60 text-sm lg:text-base leading-relaxed max-w-xl mx-auto lg:mx-0">
               At Yogi Digital Studio, photography is more than a profession—it is a lifelong pursuit of cinematic perfection. We blend an editorial aesthetic with raw authenticity to craft films and photographs that transcend time.
             </p>
           </ScrollReveal>
 
-          <ScrollReveal delay={0.3}>
-            <p className="text-silver/60 text-sm leading-relaxed">
+          <ScrollReveal delay={0.3} className="w-full">
+            <p className="text-silver/60 text-sm lg:text-base leading-relaxed max-w-xl mx-auto lg:mx-0">
               For {experienceYears} years, we have been welcomed into your families and trusted with your most intimate moments. Our approach is incredibly personal—we don't just stand behind a camera; we celebrate with you, laugh with you, and quietly preserve the genuine emotion of your greatest milestones.
             </p>
           </ScrollReveal>
 
           {/* Studio Details */}
-          <ScrollReveal delay={0.4}>
-            <div className="border-t border-white/8 pt-6 mt-2 space-y-3">
-              <a href="https://www.google.com/maps/search/?api=1&query=Periyar+Nagar+Main+Road,+Erode" target="_blank" rel="noreferrer" className="flex items-start gap-3 hover:opacity-80 transition-opacity">
-                <MapPin className="w-4 h-4 text-gold mt-0.5 flex-shrink-0" />
-                <p className="text-silver/50 text-sm hover:text-gold transition-colors">#H96, Shop no.4, Periyar Nagar Main Road, Erode - 1</p>
+          <ScrollReveal delay={0.4} className="w-full">
+            <div className="border-t border-white/10 pt-8 mt-4 space-y-6 flex flex-col items-center lg:items-start">
+              <a href="https://www.google.com/maps/search/?api=1&query=Periyar+Nagar+Main+Road,+Erode" target="_blank" rel="noreferrer" className="flex flex-col lg:flex-row items-center lg:items-start gap-3 hover:opacity-80 transition-opacity">
+                <MapPin className="w-5 h-5 text-[#d4af37] flex-shrink-0" />
+                <p className="text-silver/50 text-sm hover:text-[#d4af37] transition-colors leading-relaxed max-w-xs">#H96, Shop no.4, Periyar Nagar Main Road, Erode - 1</p>
               </a>
-              <a href="javascript:void(0)" onClick={() => window.open('https://wa.me/919842775676', '_blank')} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-                <Phone className="w-4 h-4 text-gold flex-shrink-0" />
-                <p className="text-silver/50 text-sm hover:text-gold transition-colors">+91 98427 75676</p>
+              <a href="javascript:void(0)" onClick={() => window.open('https://wa.me/919842775676', '_blank')} className="flex flex-col lg:flex-row items-center lg:items-start gap-3 hover:opacity-80 transition-opacity">
+                <Phone className="w-5 h-5 text-[#d4af37] flex-shrink-0" />
+                <p className="text-silver/50 text-sm hover:text-[#d4af37] transition-colors tracking-wide">+91 98427 75676</p>
               </a>
             </div>
           </ScrollReveal>
 
           {/* Social Links */}
-          <ScrollReveal delay={0.5}>
-            <div className="flex items-center gap-4 mt-2">
-              <a href="https://www.instagram.com/yogistudio_official?igsh=NXFlM3RpOG82M2R0" target="_blank" rel="noreferrer"
-                className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:border-gold/40 hover:bg-gold/5 transition-all group"
-                title="Instagram">
-                <InstagramIcon className="w-4 h-4 text-silver/40 group-hover:text-gold transition-colors" />
-              </a>
-              <a href="javascript:void(0)" onClick={() => window.open('https://wa.me/919842775676', '_blank')}
-                className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:border-gold/40 hover:bg-gold/5 transition-all group"
-                title="WhatsApp">
-                <WhatsappIcon className="w-4 h-4 text-silver/40 group-hover:text-gold transition-colors" />
-              </a>
-              <a href="https://youtube.com/@yogistudio-official?si=w81KIpSqR3SXeSWk" target="_blank" rel="noreferrer"
-                className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:border-gold/40 hover:bg-gold/5 transition-all group"
-                title="YouTube">
-                <YoutubeIcon className="w-4 h-4 text-silver/40 group-hover:text-gold transition-colors" />
-              </a>
-              <span className="text-silver/30 text-xs ml-2">@yogistudio_official</span>
+          <ScrollReveal delay={0.5} className="w-full">
+            <div className="flex flex-col items-center lg:items-start gap-4 mt-6">
+              <div className="flex items-center gap-5">
+                <a href="https://www.instagram.com/yogistudio_official?igsh=NXFlM3RpOG82M2R0" target="_blank" rel="noreferrer"
+                  className="w-12 h-12 lg:w-10 lg:h-10 rounded-full border border-white/10 flex items-center justify-center hover:border-gold/40 hover:bg-gold/5 transition-all group"
+                  title="Instagram">
+                  <InstagramIcon className="w-4 h-4 text-silver/40 group-hover:text-gold transition-colors" />
+                </a>
+                <a href="javascript:void(0)" onClick={() => window.open('https://wa.me/919842775676', '_blank')}
+                  className="w-12 h-12 lg:w-10 lg:h-10 rounded-full border border-white/10 flex items-center justify-center hover:border-gold/40 hover:bg-gold/5 transition-all group"
+                  title="WhatsApp">
+                  <WhatsappIcon className="w-4 h-4 text-silver/40 group-hover:text-gold transition-colors" />
+                </a>
+                <a href="https://youtube.com/@yogistudio-official?si=w81KIpSqR3SXeSWk" target="_blank" rel="noreferrer"
+                  className="w-12 h-12 lg:w-10 lg:h-10 rounded-full border border-white/10 flex items-center justify-center hover:border-gold/40 hover:bg-gold/5 transition-all group"
+                  title="YouTube">
+                  <YoutubeIcon className="w-4 h-4 text-silver/40 group-hover:text-gold transition-colors" />
+                </a>
+              </div>
+              <span className="text-silver/30 text-[11px] tracking-widest uppercase mt-2">@yogistudio_official</span>
             </div>
           </ScrollReveal>
         </div>

@@ -14,31 +14,35 @@ export default function VideoModal({ url, onClose }) {
   }
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 backdrop-blur-md p-4 md:p-12">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/95 backdrop-blur-xl p-0 md:p-12" onClick={onClose}>
+      <button
+        type="button"
+        onClick={onClose}
+        className="absolute top-4 right-4 md:top-6 md:right-8 z-[10000] p-3 rounded-full bg-black/40 border border-white/10 text-white hover:bg-gold/80 hover:text-black transition-colors backdrop-blur-md"
+      >
+        <X className="w-5 h-5 md:w-6 md:h-6" />
+      </button>
+
       <motion.div
+        onClick={(e) => e.stopPropagation()}
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 20 }}
         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-        className="relative w-full max-w-6xl aspect-video bg-charcoal rounded-2xl overflow-hidden shadow-2xl shadow-black/80 ring-1 ring-white/10"
+        className="relative w-full bg-black md:rounded-2xl overflow-hidden shadow-2xl shadow-black/80 ring-0 md:ring-1 ring-white/10 flex flex-col mx-auto"
+        style={{ maxWidth: 'min(72rem, calc(100dvh * 16 / 9))' }}
       >
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 z-50 p-2 rounded-full bg-black/40 text-white hover:bg-gold/80 hover:text-black transition-colors backdrop-blur-sm"
-        >
-          <X className="w-5 h-5" />
-        </button>
         
         {videoId ? (
-          <div className="w-full h-full flex flex-col">
+          <div className="w-full flex flex-col">
             <iframe
-              src={`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`}
+              src={`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&fs=1&playsinline=1`}
               title="YouTube video player"
-              className="w-full flex-1 border-0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              className="w-full aspect-video border-0 bg-black"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
               allowFullScreen
             />
-            <div className="bg-black/60 p-3 text-center border-t border-white/10">
+            <div className="hidden md:block bg-black/60 p-3 text-center border-t border-white/10">
               <p className="text-silver/70 text-sm">
                 Video not playing? Some videos restrict embedding.{' '}
                 <a href={url} target="_blank" rel="noopener noreferrer" className="text-gold hover:text-gold-light underline">

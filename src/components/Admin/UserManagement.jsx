@@ -43,7 +43,7 @@ function StatusBadge({ status }) {
 
 function Breadcrumb({ crumbs }) {
   return (
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto hide-scrollbar whitespace-nowrap pb-2 -mx-2 px-2 sm:mx-0 sm:px-0">
         <button
           onClick={crumbs[0].onClick}
           className="p-2 -ml-2 rounded-xl text-silver/40 hover:text-white hover:bg-white/5 transition-all"
@@ -328,7 +328,7 @@ function FolderCard({ folder, user, onAddPhotos, onDeletePhoto, onDelete, onRena
 
               {/* Photo grid */}
               {folder.photos.length > 0 && (
-                <div className="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-8 gap-2">
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2">
                   <AnimatePresence>
                     {folder.photos.map((ph) => (
                       <motion.div
@@ -515,9 +515,9 @@ function EventDetail({
       />
 
       {/* Event header */}
-      <div className="glass rounded-2xl p-6 mb-6 border border-white/[0.05]">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
+      <div className="glass rounded-2xl p-5 sm:p-6 mb-6 border border-white/[0.05]">
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+          <div className="w-full sm:w-auto">
             <p className="text-gold/70 text-[10px] tracking-[0.35em] uppercase mb-1">{event.category}</p>
             <h2 className="font-serif text-2xl text-white font-light mb-1">{event.eventName}</h2>
             <div className="flex flex-wrap items-center gap-3 text-sm text-silver/50 mt-1">
@@ -535,7 +535,7 @@ function EventDetail({
               )}
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
             <StatusBadge status={event.status} />
             {event.status === 'pending' && (
               <button

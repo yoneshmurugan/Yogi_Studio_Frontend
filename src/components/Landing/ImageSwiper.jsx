@@ -130,7 +130,7 @@ export default function ImageSwiper({
       {cardOrder.map((originalIndex, displayIndex) => {
         const card = cards[originalIndex];
         return (
-          <article key={card.id} className="image-card absolute cursor-grab active:cursor-grabbing place-self-center border border-gold/20 rounded-2xl shadow-lg overflow-hidden will-change-transform bg-charcoal" style={{
+          <article key={card.id || displayIndex} className="image-card absolute cursor-grab active:cursor-grabbing place-self-center border border-gold/20 rounded-2xl shadow-xl overflow-hidden will-change-transform bg-zinc-900" style={{
             '--i': displayIndex.toString(),
             '--swipe-x': '0px',
             '--swipe-rotate': '0deg',
@@ -138,17 +138,31 @@ export default function ImageSwiper({
             height: cardHeight,
             zIndex: cards.length - displayIndex,
             transform: `
-              translateY(calc(var(--i) * 10px))
-              translateZ(calc(var(--i) * -45px))
+              translateY(calc(var(--i) * 20px))
+              scale(calc(1 - var(--i) * 0.06))
+              rotate(calc(var(--i) * -1.5deg))
               translateX(var(--swipe-x))
-              rotate(var(--swipe-rotate))
+              rotate(calc(var(--swipe-rotate)))
             `
           }}>
-            <img src={card.imageUrl} alt="About Studio" className="w-full h-full object-cover pointer-events-none" draggable={false} onError={e => {
+            <img src={card.imageUrl || card.image} alt={card.title || "Image"} className="w-full h-full object-cover pointer-events-none" draggable={false} onError={e => {
               const target = e.target;
               target.onerror = null;
               target.src = `https://placehold.co/${cardWidth}x${cardHeight}/2d3748/e2e8f0?text=Image+Not+Found`;
             }} />
+            
+            {card.title && (
+              <>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-transparent pointer-events-none" />
+                <div className="absolute bottom-0 left-0 right-0 p-6 pointer-events-none">
+                  <div className="h-[2px] w-10 bg-[#d4af37] mb-3 opacity-80" />
+                  <h3 className="text-white font-serif text-xl font-light mb-2">{card.title}</h3>
+                  {card.description && (
+                    <p className="text-white/80 text-sm leading-relaxed">{card.description}</p>
+                  )}
+                </div>
+              </>
+            )}
           </article>
         );
       })}

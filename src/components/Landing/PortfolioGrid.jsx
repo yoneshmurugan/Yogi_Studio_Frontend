@@ -14,7 +14,7 @@ export default function PortfolioGrid({ items, onOpenMedia }) {
       variants={container}
       initial="hidden"
       animate="visible"
-      className="columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4"
+      className="columns-2 sm:columns-2 lg:columns-3 gap-2 md:gap-4 space-y-2 md:space-y-4"
     >
       <AnimatePresence mode="popLayout">
         {items.map((item) => (

@@ -9,6 +9,7 @@ import { FiArrowRight, FiMapPin } from "react-icons/fi";
 import { useRef, useEffect, useState } from "react";
 import yogiLogo from "../../assets/yogi-logo-removebg-preview.png";
 import vidSample from "../../assets/ReelIMG.mp4";
+import imgHeroMobile from "../../assets/Heromobile.webp";
 const imgHero = "https://ik.imagekit.io/yogistudio/Hero.jpg";
 const imgWedding = "https://ik.imagekit.io/yogistudio/IMG_5775.webp";
 const imgVideo1 = "https://ik.imagekit.io/yogistudio/Heroimg.webp";
@@ -136,7 +137,7 @@ export const SmoothScrollHero = () => {
 
 const Hero = () => {
   const isMobile = useIsMobile();
-  const SECTION_HEIGHT = isMobile ? 1500 : 2500;
+  const SECTION_HEIGHT = isMobile ? 2200 : 2500;
 
   return (
     <div
@@ -153,23 +154,16 @@ const Hero = () => {
 const CenterImage = ({ sectionHeight, isMobile }) => {
   const { scrollY } = useScroll();
 
-  // Desktop: fancy clipPath polygon reveal (GPU can handle it)
-  const clip1 = useTransform(scrollY, [0, 1500], [25, 0]);
-  const clip2 = useTransform(scrollY, [0, 1500], [75, 100]);
+  // ClipPath polygon reveal — starts as centered box, expands to full screen
+  const clip1 = useTransform(scrollY, [0, isMobile ? 800 : 1500], [25, 0]);
+  const clip2 = useTransform(scrollY, [0, isMobile ? 800 : 1500], [75, 100]);
   const clipPath = useMotionTemplate`polygon(${clip1}% ${clip1}%, ${clip2}% ${clip1}%, ${clip2}% ${clip2}%, ${clip1}% ${clip2}%)`;
 
-  // Desktop: background-size zoom
-  const backgroundSize = useTransform(
-    scrollY,
-    [0, sectionHeight + 500],
-    ["170%", "100%"]
-  );
-
-  // Mobile: GPU-compositable scale on <img> (much cheaper than backgroundSize)
+  // Scale zoom — image starts zoomed in and settles to normal
   const imgScale = useTransform(
     scrollY,
     [0, sectionHeight + 500],
-    [1.4, 1]
+    [isMobile ? 1.3 : 1.7, 1]
   );
 
   const opacity = useTransform(
@@ -178,42 +172,34 @@ const CenterImage = ({ sectionHeight, isMobile }) => {
     [1, 0]
   );
 
-  // Mobile: simple inset clip via overflow:hidden + scale (no polygon recalc)
-  const mobileClipInset = useTransform(scrollY, [0, 1500], [15, 0]);
-  const mobileInset = useMotionTemplate`${mobileClipInset}%`;
+  // Desktop: background-size zoom (must be called before any early return)
+  const backgroundSize = useTransform(
+    scrollY,
+    [0, sectionHeight + 500],
+    ["170%", "100%"]
+  );
 
   if (isMobile) {
-    // Mobile path: uses transform:scale on an <img> (GPU layer) + inset for reveal
     return (
       <motion.div
-        className="sticky top-0 h-screen w-full overflow-hidden relative"
-        style={{ opacity }}
+        className="sticky top-0 h-[100dvh] w-full overflow-hidden relative"
+        style={{ clipPath, opacity }}
       >
-        <motion.div
-          className="absolute overflow-hidden"
+        <motion.img
+          src={imgHeroMobile}
+          alt="Hero"
+          className="w-full h-full object-cover"
           style={{
-            top: mobileInset,
-            left: mobileInset,
-            right: mobileInset,
-            bottom: mobileInset,
-            willChange: 'top, left, right, bottom',
+            scale: imgScale,
+            objectPosition: 'center top',
+            willChange: 'transform',
           }}
-        >
-          <motion.img
-            src={imgHero}
-            alt="Hero"
-            className="w-full h-full object-cover"
-            style={{
-              scale: imgScale,
-              willChange: 'transform',
-            }}
-          />
-        </motion.div>
+        />
         {/* Watermark Logo */}
         <img
           src={yogiLogo}
           alt="Yogi Studio Watermark"
-          className="absolute bottom-6 right-6 w-24 opacity-[0.3] pointer-events-none select-none drop-shadow-md z-10"
+          className="absolute bottom-6 right-6 w-36 opacity-[0.3] pointer-events-none select-none drop-shadow-md z-10"
         />
       </motion.div>
     );
@@ -244,27 +230,27 @@ const CenterImage = ({ sectionHeight, isMobile }) => {
 
 const ParallaxImages = ({ isMobile }) => {
   return (
-    <div className="mx-auto max-w-5xl px-4 pt-[200px] pointer-events-none relative z-10">
+    <div className="mx-auto max-w-5xl px-2 md:px-4 pt-[150px] md:pt-[200px] pointer-events-none relative z-10 flex flex-col md:block">
       <ParallaxMedia
         src={imgWedding}
         alt="Wedding photography"
-        start={isMobile ? -80 : -200}
-        end={isMobile ? 80 : 200}
-        className="w-1/3 rounded-xl shadow-[0_0_40px_rgba(0,0,0,0.5)]"
+        start={isMobile ? -20 : -200}
+        end={isMobile ? 20 : 200}
+        className="w-[75%] ml-2 md:ml-0 md:w-1/3 rounded-xl shadow-[0_0_40px_rgba(0,0,0,0.5)] relative z-10"
       />
       <ParallaxMedia
         src={imgVideo1}
         alt="Sample Video 1"
-        start={isMobile ? 80 : 200}
-        end={isMobile ? -100 : -250}
-        className="mx-auto w-2/3 rounded-xl shadow-[0_0_40px_rgba(0,0,0,0.5)]"
+        start={isMobile ? 30 : 200}
+        end={isMobile ? -30 : -250}
+        className="ml-auto mr-2 w-[90%] md:w-2/3 mt-[-10px] md:mt-0 rounded-xl shadow-[0_0_40px_rgba(0,0,0,0.5)] relative z-20"
       />
       <ParallaxMedia
         src={imgEvent}
         alt="Event photography"
-        start={isMobile ? -80 : -200}
-        end={isMobile ? 80 : 200}
-        className="ml-auto w-1/3 rounded-xl shadow-[0_0_40px_rgba(0,0,0,0.5)]"
+        start={isMobile ? -20 : -200}
+        end={isMobile ? 20 : 200}
+        className="w-[70%] ml-4 md:ml-auto md:w-1/3 mt-[-15px] md:mt-0 rounded-xl shadow-[0_0_40px_rgba(0,0,0,0.5)] relative z-10"
       />
       {/* Video always shown on all devices */}
       <ParallaxMedia
@@ -272,8 +258,8 @@ const ParallaxImages = ({ isMobile }) => {
         src={vidSample}
         alt="Sample Video 2"
         start={0}
-        end={isMobile ? -200 : -500}
-        className="ml-24 w-5/12 rounded-xl shadow-[0_0_40px_rgba(0,0,0,0.5)]"
+        end={isMobile ? -60 : -500}
+        className="ml-auto mr-4 w-[60%] md:ml-24 md:w-5/12 mt-[-20px] md:mt-0 rounded-xl shadow-[0_0_40px_rgba(0,0,0,0.5)] relative z-20"
       />
     </div>
   );
@@ -336,13 +322,171 @@ const StudioDetails = () => {
   const glowSize = isMobile ? 280 : 600;
   const ringSize = isMobile ? 240 : 520;
 
+  if (isMobile) {
+    // Mobile: sticky section with SplashCursor enabled for touch interaction
+    return (
+      <div className="relative w-full" style={{ height: '200vh' }}>
+        <div className="sticky top-0 h-[100dvh] w-full overflow-hidden">
+          {/* SplashCursor enabled on mobile for touch play */}
+          <DesktopSplashCursor />
+
+          <section
+            id="studio-details"
+            className="relative h-full w-full flex flex-col items-center justify-center text-white text-center z-20 px-4 py-12"
+          >
+            {/* ── Top area: Logo + decorations ── */}
+            <div className="flex-shrink-0 w-full flex flex-col items-center pt-4">
+              {/* Ambient radial glow */}
+              <div
+                aria-hidden
+                style={{
+                  position: "absolute",
+                  top: "50%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  width: glowSize,
+                  height: glowSize,
+                  borderRadius: "50%",
+                  background: "radial-gradient(circle, rgba(212,175,55,0.13) 0%, rgba(212,175,55,0.04) 45%, transparent 70%)",
+                  animation: "pulseGlow 4s ease-in-out infinite",
+                  pointerEvents: "none",
+                }}
+              />
+              {/* Outer ring */}
+              <div
+                aria-hidden
+                style={{
+                  position: "absolute",
+                  top: "50%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  width: ringSize,
+                  height: ringSize,
+                  borderRadius: "50%",
+                  border: "1px solid rgba(212,175,55,0.08)",
+                  animation: "slowSpin 60s linear infinite",
+                  pointerEvents: "none",
+                }}
+              />
+              {/* Floating gold dust */}
+              <div aria-hidden style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
+                {particles.map((p, i) => (
+                  <DustParticle key={i} style={p} />
+                ))}
+              </div>
+
+              {/* Logo + line accents */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.88 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                transition={{ ease: "easeInOut", duration: 1.2 }}
+                className="w-full flex flex-col items-center gap-4"
+              >
+                {/* Lines above logo */}
+                <div className="flex items-center gap-4 w-full justify-center">
+                  <motion.div
+                    initial={{ scaleX: 0, opacity: 0 }}
+                    whileInView={{ scaleX: 1, opacity: 0.4 }}
+                    transition={{ duration: 1.4, ease: "easeOut", delay: 0.3 }}
+                    style={{ transformOrigin: "right" }}
+                    className="h-px flex-1 max-w-[120px] bg-gradient-to-l from-[#d4af37] to-transparent"
+                  />
+                  <span style={{ color: "#d4af37", opacity: 0.5, fontSize: 10, letterSpacing: "0.3em" }}>✦</span>
+                  <motion.div
+                    initial={{ scaleX: 0, opacity: 0 }}
+                    whileInView={{ scaleX: 1, opacity: 0.4 }}
+                    transition={{ duration: 1.4, ease: "easeOut", delay: 0.3 }}
+                    style={{ transformOrigin: "left" }}
+                    className="h-px flex-1 max-w-[120px] bg-gradient-to-r from-[#d4af37] to-transparent"
+                  />
+                </div>
+                {/* Logo */}
+                <img
+                  src={yogiLogo}
+                  alt="Yogi Digital Studio"
+                  style={{ mixBlendMode: "lighten" }}
+                  className="w-[95vw] md:w-[85vw] max-w-xl object-contain select-none pointer-events-none"
+                />
+                {/* Lines below logo */}
+                <div className="flex items-center gap-4 w-full justify-center">
+                  <motion.div
+                    initial={{ scaleX: 0, opacity: 0 }}
+                    whileInView={{ scaleX: 1, opacity: 0.4 }}
+                    transition={{ duration: 1.4, ease: "easeOut", delay: 0.5 }}
+                    style={{ transformOrigin: "right" }}
+                    className="h-px flex-1 max-w-[120px] bg-gradient-to-l from-[#d4af37] to-transparent"
+                  />
+                  <div style={{ display: "flex", gap: 6 }}>
+                    {[0, 1, 2, 3, 4].map((d) => (
+                      <motion.span
+                        key={d}
+                        initial={{ opacity: 0, scale: 0 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.6 + d * 0.07, duration: 0.4 }}
+                        style={{
+                          display: "inline-block",
+                          width: d === 2 ? 6 : 3,
+                          height: d === 2 ? 6 : 3,
+                          borderRadius: "50%",
+                          background: "#d4af37",
+                          opacity: d === 2 ? 0.9 : 0.4,
+                        }}
+                      />
+                    ))}
+                  </div>
+                  <motion.div
+                    initial={{ scaleX: 0, opacity: 0 }}
+                    whileInView={{ scaleX: 1, opacity: 0.4 }}
+                    transition={{ duration: 1.4, ease: "easeOut", delay: 0.5 }}
+                    style={{ transformOrigin: "left" }}
+                    className="h-px flex-1 max-w-[120px] bg-gradient-to-r from-[#d4af37] to-transparent"
+                  />
+                </div>
+              </motion.div>
+
+              <motion.h1
+                initial={{ y: 48, opacity: 0 }}
+                whileInView={{ y: 0, opacity: 1 }}
+                transition={{ ease: "easeInOut", duration: 0.75, delay: 0.2 }}
+                className="mb-0 text-3xl font-serif text-[#d4af37] font-light drop-shadow-lg mt-4"
+              >
+                Yogi Digital Studio
+              </motion.h1>
+              <motion.div
+                initial={{ y: 48, opacity: 0 }}
+                whileInView={{ y: 0, opacity: 1 }}
+                transition={{ ease: "easeInOut", duration: 0.75, delay: 0.3 }}
+                className="mt-2 block"
+              >
+                <span className="text-[#d4af37] opacity-80 tracking-[0.4em] text-[10px] uppercase">
+                  Since 2001
+                </span>
+              </motion.div>
+            </div>
+
+            {/* ── Bottom area: Description text ── */}
+            <motion.p
+              initial={{ y: 48, opacity: 0 }}
+              whileInView={{ y: 0, opacity: 1 }}
+              transition={{ ease: "easeInOut", duration: 0.75, delay: 0.4 }}
+              className="mt-12 text-gray-300 text-base max-w-2xl mx-auto leading-relaxed px-2 flex-shrink-0"
+            >
+              Where art meets emotion. We capture your most precious moments with elegant, cinematic, and timeless photography.{" "}
+              Experience the opulent digital studio — crafting future memories through high-fashion wedding photography &amp; cinematic videography.
+            </motion.p>
+          </section>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Desktop: unchanged ──
   return (
     <div className="relative w-full overflow-hidden">
-      {/* SplashCursor on desktop only, CSS glow on mobile */}
-      {isMobile ? <MobileGlow /> : <DesktopSplashCursor />}
+      <DesktopSplashCursor />
       <section
         id="studio-details"
-        className="relative mx-auto max-w-5xl px-4 py-24 md:py-48 text-white flex flex-col items-center text-center z-20"
+        className="relative mx-auto max-w-5xl px-4 py-48 text-white flex flex-col items-center text-center z-20"
       >
         {/* ── Ambient radial glow behind logo ── */}
         <div
@@ -355,14 +499,12 @@ const StudioDetails = () => {
             width: glowSize,
             height: glowSize,
             borderRadius: "50%",
-            background:
-              "radial-gradient(circle, rgba(212,175,55,0.13) 0%, rgba(212,175,55,0.04) 45%, transparent 70%)",
+            background: "radial-gradient(circle, rgba(212,175,55,0.13) 0%, rgba(212,175,55,0.04) 45%, transparent 70%)",
             animation: "pulseGlow 4s ease-in-out infinite",
             pointerEvents: "none",
           }}
         />
-
-        {/* ── Outer ring arc (thin, slow spin) ── */}
+        {/* ── Outer ring arc ── */}
         <div
           aria-hidden
           style={{
@@ -378,7 +520,6 @@ const StudioDetails = () => {
             pointerEvents: "none",
           }}
         />
-
         {/* ── Floating gold dust ── */}
         <div aria-hidden style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
           {particles.map((p, i) => (
@@ -400,33 +541,26 @@ const StudioDetails = () => {
               whileInView={{ scaleX: 1, opacity: 0.4 }}
               transition={{ duration: 1.4, ease: "easeOut", delay: 0.3 }}
               style={{ transformOrigin: "right" }}
-              className="h-px flex-1 max-w-[120px] md:max-w-[180px] bg-gradient-to-l from-[#d4af37] to-transparent"
+              className="h-px flex-1 max-w-[180px] bg-gradient-to-l from-[#d4af37] to-transparent"
             />
-            <span style={{ color: "#d4af37", opacity: 0.5, fontSize: 10, letterSpacing: "0.3em" }}>
-              ✦
-            </span>
+            <span style={{ color: "#d4af37", opacity: 0.5, fontSize: 10, letterSpacing: "0.3em" }}>✦</span>
             <motion.div
               initial={{ scaleX: 0, opacity: 0 }}
               whileInView={{ scaleX: 1, opacity: 0.4 }}
               transition={{ duration: 1.4, ease: "easeOut", delay: 0.3 }}
               style={{ transformOrigin: "left" }}
-              className="h-px flex-1 max-w-[120px] md:max-w-[180px] bg-gradient-to-r from-[#d4af37] to-transparent"
+              className="h-px flex-1 max-w-[180px] bg-gradient-to-r from-[#d4af37] to-transparent"
             />
           </div>
-
           {/* Logo */}
           <div style={{ position: "relative" }}>
             <img
               src={yogiLogo}
               alt="Yogi Digital Studio"
-              style={{
-                mixBlendMode: "lighten",
-                opacity: 1,
-              }}
-              className="w-[85vw] md:w-[80vw] max-w-xl object-contain select-none pointer-events-none"
+              style={{ mixBlendMode: "lighten", opacity: 1 }}
+              className="w-[80vw] max-w-xl object-contain select-none pointer-events-none"
             />
           </div>
-
           {/* Expanding horizontal lines below logo */}
           <div className="flex items-center gap-4 w-full justify-center">
             <motion.div
@@ -434,9 +568,8 @@ const StudioDetails = () => {
               whileInView={{ scaleX: 1, opacity: 0.4 }}
               transition={{ duration: 1.4, ease: "easeOut", delay: 0.5 }}
               style={{ transformOrigin: "right" }}
-              className="h-px flex-1 max-w-[120px] md:max-w-[180px] bg-gradient-to-l from-[#d4af37] to-transparent"
+              className="h-px flex-1 max-w-[180px] bg-gradient-to-l from-[#d4af37] to-transparent"
             />
-            {/* Decorative dot row */}
             <div style={{ display: "flex", gap: 6 }}>
               {[0, 1, 2, 3, 4].map((d) => (
                 <motion.span
@@ -460,7 +593,7 @@ const StudioDetails = () => {
               whileInView={{ scaleX: 1, opacity: 0.4 }}
               transition={{ duration: 1.4, ease: "easeOut", delay: 0.5 }}
               style={{ transformOrigin: "left" }}
-              className="h-px flex-1 max-w-[120px] md:max-w-[180px] bg-gradient-to-r from-[#d4af37] to-transparent"
+              className="h-px flex-1 max-w-[180px] bg-gradient-to-r from-[#d4af37] to-transparent"
             />
           </div>
         </motion.div>
@@ -469,7 +602,7 @@ const StudioDetails = () => {
           initial={{ y: 48, opacity: 0 }}
           whileInView={{ y: 0, opacity: 1 }}
           transition={{ ease: "easeInOut", duration: 0.75, delay: 0.2 }}
-          className="mb-0 text-3xl md:text-6xl font-serif text-[#d4af37] font-light drop-shadow-lg"
+          className="mb-0 text-6xl font-serif text-[#d4af37] font-light drop-shadow-lg"
         >
           Yogi Digital Studio
         </motion.h1>
@@ -477,9 +610,9 @@ const StudioDetails = () => {
           initial={{ y: 48, opacity: 0 }}
           whileInView={{ y: 0, opacity: 1 }}
           transition={{ ease: "easeInOut", duration: 0.75, delay: 0.3 }}
-          className="mt-3 md:mt-4 mb-8 md:mb-12 block"
+          className="mt-4 mb-12 block"
         >
-          <span className="text-[#d4af37] opacity-80 tracking-[0.4em] text-[10px] md:text-xs uppercase">
+          <span className="text-[#d4af37] opacity-80 tracking-[0.4em] text-xs uppercase">
             Since 2001
           </span>
         </motion.div>
@@ -487,7 +620,7 @@ const StudioDetails = () => {
           initial={{ y: 48, opacity: 0 }}
           whileInView={{ y: 0, opacity: 1 }}
           transition={{ ease: "easeInOut", duration: 0.75, delay: 0.4 }}
-          className="text-gray-300 text-base md:text-xl max-w-2xl mx-auto leading-relaxed px-2"
+          className="text-gray-300 text-xl max-w-2xl mx-auto leading-relaxed px-2"
         >
           Where art meets emotion. We capture your most precious moments with elegant, cinematic, and timeless photography.{" "}
           Experience the opulent digital studio — crafting future memories through high-fashion wedding photography &amp; cinematic videography.

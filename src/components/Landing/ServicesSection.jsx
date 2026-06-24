@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import ScrollReveal from '../ui/ScrollReveal';
+import ImageSwiper from './ImageSwiper';
 
 import img1 from '../../assets/AG_00223.webp';
 import img2 from '../../assets/C_0528.webp';
@@ -222,11 +223,26 @@ export default function ServicesSection() {
         </p>
       </ScrollReveal>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
-        {services.map((service, i) => (
-          <ServiceCard key={service.title} service={service} index={i} isMobile={isMobile} />
-        ))}
-      </div>
+      {isMobile ? (
+        <div className="flex justify-center w-full py-4 pb-12 overflow-hidden">
+          <ImageSwiper 
+            cards={services.map((s, i) => ({ 
+              id: i.toString(), 
+              image: s.image, 
+              title: s.title, 
+              description: s.description 
+            }))} 
+            cardWidth={Math.min(window.innerWidth * 0.95, 380)} 
+            cardHeight={Math.min(window.innerHeight * 0.65, 550)} 
+          />
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
+          {services.map((service, i) => (
+            <ServiceCard key={service.title} service={service} index={i} isMobile={isMobile} />
+          ))}
+        </div>
+      )}
     </section>
   );
 }

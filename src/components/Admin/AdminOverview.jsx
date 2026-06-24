@@ -41,7 +41,7 @@ function KpiCard({ icon: Icon, label, value, sub, color = 'gold', delay = 0 }) {
       <div className={`inline-flex p-2.5 rounded-xl ${c.bg} mb-4`}>
         <Icon className={`w-5 h-5 ${c.icon}`} />
       </div>
-      <p className="text-3xl font-serif text-white font-light mb-1">
+      <p className="text-2xl sm:text-3xl font-serif text-white font-light mb-1">
         <AnimatedNumber target={value} />
       </p>
       <p className="text-silver/70 text-sm">{label}</p>
