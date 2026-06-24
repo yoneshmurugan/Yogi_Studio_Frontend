@@ -27,12 +27,12 @@ export default function ContactFooter() {
   return (
     <footer id="contact" className="relative border-t border-white/5">
       {/* Main Footer Content */}
-      <div className="px-6 md:px-12 lg:px-20 py-20 md:py-28 max-w-7xl mx-auto">
+      <div className="px-4 md:px-12 lg:px-20 py-16 md:py-28 max-w-7xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8">
           {/* Brand Column */}
           <ScrollReveal direction="up" delay={0}>
-            <div>
-              <img src={yogiLogo} alt="Yogi Digital Studio" className="w-36 mb-4" />
+            <div className="text-center md:text-left">
+              <img src={yogiLogo} alt="Yogi Digital Studio" className="w-28 md:w-36 mb-4 mx-auto md:mx-0" />
               <p className="text-silver/60 text-sm leading-relaxed max-w-xs mb-4">
                 The opulent digital studio — capturing future memories with artistry and passion.
               </p>
@@ -79,19 +79,19 @@ export default function ContactFooter() {
               </GoldButton>
 
               {/* Social Row */}
-              <div className="flex items-center gap-3 mt-8">
+              <div className="flex items-center gap-3 mt-6 md:mt-8">
                 <a href="https://www.instagram.com/yogistudio_official?igsh=NXFlM3RpOG82M2R0" target="_blank" rel="noreferrer"
-                  className="w-9 h-9 rounded-full border border-white/8 flex items-center justify-center hover:border-gold/30 hover:bg-gold/5 transition-all group"
+                  className="w-11 h-11 md:w-9 md:h-9 rounded-full border border-white/8 flex items-center justify-center hover:border-gold/30 hover:bg-gold/5 transition-all group"
                   title="Instagram">
                   <InstagramIcon className="w-3.5 h-3.5 text-silver/30 group-hover:text-gold transition-colors" />
                 </a>
                 <a href="javascript:void(0)" onClick={() => window.open('https://wa.me/919842775676', '_blank')}
-                  className="w-9 h-9 rounded-full border border-white/8 flex items-center justify-center hover:border-gold/30 hover:bg-gold/5 transition-all group"
+                  className="w-11 h-11 md:w-9 md:h-9 rounded-full border border-white/8 flex items-center justify-center hover:border-gold/30 hover:bg-gold/5 transition-all group"
                   title="WhatsApp">
                   <WhatsappIcon className="w-3.5 h-3.5 text-silver/30 group-hover:text-gold transition-colors" />
                 </a>
                 <a href="https://youtube.com/@yogistudio-official?si=w81KIpSqR3SXeSWk" target="_blank" rel="noreferrer"
-                  className="w-9 h-9 rounded-full border border-white/8 flex items-center justify-center hover:border-gold/30 hover:bg-gold/5 transition-all group"
+                  className="w-11 h-11 md:w-9 md:h-9 rounded-full border border-white/8 flex items-center justify-center hover:border-gold/30 hover:bg-gold/5 transition-all group"
                   title="YouTube">
                   <YoutubeIcon className="w-3.5 h-3.5 text-silver/30 group-hover:text-gold transition-colors" />
                 </a>
