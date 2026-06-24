@@ -44,21 +44,21 @@ export default function FinaliseModal({ isOpen, onConfirm, onCancel, selectedCou
           </p>
 
           {/* Stats */}
-          <div className="grid grid-cols-3 gap-3 mb-6">
-            <div className="glass rounded-2xl p-4 text-center border border-gold/10">
-              <Heart className="w-5 h-5 text-gold fill-current mx-auto mb-2" />
-              <p className="text-2xl font-serif text-gold font-light">{selectedCount}</p>
-              <p className="text-silver/40 text-[10px] uppercase tracking-wider mt-0.5">Selected</p>
+          <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-6">
+            <div className="glass rounded-2xl p-2 sm:p-4 text-center border border-gold/10">
+              <Heart className="w-4 h-4 sm:w-5 sm:h-5 text-gold fill-current mx-auto mb-1 sm:mb-2" />
+              <p className="text-xl sm:text-2xl font-serif text-gold font-light">{selectedCount}</p>
+              <p className="text-silver/40 text-[9px] sm:text-[10px] uppercase tracking-wider mt-0.5">Selected</p>
             </div>
-            <div className="glass rounded-2xl p-4 text-center border border-red-500/10">
-              <X className="w-5 h-5 text-red-400 mx-auto mb-2" strokeWidth={2.5} />
-              <p className="text-2xl font-serif text-red-400 font-light">{rejectedCount}</p>
-              <p className="text-silver/40 text-[10px] uppercase tracking-wider mt-0.5">Rejected</p>
+            <div className="glass rounded-2xl p-2 sm:p-4 text-center border border-red-500/10">
+              <X className="w-4 h-4 sm:w-5 sm:h-5 text-red-400 mx-auto mb-1 sm:mb-2" strokeWidth={2.5} />
+              <p className="text-xl sm:text-2xl font-serif text-red-400 font-light">{rejectedCount}</p>
+              <p className="text-silver/40 text-[9px] sm:text-[10px] uppercase tracking-wider mt-0.5">Rejected</p>
             </div>
-            <div className="glass rounded-2xl p-4 text-center border border-white/[0.05]">
-              <div className="w-5 h-5 rounded-full border-2 border-silver/30 mx-auto mb-2" />
-              <p className="text-2xl font-serif text-silver/60 font-light">{unreviewedCount}</p>
-              <p className="text-silver/40 text-[10px] uppercase tracking-wider mt-0.5">Skipped</p>
+            <div className="glass rounded-2xl p-2 sm:p-4 text-center border border-white/[0.05]">
+              <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full border-2 border-silver/30 mx-auto mb-1 sm:mb-2" />
+              <p className="text-xl sm:text-2xl font-serif text-silver/60 font-light">{unreviewedCount}</p>
+              <p className="text-silver/40 text-[9px] sm:text-[10px] uppercase tracking-wider mt-0.5">Skipped</p>
             </div>
           </div>
 

@@ -135,12 +135,12 @@ export default function GalleryLightbox({
       {/* ── Floating Top Actions ── */}
       <div className="absolute top-4 right-4 md:top-6 md:right-8 z-50 flex items-center gap-2">
         <button onClick={() => setZoomed((z) => !z)}
-          className="p-3 rounded-full bg-black/40 border border-white/10 text-white hover:bg-white/10 transition-colors shadow-2xl backdrop-blur-md">
+          className="p-2 sm:p-3 rounded-full bg-black/40 border border-white/10 text-white hover:bg-white/10 transition-colors shadow-2xl backdrop-blur-md">
           {zoomed ? <ZoomOut className="w-5 h-5" /> : <ZoomIn className="w-5 h-5" />}
         </button>
         <button onClick={onClose}
-          className="p-3 rounded-full bg-black/40 border border-white/10 text-white hover:bg-white/10 transition-colors shadow-2xl backdrop-blur-md">
-          <X className="w-6 h-6" />
+          className="p-2 sm:p-3 rounded-full bg-black/40 border border-white/10 text-white hover:bg-white/10 transition-colors shadow-2xl backdrop-blur-md">
+          <X className="w-5 h-5 sm:w-6 sm:h-6" />
         </button>
       </div>
 
@@ -275,7 +275,7 @@ export default function GalleryLightbox({
                     initial={{ opacity: 0, y: 10, scale: 0.95 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                    className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 w-64 p-3 rounded-2xl glass-strong border border-white/10 shadow-2xl origin-bottom"
+                    className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 w-[85vw] sm:w-64 p-3 rounded-2xl glass-strong border border-white/10 shadow-2xl origin-bottom"
                   >
                     <textarea
                       autoFocus

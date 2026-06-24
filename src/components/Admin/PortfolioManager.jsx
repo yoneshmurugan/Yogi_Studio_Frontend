@@ -100,15 +100,15 @@ function PhotosTab({ items, onAdd, onDelete, setGlobalStatus }) {
                 </select>
                 <input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="Photo Title" className="w-full bg-charcoal/40 border border-white/8 rounded-lg px-3 py-2 text-sm text-white placeholder:text-silver/30 focus:outline-none focus:border-gold/40" />
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap sm:flex-nowrap items-center gap-3">
                 <input type="file" ref={fileRef} accept="image/*" onChange={(e) => setForm({ ...form, file: e.target.files[0] })} className="hidden" />
-                <button onClick={() => fileRef.current?.click()} className="flex-1 py-2 rounded-lg border border-dashed border-white/20 text-silver/50 hover:border-gold/50 hover:text-gold transition-colors text-sm">
+                <button onClick={() => fileRef.current?.click()} className="w-full sm:flex-1 py-2 rounded-lg border border-dashed border-white/20 text-silver/50 hover:border-gold/50 hover:text-gold transition-colors text-sm">
                   {form.file ? form.file.name : "Select Image"}
                 </button>
-                <button onClick={handleAdd} disabled={loading} className="px-5 py-2 rounded-lg bg-gold text-black text-sm font-medium hover:bg-gold-light disabled:opacity-50 flex items-center gap-2">
+                <button onClick={handleAdd} disabled={loading} className="flex-1 sm:flex-none justify-center px-5 py-2 rounded-lg bg-gold text-black text-sm font-medium hover:bg-gold-light disabled:opacity-50 flex items-center gap-2">
                   {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Upload"}
                 </button>
-                <button onClick={() => setAdding(false)} className="px-3 py-2 rounded-lg text-silver/40 hover:text-white"><X className="w-4 h-4" /></button>
+                <button onClick={() => setAdding(false)} className="p-2 rounded-lg text-silver/40 hover:text-white bg-white/5 sm:bg-transparent"><X className="w-5 h-5 sm:w-4 sm:h-4" /></button>
               </div>
             </div>
           </motion.div>
@@ -206,21 +206,21 @@ function AlbumsTab({ items, onAdd, onDelete, setGlobalStatus }) {
                 </select>
                 <input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="Album Title" className="w-full bg-charcoal/40 border border-white/8 rounded-lg px-3 py-2 text-sm text-white placeholder:text-silver/30 focus:outline-none focus:border-gold/40" />
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap sm:flex-nowrap items-center gap-3">
                 <input type="file" ref={fileRef} multiple accept="image/*" onChange={(e) => setForm({ ...form, files: Array.from(e.target.files) })} className="hidden" />
-                <button onClick={() => fileRef.current?.click()} className="flex-1 py-2 rounded-lg border border-dashed border-white/20 text-silver/50 hover:border-gold/50 hover:text-gold transition-colors text-sm">
+                <button onClick={() => fileRef.current?.click()} className="w-full sm:flex-1 py-2 rounded-lg border border-dashed border-white/20 text-silver/50 hover:border-gold/50 hover:text-gold transition-colors text-sm">
                   {form.files.length > 0 ? `${form.files.length} images selected` : "Select Images"}
                 </button>
 
                 <input type="file" ref={musicRef} accept="audio/*" onChange={(e) => setForm({ ...form, musicFile: e.target.files[0] })} className="hidden" />
-                <button onClick={() => musicRef.current?.click()} className="flex-1 py-2 rounded-lg border border-dashed border-white/20 text-silver/50 hover:border-gold/50 hover:text-gold transition-colors text-sm truncate px-2">
+                <button onClick={() => musicRef.current?.click()} className="w-full sm:flex-1 py-2 rounded-lg border border-dashed border-white/20 text-silver/50 hover:border-gold/50 hover:text-gold transition-colors text-sm truncate px-2">
                   {form.musicFile ? form.musicFile.name : "Select Audio (Optional)"}
                 </button>
 
-                <button onClick={handleAdd} disabled={loading} className="px-5 py-2 rounded-lg bg-gold text-black text-sm font-medium hover:bg-gold-light disabled:opacity-50 flex items-center gap-2">
+                <button onClick={handleAdd} disabled={loading} className="flex-1 sm:flex-none justify-center px-5 py-2 rounded-lg bg-gold text-black text-sm font-medium hover:bg-gold-light disabled:opacity-50 flex items-center gap-2">
                   {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Upload Album"}
                 </button>
-                <button onClick={() => setAdding(false)} className="px-3 py-2 rounded-lg text-silver/40 hover:text-white"><X className="w-4 h-4" /></button>
+                <button onClick={() => setAdding(false)} className="p-2 rounded-lg text-silver/40 hover:text-white bg-white/5 sm:bg-transparent"><X className="w-5 h-5 sm:w-4 sm:h-4" /></button>
               </div>
             </div>
           </motion.div>
@@ -296,15 +296,15 @@ function VideosTab({ items, onAdd, onDelete, setGlobalStatus }) {
                   </select>
                   <input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="Video Title" className="w-full bg-charcoal/40 border border-white/8 rounded-lg px-3 py-2 text-sm text-white placeholder:text-silver/30 focus:outline-none focus:border-gold/40" />
                 </div>
-                <div className="flex gap-3">
-                  <div className="flex-1 relative">
+                <div className="flex flex-wrap sm:flex-nowrap gap-3">
+                  <div className="w-full sm:flex-1 relative">
                     <Link2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-red-400/50" />
                     <input value={form.url} onChange={(e) => setForm({ ...form, url: e.target.value })} placeholder="YouTube URL…" className="w-full bg-charcoal/40 border border-white/8 rounded-lg pl-9 pr-3 py-2 text-sm text-white placeholder:text-silver/30 focus:outline-none focus:border-gold/40" />
                   </div>
-                  <button onClick={handleAdd} disabled={loading} className="px-5 py-2 rounded-lg bg-gold text-black text-sm font-medium hover:bg-gold-light disabled:opacity-50 flex items-center gap-2">
+                  <button onClick={handleAdd} disabled={loading} className="flex-1 sm:flex-none justify-center px-5 py-2 rounded-lg bg-gold text-black text-sm font-medium hover:bg-gold-light disabled:opacity-50 flex items-center gap-2">
                     {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Add"}
                   </button>
-                  <button onClick={() => setAdding(false)} className="px-3 py-2 rounded-lg text-silver/40 hover:text-white"><X className="w-4 h-4" /></button>
+                  <button onClick={() => setAdding(false)} className="p-2 rounded-lg text-silver/40 hover:text-white bg-white/5 sm:bg-transparent"><X className="w-5 h-5 sm:w-4 sm:h-4" /></button>
                 </div>
               </div>
             </div>

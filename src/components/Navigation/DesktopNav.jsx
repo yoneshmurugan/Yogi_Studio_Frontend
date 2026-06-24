@@ -28,10 +28,19 @@ export default function DesktopNav({ onLogin, onHome }) {
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     const previous = scrollY.getPrevious();
-    if (latest > previous && latest > 150) {
-      setHidden(true);
+    const isLandingPage = location.pathname === '/';
+    const inHeroSection = isLandingPage && latest < 3200;
+    
+    if (latest > 150) {
+      if (inHeroSection) {
+        setHidden(true); // Always hide past 150px while in hero section
+      } else if (latest > previous) {
+        setHidden(true); // Hide when scrolling down outside hero
+      } else {
+        setHidden(false); // Show when scrolling up outside hero
+      }
     } else {
-      setHidden(false);
+      setHidden(false); // Always show near the top
     }
   });
 

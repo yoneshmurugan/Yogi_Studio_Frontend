@@ -62,12 +62,12 @@ function PhotoCard({ photo, isSelected, isRejected, onToggleSelect, onToggleReje
       </AnimatePresence>
 
       {/* Hover overlay: quick-action buttons */}
-      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-end pb-3 gap-2 z-10">
-        <div className="flex gap-2">
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity flex flex-col items-center justify-end pb-2 sm:pb-3 gap-1 sm:gap-2 z-10 pointer-events-none">
+        <div className="flex gap-2 pointer-events-auto">
           <motion.button
             onClick={(e) => { e.stopPropagation(); onToggleReject(); }}
             whileTap={{ scale: 0.88 }}
-            className={`w-9 h-9 rounded-full flex items-center justify-center transition-all
+            className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center transition-all
               ${isRejected ? 'bg-red-500 shadow-md' : 'bg-black/60 border border-red-500/50 hover:bg-red-500/30'}`}
           >
             <X className="w-4 h-4 text-red-400" strokeWidth={2.5} />
@@ -75,7 +75,7 @@ function PhotoCard({ photo, isSelected, isRejected, onToggleSelect, onToggleReje
           <motion.button
             onClick={(e) => { e.stopPropagation(); onToggleSelect(); }}
             whileTap={{ scale: 0.88 }}
-            className={`w-9 h-9 rounded-full flex items-center justify-center transition-all
+            className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center transition-all
               ${isSelected ? 'bg-gold shadow-md' : 'bg-black/60 border border-gold/50 hover:bg-gold/30'}`}
           >
             <Heart className={`w-4 h-4 ${isSelected ? 'text-black fill-current' : 'text-gold'}`} />
