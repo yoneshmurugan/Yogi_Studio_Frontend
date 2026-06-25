@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LogIn, Eye, EyeOff, AlertCircle, Phone, KeyRound, ArrowLeft } from 'lucide-react';
-import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
+import { RecaptchaVerifier, signInWithPhoneNumber, signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../lib/firebase';
 import { Capacitor } from '@capacitor/core';
 import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
@@ -204,16 +204,22 @@ export default function LoginPage({ onLoginSuccess, onBack }) {
     setError('');
     setIsLoading(true);
 
-    await new Promise((r) => setTimeout(r, 800)); // Simulate API
-
-    const adminEmail = import.meta.env.VITE_ADMIN_EMAIL || ADMIN_DEMO.email;
-    const adminPassword = import.meta.env.VITE_ADMIN_PASSWORD || ADMIN_DEMO.password;
-
-    if (email.toLowerCase() === adminEmail && password === adminPassword) {
-      sessionStorage.setItem('adminAuth', 'true');
+    try {
+      // Authenticate with Firebase using Email/Password
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      
+      // Fetch the secure Firebase ID token
+      const idToken = await userCredential.user.getIdToken(true);
+      
+      // Store token for backend auth verification
+      sessionStorage.setItem('adminToken', idToken);
+      sessionStorage.setItem('adminAuth', 'true'); // Keep for UI state backward compatibility
+      
       onLoginSuccess('admin');
-    } else {
-      setError('Invalid admin credentials.');
+    } catch (err) {
+      console.error("Admin Login Error:", err);
+      // Firebase throws specific errors we can catch, but a generic message is safer for security
+      setError('Invalid admin credentials or unauthorized.');
       setIsLoading(false);
     }
   };

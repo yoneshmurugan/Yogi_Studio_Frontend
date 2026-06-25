@@ -101,7 +101,7 @@ export default function MobileNav({ onLogin, onHome }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.2 }}
-            className="absolute top-16 left-0 right-0 bg-black/95 backdrop-blur-xl border-b border-white/10 shadow-2xl z-40"
+            className="absolute top-full left-0 right-0 bg-black/95 backdrop-blur-xl border-b border-white/10 shadow-2xl z-40"
           >
             <div className="flex flex-col py-6 px-6 gap-6">
               {['Portfolio', 'Testimonials', 'About', 'Contact'].map((item) => (
