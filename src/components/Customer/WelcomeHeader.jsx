@@ -65,14 +65,21 @@ export default function WelcomeHeader({ coupleName, eventName, eventDate, eventT
       )}
 
       {/* Photographer note */}
-      <motion.p
-        className="text-silver/40 text-xs sm:text-sm max-w-xl mx-auto mt-5 leading-relaxed px-4"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
+      <motion.div
+        className="mt-6 flex justify-center px-4"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1 }}
       >
-        Tap any photo for fullscreen view. Double tap to select and swipe up or down to reject.
-      </motion.p>
+        <div className="bg-white/5 border border-white/10 backdrop-blur-md rounded-2xl py-3 px-5 max-w-xl shadow-lg flex items-start gap-3">
+          <div className="mt-0.5 w-5 h-5 rounded-full bg-gold/20 flex items-center justify-center shrink-0">
+            <div className="w-1.5 h-1.5 rounded-full bg-gold animate-pulse" />
+          </div>
+          <p className="text-silver/90 text-xs sm:text-sm leading-relaxed font-medium">
+            <span className="text-white">Tip:</span> Tap any photo for fullscreen view. Double tap to <span className="text-gold">select</span> and swipe up or down to <span className="text-red-400">reject</span>.
+          </p>
+        </div>
+      </motion.div>
     </motion.div>
   );
 }
