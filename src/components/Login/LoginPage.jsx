@@ -354,6 +354,8 @@ export default function LoginPage({ onLoginSuccess, onBack }) {
                       <input
                         ref={otpInputRef}
                         type="text"
+                        inputMode="numeric"
+                        autoComplete="one-time-code"
                         value={otpCode}
                         onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
                         placeholder="6-digit code"
