@@ -47,6 +47,8 @@ export default function VideoPreloader({ isVisible, videoUrl, fallbackUrl, onCom
             autoPlay
             muted
             playsInline
+            controls={false}
+            disablePictureInPicture
         onCanPlay={() => setVideoReady(true)}
         onEnded={onComplete}
         className="absolute inset-0 w-full h-full object-cover"

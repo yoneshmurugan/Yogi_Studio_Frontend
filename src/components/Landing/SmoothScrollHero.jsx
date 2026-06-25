@@ -317,6 +317,8 @@ const ParallaxMedia = ({ className, alt, src, start, end, isVideo }) => {
           muted
           loop
           playsInline
+          controls={false}
+          disablePictureInPicture
           className="w-full h-auto object-cover"
         />
       ) : (
