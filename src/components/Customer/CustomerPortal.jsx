@@ -58,31 +58,27 @@ function CustomerPortalInner() {
   const [comments, setComments]         = useState({});
 
   // Load from local storage when activeEvent changes
+  const isFirstLoadRef = useRef(true);
+
+  // Load from backend when activeEvent changes
   useEffect(() => {
     if (activeEvent) {
-      try {
-        const sel = localStorage.getItem(`yogi_sel_${activeEvent.id}`);
-        const rej = localStorage.getItem(`yogi_rej_${activeEvent.id}`);
-        const com = localStorage.getItem(`yogi_com_${activeEvent.id}`);
+      isFirstLoadRef.current = true;
+      const initialSel = new Set(activeEvent.selectedPhotoIds || []);
+      const initialRej = new Set(activeEvent.rejectedPhotoIds || []);
+      const initialCom = activeEvent.photoComments || {};
 
-        const initialSel = sel ? new Set(JSON.parse(sel)) : new Set();
-        const initialRej = rej ? new Set(JSON.parse(rej)) : new Set();
-        const initialCom = com ? JSON.parse(com) : {};
-
-        // Merge with activeEvent data in case backend has selections/comments not in local storage
-        activeEvent.folders?.forEach(f => {
-          f.photos?.forEach(p => {
-            if (p.is_selected) initialSel.add(p.id);
-            if (p.comment) initialCom[p.id] = p.comment;
-          });
+      // Merge with activeEvent data in case backend has legacy selections/comments
+      activeEvent.folders?.forEach(f => {
+        f.photos?.forEach(p => {
+          if (p.is_selected) initialSel.add(p.id);
+          if (p.comment) initialCom[p.id] = p.comment;
         });
+      });
 
-        setSelectedIds(initialSel);
-        setRejectedIds(initialRej);
-        setComments(initialCom);
-      } catch (e) {
-        console.error("Failed to load local selections", e);
-      }
+      setSelectedIds(initialSel);
+      setRejectedIds(initialRej);
+      setComments(initialCom);
     } else {
       setSelectedIds(new Set());
       setRejectedIds(new Set());
@@ -90,14 +86,33 @@ function CustomerPortalInner() {
     }
   }, [activeEvent]);
 
-  // Save to local storage when selections change
+  // Debounced save to backend when selections change
+  const saveTimeoutRef = useRef(null);
   useEffect(() => {
-    if (activeEvent) {
-      localStorage.setItem(`yogi_sel_${activeEvent.id}`, JSON.stringify([...selectedIds]));
-      localStorage.setItem(`yogi_rej_${activeEvent.id}`, JSON.stringify([...rejectedIds]));
-      localStorage.setItem(`yogi_com_${activeEvent.id}`, JSON.stringify(comments));
+    if (isFirstLoadRef.current) {
+      isFirstLoadRef.current = false;
+      return;
     }
-  }, [activeEvent, selectedIds, rejectedIds, comments]);
+
+    if (activeEvent) {
+      if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+      
+      saveTimeoutRef.current = setTimeout(() => {
+        fetch(`${import.meta.env.VITE_API_BASE_URL}/customer/events/${activeEvent.id}/progress`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            selectedPhotoIds: [...selectedIds],
+            rejectedPhotoIds: [...rejectedIds],
+            photoComments: comments
+          })
+        }).catch(err => console.error("Failed to sync progress:", err));
+      }, 2000);
+    }
+  }, [activeEvent, selectedIds, rejectedIds, comments, token]);
   
   const [lightboxIdx, setLightboxIdx]   = useState(null);  // null = closed
   const [drawerOpen, setDrawerOpen]     = useState(false);

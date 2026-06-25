@@ -107,18 +107,15 @@ export default function LandingPage() {
 
   return (
     <div className={showPreloader ? "h-screen overflow-hidden bg-black" : ""}>
-      <AnimatePresence>
-        {showPreloader && (
-          <VideoPreloader 
-            videoUrl={PRELOADER_VIDEO_URL} 
-            fallbackUrl={preloaderFallback}
-            onComplete={() => {
-              sessionStorage.setItem('preloaderShown', 'true');
-              setShowPreloader(false);
-            }} 
-          />
-        )}
-      </AnimatePresence>
+      <VideoPreloader 
+        isVisible={showPreloader}
+        videoUrl={PRELOADER_VIDEO_URL} 
+        fallbackUrl={preloaderFallback}
+        onComplete={() => {
+          sessionStorage.setItem('preloaderShown', 'true');
+          setShowPreloader(false);
+        }} 
+      />
 
       <motion.div
         initial={{ opacity: 0 }}
