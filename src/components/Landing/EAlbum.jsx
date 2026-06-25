@@ -192,18 +192,43 @@ export default function EAlbum({ onExit, photos = [], musicUrl }) {
     </Page>
   );
 
+  const [loadedImagesCount, setLoadedImagesCount] = useState(5);
+
+  // When user approaches the end of the loaded chunk, load the next 5 images
+  useEffect(() => {
+    const currentSpreadIndex = Math.floor(current / 2);
+    if (currentSpreadIndex >= loadedImagesCount - 2) {
+      setLoadedImagesCount(prev => prev + 5);
+    }
+  }, [current, loadedImagesCount]);
+
   // Spreads
   spreadPhotos.forEach((photoObj, i) => {
+    const leftIndex = 1 + i * 2;
+    const rightIndex = 2 + i * 2;
+    
     // Left half
     pages.push(
       <Page key={`spread-${i}-left`}>
-        <div className="w-full h-full border-r border-black/20" style={{ backgroundImage: `url(${photoObj.url})`, backgroundSize: '200% 100%', backgroundPosition: 'left center' }} />
+        <div 
+          className={`w-full h-full border-r border-black/20 album-page-${leftIndex}`}
+          style={{ 
+            backgroundSize: '200% 100%', 
+            backgroundPosition: 'left center' 
+          }} 
+        />
       </Page>
     );
     // Right half
     pages.push(
       <Page key={`spread-${i}-right`}>
-        <div className="w-full h-full border-l border-white/5" style={{ backgroundImage: `url(${photoObj.url})`, backgroundSize: '200% 100%', backgroundPosition: 'right center' }} />
+        <div 
+          className={`w-full h-full border-l border-white/5 album-page-${rightIndex}`}
+          style={{ 
+            backgroundSize: '200% 100%', 
+            backgroundPosition: 'right center' 
+          }} 
+        />
       </Page>
     );
   });
@@ -332,6 +357,33 @@ export default function EAlbum({ onExit, photos = [], musicUrl }) {
   return (
     <>
       <audio ref={audioRef} loop src={musicUrl || "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"} preload="none" />
+
+      {/* Dynamic CSS for lazy-loading backgrounds to bypass pageflip static DOM */}
+      <style>
+        {spreadPhotos.map((photo, i) => {
+          const leftIndex = 1 + i * 2;
+          const rightIndex = 2 + i * 2;
+          if (i < loadedImagesCount) {
+            return `
+              .album-page-${leftIndex} { background-image: url("${photo.url}"); }
+              .album-page-${rightIndex} { background-image: url("${photo.url}"); }
+            `;
+          }
+          return '';
+        }).join('\n')}
+      </style>
+
+      {/* Explicit Preloader: Forces the browser to download the images immediately in batches, 
+          bypassing the browser's optimization of not loading background images for display:none elements */}
+      <div style={{ position: 'absolute', width: 0, height: 0, overflow: 'hidden', visibility: 'hidden', zIndex: -1 }}>
+        {spreadPhotos.map((photo, i) => {
+          if (i < loadedImagesCount) {
+            // Using a standard img tag guarantees the browser initiates the network request
+            return <img key={`preload-${i}`} src={photo.url} alt="" aria-hidden="true" />;
+          }
+          return null;
+        })}
+      </div>
 
       {/* Root */}
       <div
