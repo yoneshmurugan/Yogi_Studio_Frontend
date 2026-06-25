@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { createPortal } from 'react-dom';
 import yogiLogo from '../../assets/Headerlogo.png';
 
-export default function VideoPreloader({ videoUrl, fallbackUrl, onComplete }) {
+export default function VideoPreloader({ isVisible, videoUrl, fallbackUrl, onComplete }) {
   const videoRef = useRef(null);
   const [progress, setProgress] = useState(0);
   const [videoReady, setVideoReady] = useState(false);
@@ -31,20 +31,22 @@ export default function VideoPreloader({ videoUrl, fallbackUrl, onComplete }) {
   }, [videoReady]);
 
   return createPortal(
-    <motion.div
-      key="preloader"
-      initial={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.8, ease: 'easeInOut' }}
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black cursor-pointer"
-      onClick={onComplete}
-    >
-      {/* Hidden background video */}
-      <video
-        ref={videoRef}
-        autoPlay
-        muted
-        playsInline
+    <AnimatePresence>
+      {isVisible && (
+        <motion.div
+          key="preloader"
+          initial={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.8, ease: 'easeInOut' }}
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black cursor-pointer"
+          onClick={onComplete}
+        >
+          {/* Hidden background video */}
+          <video
+            ref={videoRef}
+            autoPlay
+            muted
+            playsInline
         onCanPlay={() => setVideoReady(true)}
         onEnded={onComplete}
         className="absolute inset-0 w-full h-full object-cover"
@@ -104,7 +106,9 @@ export default function VideoPreloader({ videoUrl, fallbackUrl, onComplete }) {
       >
         Tap to skip
       </motion.div>
-    </motion.div>,
+    </motion.div>
+      )}
+    </AnimatePresence>,
     document.body
   );
 }
