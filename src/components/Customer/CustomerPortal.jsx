@@ -481,6 +481,16 @@ function CustomerPortalInner() {
     );
   }
 
+  // ── Main Portal ───────────────────────────────────────────────────────────
+  if (!activeEvent) {
+    return (
+      <div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center p-6 text-center">
+        <p className="text-silver/50 mb-2 text-lg">No active events found.</p>
+        <p className="text-silver/30 text-sm">Please contact Yogi Studio if you believe this is an error.</p>
+      </div>
+    );
+  }
+
   // ── Submitted view ────────────────────────────────────────────────────────
   if (submitted || activeEvent.status === 'awaiting_approval' || activeEvent.status === 'approved' || activeEvent.status === 'downloaded') {
     return (
@@ -491,16 +501,6 @@ function CustomerPortalInner() {
         totalCount={eventInfo.totalPhotos}
         onEditResponse={handleEditResponse}
       />
-    );
-  }
-
-  // ── Main Portal ───────────────────────────────────────────────────────────
-  if (!activeEvent) {
-    return (
-      <div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center p-6 text-center">
-        <p className="text-silver/50 mb-2 text-lg">No active events found.</p>
-        <p className="text-silver/30 text-sm">Please contact Yogi Studio if you believe this is an error.</p>
-      </div>
     );
   }
 
