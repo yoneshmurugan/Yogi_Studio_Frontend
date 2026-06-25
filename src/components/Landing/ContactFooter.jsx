@@ -27,8 +27,8 @@ export default function ContactFooter() {
   return (
     <footer id="contact" className="relative border-t border-white/5">
       {/* Main Footer Content */}
-      <div className="px-4 md:px-12 lg:px-20 py-16 md:py-28 max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-16 md:gap-8 text-center md:text-left">
+      <div className="px-4 md:px-12 lg:px-20 py-10 md:py-28 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-8 text-center md:text-left">
           {/* Brand Column */}
           <ScrollReveal direction="up" delay={0}>
             <div className="flex flex-col items-center md:items-start">
