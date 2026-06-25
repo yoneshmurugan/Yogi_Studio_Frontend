@@ -319,7 +319,8 @@ const ParallaxMedia = ({ className, alt, src, start, end, isVideo }) => {
           playsInline
           controls={false}
           disablePictureInPicture
-          className="w-full h-auto object-cover"
+          poster="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+          className="w-full h-auto object-cover pointer-events-none"
         />
       ) : (
         <img

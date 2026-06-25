@@ -49,9 +49,10 @@ export default function VideoPreloader({ isVisible, videoUrl, fallbackUrl, onCom
             playsInline
             controls={false}
             disablePictureInPicture
+            poster="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
         onCanPlay={() => setVideoReady(true)}
         onEnded={onComplete}
-        className="absolute inset-0 w-full h-full object-cover"
+        className="absolute inset-0 w-full h-full object-cover pointer-events-none"
       >
         {videoUrl && <source src={videoUrl} type="video/mp4" />}
         {fallbackUrl && <source src={fallbackUrl} type="video/mp4" />}
