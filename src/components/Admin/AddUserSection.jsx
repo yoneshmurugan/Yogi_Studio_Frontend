@@ -4,6 +4,7 @@ import {
   User, Phone, ShieldCheck, Loader2, CheckCircle,
 } from 'lucide-react';
 import GoldButton from '../ui/GoldButton';
+import { adminFetch } from '../../lib/api';
 
 // ── Step indicator ─────────────────────────────────────────────────────────────
 function StepDot({ n, status }) {
@@ -65,7 +66,7 @@ export default function AddUserSection({ onUserAdded }) {
 
     try {
       const finalPhone = form.phone.startsWith('+') ? form.phone.trim() : `+91${form.phone.trim()}`;
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/admin/users`, {
+      const response = await adminFetch(`/admin/users`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: form.name.trim(), phone: finalPhone })

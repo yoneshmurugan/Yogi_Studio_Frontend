@@ -8,6 +8,7 @@ import imageCompression from 'browser-image-compression';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { storage } from '../../lib/firebase';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { adminFetch } from '../../lib/api';
 
 const PLACEHOLDER_COLORS = [
   'from-gold/20 to-gold/5', 'from-purple-500/20 to-purple-500/5',
@@ -364,7 +365,7 @@ export default function PortfolioManager() {
     // Don't override status if already set by child component (e.g., photo upload progress)
     setGlobalUploadStatus(prev => prev || `Saving ${payload.category}...`);
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/admin/portfolio`, {
+      const res = await adminFetch(`/admin/portfolio`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -397,7 +398,7 @@ export default function PortfolioManager() {
     } catch (err) { console.error(err); }
 
     // Delete from DB
-    await fetch(`${import.meta.env.VITE_API_BASE_URL}/admin/portfolio/${id}`, {
+    await adminFetch(`/admin/portfolio/${id}`, {
       method: 'DELETE'
     }).catch(err => console.error("Error deleting portfolio item:", err));
   };

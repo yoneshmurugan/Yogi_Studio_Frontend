@@ -425,8 +425,8 @@ function EventDetail({
       setDownloadingZip(false);
     }
   };
-
-  const url = `${window.location.origin}/client/photoselection/${event.id}`;
+  const baseUrl = import.meta.env.VITE_WEBSITE_URL || 'https://yogidigitalstudio.in';
+  const url = `${baseUrl}/client/photoselection/${event.id}`;
 
   const handleDownloadQR = () => {
     const svg = document.getElementById(`qr-${event.id}`);

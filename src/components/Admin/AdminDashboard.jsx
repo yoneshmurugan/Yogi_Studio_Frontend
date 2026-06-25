@@ -12,6 +12,7 @@ import UserManagement   from './UserManagement';
 import { ref, deleteObject } from 'firebase/storage';
 import { storage } from '../../lib/firebase';
 import yogiLogo from '../../assets/Headerlogo.png';
+import { adminFetch } from '../../lib/api';
 
 // ── Seed data ─────────────────────────────────────────────────────────────────
 export const seedUsers = [
@@ -62,8 +63,8 @@ export default function AdminDashboard() {
     async function fetchData() {
       try {
         const [usersRes, eventsRes] = await Promise.all([
-          fetch(`${import.meta.env.VITE_API_BASE_URL}/admin/users`),
-          fetch(`${import.meta.env.VITE_API_BASE_URL}/admin/events`)
+          adminFetch(`/admin/users`),
+          adminFetch(`/admin/events`)
         ]);
         
         if (usersRes.ok) {
@@ -125,7 +126,7 @@ export default function AdminDashboard() {
 
     console.log("Finished deleting photos. Now sending DELETE fetch to backend...");
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/admin/users/${encodeURIComponent(userToDel.phone)}`, {
+      const res = await adminFetch(`/admin/users/${encodeURIComponent(userToDel.phone)}`, {
         method: 'DELETE'
       });
       console.log("Delete response status:", res.status);
@@ -143,7 +144,7 @@ export default function AdminDashboard() {
   // Events
   const addEvent = async (eventPayload) => {
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/admin/events`, {
+      const res = await adminFetch(`/admin/events`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(eventPayload)
@@ -173,7 +174,7 @@ export default function AdminDashboard() {
     }
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/admin/events/${id}?phone=${encodeURIComponent(eventToDel.customerPhone)}`, {
+      const res = await adminFetch(`/admin/events/${id}?phone=${encodeURIComponent(eventToDel.customerPhone)}`, {
         method: 'DELETE'
       });
       if (!res.ok) throw new Error("Failed to delete event");
@@ -190,7 +191,7 @@ export default function AdminDashboard() {
     if (!ev) return;
     setEvents((p) => p.map((e) => (e.id === id ? { ...e, ...patch } : e)));
     try {
-      await fetch(`${import.meta.env.VITE_API_BASE_URL}/admin/events/${id}?phone=${encodeURIComponent(ev.customerPhone)}`, {
+      await adminFetch(`/admin/events/${id}?phone=${encodeURIComponent(ev.customerPhone)}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(patch)
@@ -208,7 +209,7 @@ export default function AdminDashboard() {
     setEvents(prev => prev.map(e => e.id === eventId ? { ...e, folders: eventFolders } : e));
 
     try {
-      await fetch(`${import.meta.env.VITE_API_BASE_URL}/admin/events/${eventId}?phone=${encodeURIComponent(ev.customerPhone)}`, {
+      await adminFetch(`/admin/events/${eventId}?phone=${encodeURIComponent(ev.customerPhone)}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ folders: eventFolders })
