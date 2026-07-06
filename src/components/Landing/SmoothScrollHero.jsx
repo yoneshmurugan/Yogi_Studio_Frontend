@@ -138,6 +138,8 @@ export const SmoothScrollHero = () => {
 const Hero = () => {
   const isMobile = useIsMobile();
   const SECTION_HEIGHT = isMobile ? 2200 : 2500;
+  const { scrollY } = useScroll();
+  const indicatorOpacity = useTransform(scrollY, [0, 250], [1, 0]);
 
   return (
     <div
@@ -145,6 +147,22 @@ const Hero = () => {
       className="relative w-full"
     >
       <CenterImage sectionHeight={SECTION_HEIGHT} isMobile={isMobile} />
+      
+      {/* ── Main Hero Page Scroll Indicator ── */}
+      <motion.div
+        style={{ opacity: indicatorOpacity }}
+        className="absolute top-[85dvh] left-1/2 -translate-x-1/2 flex flex-col items-center gap-2.5 z-[100] pointer-events-none"
+      >
+        <div className="w-[26px] h-[42px] rounded-full border border-[#d4af37]/60 flex justify-center p-1.5 shadow-[0_0_20px_rgba(212,175,55,0.2)] backdrop-blur-md bg-black/10">
+          <motion.div
+            animate={{ y: [0, 14, 0], opacity: [1, 0, 1] }}
+            transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+            className="w-[3px] h-[8px] bg-[#d4af37] rounded-full"
+          />
+        </div>
+        <span className="text-[10px] uppercase tracking-[0.25em] text-[#d4af37]/90 font-medium drop-shadow-lg shadow-black">Scroll to Explore</span>
+      </motion.div>
+
       <ParallaxImages isMobile={isMobile} />
       <div className="absolute bottom-0 left-0 right-0 h-96 bg-gradient-to-b from-zinc-950/0 to-zinc-950" />
     </div>
@@ -474,23 +492,6 @@ const StudioDetails = () => {
               Where art meets emotion. We capture your most precious moments with elegant, cinematic, and timeless photography.{" "}
               Experience the opulent digital studio — crafting future memories through high-fashion wedding photography &amp; cinematic videography.
             </motion.p>
-
-            {/* ── Mobile Scroll Indicator ── */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              transition={{ delay: 1.2, duration: 1 }}
-              className="mt-16 flex flex-col items-center gap-2.5 opacity-80"
-            >
-              <div className="w-[22px] h-[36px] rounded-full border border-[#d4af37]/40 flex justify-center p-1 shadow-[0_0_15px_rgba(212,175,55,0.1)]">
-                <motion.div
-                  animate={{ y: [0, 12, 0], opacity: [1, 0, 1] }}
-                  transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
-                  className="w-[3px] h-[6px] bg-[#d4af37] rounded-full"
-                />
-              </div>
-              <span className="text-[9px] uppercase tracking-[0.2em] text-[#d4af37]/60 font-medium">Scroll to Explore</span>
-            </motion.div>
           </section>
         </div>
       </div>
@@ -642,23 +643,6 @@ const StudioDetails = () => {
           Where art meets emotion. We capture your most precious moments with elegant, cinematic, and timeless photography.{" "}
           Experience the opulent digital studio — crafting future memories through high-fashion wedding photography &amp; cinematic videography.
         </motion.p>
-
-        {/* ── Desktop Scroll Indicator ── */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ delay: 1.2, duration: 1 }}
-          className="absolute bottom-10 flex flex-col items-center gap-3 opacity-90"
-        >
-          <div className="w-[26px] h-[42px] rounded-full border border-[#d4af37]/40 flex justify-center p-1.5 shadow-[0_0_20px_rgba(212,175,55,0.15)]">
-            <motion.div
-              animate={{ y: [0, 14, 0], opacity: [1, 0, 1] }}
-              transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
-              className="w-[3px] h-[8px] bg-[#d4af37] rounded-full"
-            />
-          </div>
-          <span className="text-[10px] uppercase tracking-[0.25em] text-[#d4af37]/70 font-medium">Scroll to Explore</span>
-        </motion.div>
       </section>
     </div>
   );
