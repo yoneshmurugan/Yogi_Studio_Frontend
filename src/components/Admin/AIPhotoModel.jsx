@@ -238,10 +238,13 @@ export default function AIPhotoModel() {
         const faceDescriptors = await extractAllFaces(canvas);
         
         if (faceDescriptors.length > 0) {
-          // 3. Upload raw image to Firebase Storage
+          // 3. Compress and Upload image to Firebase Storage
           setProgress({ current: i + 1, total: files.length, currentAction: `Uploading ${file.name}...` });
+          
+          const compressedBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.85));
+          
           const imageRef = ref(storage, `events/${eventId}/photos/${file.name}`);
-          const uploadRes = await uploadBytes(imageRef, file);
+          const uploadRes = await uploadBytes(imageRef, compressedBlob);
           newBytesUploaded += uploadRes.metadata.size;
           const downloadUrl = await getDownloadURL(imageRef);
 
