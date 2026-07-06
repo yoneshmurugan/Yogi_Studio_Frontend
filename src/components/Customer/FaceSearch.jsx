@@ -99,6 +99,7 @@ export default function FaceSearch() {
   const [matchedPhotos, setMatchedPhotos] = useState([]);
   const [downloadStatus, setDownloadStatus] = useState('idle');
   const [downloadProgress, setDownloadProgress] = useState({ current: 0, total: 0 });
+  const [hasDownloaded, setHasDownloaded] = useState(false);
   const [selectedImageIdx, setSelectedImageIdx] = useState(null);
   
   // Camera Assistant States
@@ -274,6 +275,7 @@ export default function FaceSearch() {
         setDownloadProgress({ current: idx + 1, total: matchedPhotos.length });
       }
       setDownloadStatus('done');
+      setHasDownloaded(true);
       setTimeout(() => setDownloadStatus('idle'), 3000);
     } catch (err) { console.error(err); setDownloadStatus('idle'); }
   };
@@ -845,7 +847,7 @@ export default function FaceSearch() {
                 <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-zinc-800/60 to-transparent mb-6" />
                 
                 <AnimatePresence>
-                  {downloadStatus === 'done' && (
+                  {hasDownloaded && (
                     <motion.div
                       initial={{ opacity: 0, y: 20, height: 0 }}
                       animate={{ opacity: 1, y: 0, height: 'auto' }}
