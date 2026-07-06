@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
 import { Camera as CameraIcon, Loader2, ArrowLeft, Image as ImageIcon, Search, Download, CheckCircle2, X, Sparkles, Heart, Shield, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { extractSingleFace } from '../../lib/faceApi';
+import { extractSingleFace, detectLiveFaceBox } from '../../lib/faceApi';
 import { ref, getDownloadURL } from 'firebase/storage';
 import { storage } from '../../lib/firebase';
 import { saveAs } from 'file-saver';
@@ -98,12 +98,93 @@ export default function FaceSearch() {
   const [errorMsg, setErrorMsg] = useState('');
   const [matchedPhotos, setMatchedPhotos] = useState([]);
   const [downloadStatus, setDownloadStatus] = useState('idle');
+  const [downloadProgress, setDownloadProgress] = useState({ current: 0, total: 0 });
   const [selectedImageIdx, setSelectedImageIdx] = useState(null);
   
+  // Camera Assistant States
+  const [isCameraOpen, setIsCameraOpen] = useState(false);
+  const [cameraMsg, setCameraMsg] = useState("Initializing camera...");
+  const [cameraProgress, setCameraProgress] = useState(0); 
+
   const imgRef = useRef(null);
   const fileInputRef = useRef(null);
   const touchStartX = useRef(0);
   const resultsRef = useRef(null);
+  const videoRef = useRef(null);
+  const streamRef = useRef(null);
+  const requestRef = useRef(null);
+  const goodFramesCount = useRef(0);
+
+  // Live Camera tracking Loop
+  useEffect(() => {
+    if (isCameraOpen && videoRef.current && streamRef.current) {
+      videoRef.current.srcObject = streamRef.current;
+      let lastTime = 0;
+      
+      const loop = async (time) => {
+        if (!isCameraOpen) return;
+        
+        if (time - lastTime < 100) { // Limit to ~10 FPS for mobile battery
+          requestRef.current = requestAnimationFrame(loop);
+          return;
+        }
+        lastTime = time;
+        
+        if (videoRef.current && videoRef.current.readyState === 4) {
+          try {
+            const detection = await detectLiveFaceBox(videoRef.current);
+            if (!detection) {
+              setCameraMsg("Face not found. Look into the camera.");
+              setCameraProgress(0);
+              goodFramesCount.current = 0;
+            } else {
+              const { box } = detection;
+              const vW = videoRef.current.videoWidth;
+              const vH = videoRef.current.videoHeight;
+              
+              const boxW = (box.width / vW) * 100;
+              const boxX = (box.x / vW) * 100 + (boxW/2);
+              const boxY = (box.y / vH) * 100 + ((box.height / vH) * 100 / 2);
+
+              let isGood = true;
+
+              if (boxW < 20) { setCameraMsg("Move closer"); isGood = false; }
+              else if (boxW > 60) { setCameraMsg("Move slightly back"); isGood = false; }
+              else if (Math.abs(boxX - 50) > 18 || Math.abs(boxY - 50) > 20) {
+                setCameraMsg("Center your face in the oval"); isGood = false;
+              }
+
+              if (isGood) {
+                setCameraMsg("Perfect! Hold still...");
+                goodFramesCount.current += 1;
+                setCameraProgress(Math.min((goodFramesCount.current / 12) * 100, 100)); // ~1.2s
+                
+                if (goodFramesCount.current >= 12) {
+                  // Capture!
+                  cancelAnimationFrame(requestRef.current);
+                  handleAutoCapture();
+                  return;
+                }
+              } else {
+                goodFramesCount.current = 0;
+                setCameraProgress(0);
+              }
+            }
+          } catch(e) {}
+        }
+        requestRef.current = requestAnimationFrame(loop);
+      };
+      
+      videoRef.current.onloadedmetadata = () => {
+        videoRef.current.play();
+        requestRef.current = requestAnimationFrame(loop);
+      };
+    }
+    
+    return () => {
+      if (requestRef.current) cancelAnimationFrame(requestRef.current);
+    };
+  }, [isCameraOpen]);
 
   // Auto-scroll to results
   useEffect(() => {
@@ -145,6 +226,7 @@ export default function FaceSearch() {
   const handleDownloadAll = async () => {
     if (matchedPhotos.length === 0) return;
     setDownloadStatus('downloading');
+    setDownloadProgress({ current: 0, total: matchedPhotos.length });
     try {
       const applyWatermark = (url) => new Promise((resolve) => {
         const img = new Image();
@@ -175,24 +257,62 @@ export default function FaceSearch() {
       for (let idx = 0; idx < matchedPhotos.length; idx++) {
         const blob = await applyWatermark(matchedPhotos[idx]);
         if (blob) { saveAs(blob, `${eventId}_YogiStudio_Photo_${idx + 1}.jpg`); await new Promise(r => setTimeout(r, 300)); }
+        setDownloadProgress({ current: idx + 1, total: matchedPhotos.length });
       }
       setDownloadStatus('done');
       setTimeout(() => setDownloadStatus('idle'), 3000);
     } catch (err) { console.error(err); setDownloadStatus('idle'); }
   };
 
-  const triggerCamera = () => {
-    if (!eventId) { setErrorMsg('Please enter an Event Code.'); return; }
-    setErrorMsg(''); setStatus('idle'); setMatchedPhotos([]); fileInputRef.current?.click();
+  const closeCamera = () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+    }
+    setIsCameraOpen(false);
+    if (requestRef.current) cancelAnimationFrame(requestRef.current);
   };
 
-  const handleFileCapture = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    e.target.value = '';
+  const handleAutoCapture = () => {
+    if (!videoRef.current) return;
+    const canvas = document.createElement('canvas');
+    canvas.width = videoRef.current.videoWidth;
+    canvas.height = videoRef.current.videoHeight;
+    const ctx = canvas.getContext('2d');
+    
+    // Mirror draw for front camera
+    ctx.translate(canvas.width, 0);
+    ctx.scale(-1, 1);
+    ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
+    
+    closeCamera();
+    
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+    processImageCapture(dataUrl);
+  };
+
+  const triggerCamera = async () => {
+    if (!eventId) { setErrorMsg('Please enter an Event Code.'); return; }
+    setErrorMsg(''); setStatus('idle'); setMatchedPhotos([]); 
+
+    try {
+      // Request camera
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { facingMode: 'user', width: { ideal: 720 }, height: { ideal: 1280 } } 
+      });
+      streamRef.current = stream;
+      setCameraMsg("Initializing AI engine...");
+      setCameraProgress(0);
+      goodFramesCount.current = 0;
+      setIsCameraOpen(true);
+    } catch (err) {
+      console.warn("Camera denied/unavailable. Falling back to native file upload.");
+      fileInputRef.current?.click();
+    }
+  };
+
+  const processImageCapture = async (dataUrl) => {
     try {
       setStatus('analyzing');
-      const dataUrl = await new Promise((res, rej) => { const r = new FileReader(); r.onload = (e) => res(e.target.result); r.onerror = rej; r.readAsDataURL(file); });
       const img = new Image(); img.src = dataUrl;
       await new Promise((res, rej) => { img.onload = res; img.onerror = rej; });
       const descriptor = await extractSingleFace(img);
@@ -208,6 +328,16 @@ export default function FaceSearch() {
       const data = await response.json();
       setMatchedPhotos(data.photos || []);
       setStatus('complete');
+    } catch (err) { console.error(err); setStatus('error'); setErrorMsg(err.message || 'Something went wrong.'); }
+  };
+
+  const handleFileCapture = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    e.target.value = '';
+    try {
+      const dataUrl = await new Promise((res, rej) => { const r = new FileReader(); r.onload = (e) => res(e.target.result); r.onerror = rej; r.readAsDataURL(file); });
+      await processImageCapture(dataUrl);
     } catch (err) { console.error(err); setStatus('error'); setErrorMsg(err.message || 'Something went wrong.'); }
   };
 
@@ -607,9 +737,26 @@ export default function FaceSearch() {
                   disabled={downloadStatus !== 'idle'}
                   className="flex items-center gap-2.5 px-7 py-3 bg-[#0a0a0a] backdrop-blur-xl border border-zinc-800/60 rounded-full text-white font-medium hover:bg-gold hover:text-black hover:border-gold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {downloadStatus === 'downloading' ? <><Loader2 className="w-4 h-4 animate-spin" /><span>Preparing your memories...</span></> :
-                   downloadStatus === 'done' ? <><CheckCircle2 className="w-4 h-4 text-green-500" /><span>Memories Saved!</span></> :
-                   <><Download className="w-4 h-4" /><span>Save All Memories</span></>}
+                  {downloadStatus === 'downloading' ? (
+                    <div className="flex flex-col items-center justify-center w-full min-w-[200px] px-2 py-1">
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <Loader2 className="w-4 h-4 animate-spin text-gold" />
+                        <span className="text-sm font-medium">Downloading {downloadProgress.current} / {downloadProgress.total}</span>
+                      </div>
+                      <div className="w-full bg-zinc-800 rounded-full h-1.5 overflow-hidden">
+                        <motion.div
+                          className="h-full bg-gold"
+                          initial={{ width: 0 }}
+                          animate={{ width: `${(downloadProgress.current / downloadProgress.total) * 100}%` }}
+                          transition={{ ease: 'linear', duration: 0.2 }}
+                        />
+                      </div>
+                    </div>
+                  ) : downloadStatus === 'done' ? (
+                    <><CheckCircle2 className="w-4 h-4 text-green-500" /><span>Memories Saved!</span></>
+                  ) : (
+                    <><Download className="w-4 h-4" /><span>Save All Memories</span></>
+                  )}
                 </motion.button>
               </motion.div>
 
@@ -726,6 +873,72 @@ export default function FaceSearch() {
       </AnimatePresence>
 
       <img ref={imgRef} className="hidden" alt="" />
+      {/* ═══ LIVE AI CAMERA ASSISTANT ═══ */}
+      <AnimatePresence>
+        {isCameraOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: 100 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 100 }}
+            className="fixed inset-0 z-[100] bg-black overflow-hidden flex flex-col"
+          >
+            {/* Header */}
+            <div className="absolute top-0 left-0 right-0 p-6 z-10 flex justify-between items-center bg-gradient-to-b from-black/80 to-transparent">
+              <h2 className="text-white font-serif text-xl tracking-wide">Yogi AI Assistant</h2>
+              <button onClick={closeCamera} className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center backdrop-blur-md">
+                <X className="w-5 h-5 text-white" />
+              </button>
+            </div>
+            
+            {/* Video Feed */}
+            <div className="relative flex-1 w-full flex items-center justify-center bg-[#050505]">
+              <video 
+                ref={videoRef} 
+                className="absolute inset-0 w-full h-full object-cover"
+                style={{ transform: 'scaleX(-1)' }}
+                playsInline
+                muted
+              />
+              
+              {/* Target Oval Overlay */}
+              <div className="absolute inset-0 z-10 pointer-events-none flex flex-col items-center justify-center">
+                <div className="w-[70vw] max-w-[320px] h-[55vh] max-h-[450px] rounded-[150px] border-[3px] border-gold/40 shadow-[0_0_0_9999px_rgba(0,0,0,0.65)] relative overflow-hidden transition-all duration-300">
+                  {/* Scan line effect inside oval */}
+                  <motion.div
+                    animate={{ top: ['0%', '100%', '0%'] }}
+                    transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
+                    className="absolute left-0 right-0 h-[2px] bg-gold/50 z-20 shadow-[0_0_20px_rgba(255,215,0,0.8)]"
+                  />
+                </div>
+                
+                {/* Feedback Text */}
+                <div className="absolute bottom-[10vh] left-0 right-0 flex flex-col items-center">
+                  <motion.div 
+                    animate={{ scale: cameraProgress === 100 ? [1, 1.1, 1] : 1 }}
+                    className={`px-6 py-3.5 rounded-full backdrop-blur-md border shadow-2xl transition-colors duration-300 ${
+                      cameraProgress > 0 ? 'bg-green-500/20 border-green-500/50 text-green-400' 
+                      : 'bg-black/60 border-white/20 text-white'
+                    }`}
+                  >
+                    <span className="font-medium text-lg tracking-wide">{cameraMsg}</span>
+                  </motion.div>
+                  
+                  {/* Progress Bar */}
+                  <div className="w-48 h-1.5 bg-black/50 rounded-full mt-6 overflow-hidden border border-white/10 relative">
+                    <motion.div 
+                      className="h-full bg-gradient-to-r from-amber-400 to-gold"
+                      initial={{ width: 0 }}
+                      animate={{ width: `${cameraProgress}%` }}
+                      transition={{ ease: 'linear', duration: 0.1 }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
     </div>
   );
 }

@@ -3,6 +3,7 @@ import '@tensorflow/tfjs-backend-webgl';
 import * as faceapi from '@vladmandic/face-api';
 
 let isInitialized = false;
+let isLiveInitialized = false;
 
 /**
  * Initializes the TensorFlow backend and loads the required models.
@@ -76,4 +77,43 @@ export const extractSingleFace = async (input) => {
 
   if (!detection) return null;
   return detection.descriptor;
+};
+
+/**
+ * Fast initialization for mobile live tracking (skips ssdMobilenetv1).
+ */
+export const initializeLiveFaceApi = async () => {
+  if (isLiveInitialized) return;
+
+  try {
+    await tf.setBackend('webgl');
+    await tf.ready();
+    const MODEL_URL = '/models';
+    
+    // Only load tiny face detector and landmarks/recognition
+    await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
+    await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
+    await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
+
+    isLiveInitialized = true;
+    console.log('Live FaceAPI initialized successfully.');
+  } catch (error) {
+    console.error('Error initializing Live FaceAPI:', error);
+    throw error;
+  }
+};
+
+/**
+ * Ultra-fast bounding box detection for real-time video streaming.
+ * Skips descriptor extraction for high FPS.
+ * @param {HTMLVideoElement} video 
+ * @returns {Promise<faceapi.FaceDetection | null>}
+ */
+export const detectLiveFaceBox = async (video) => {
+  if (!isLiveInitialized) await initializeLiveFaceApi();
+
+  const options = new faceapi.TinyFaceDetectorOptions({ inputSize: 160, scoreThreshold: 0.5 });
+  const detection = await faceapi.detectSingleFace(video, options);
+  
+  return detection; // Contains .box with x, y, width, height
 };
