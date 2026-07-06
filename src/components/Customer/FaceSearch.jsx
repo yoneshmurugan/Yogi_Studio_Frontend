@@ -100,6 +100,7 @@ export default function FaceSearch() {
   const [downloadStatus, setDownloadStatus] = useState('idle');
   const [downloadProgress, setDownloadProgress] = useState({ current: 0, total: 0 });
   const [hasDownloaded, setHasDownloaded] = useState(false);
+  const [showPostDownloadModal, setShowPostDownloadModal] = useState(false);
   const [selectedImageIdx, setSelectedImageIdx] = useState(null);
   
   // Camera Assistant States
@@ -276,6 +277,7 @@ export default function FaceSearch() {
       }
       setDownloadStatus('done');
       setHasDownloaded(true);
+      setShowPostDownloadModal(true);
       setTimeout(() => setDownloadStatus('idle'), 3000);
     } catch (err) { console.error(err); setDownloadStatus('idle'); }
   };
@@ -939,6 +941,53 @@ export default function FaceSearch() {
               />
             </AnimatePresence>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ═══ POST-DOWNLOAD MODAL ═══ */}
+      <AnimatePresence>
+        {showPostDownloadModal && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="relative w-full max-w-sm bg-gradient-to-b from-[#111] to-black border border-gold/30 rounded-3xl p-8 text-center shadow-[0_0_50px_rgba(255,215,0,0.15)] overflow-hidden"
+            >
+              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-gold/10 via-transparent to-transparent pointer-events-none" />
+              
+              <button 
+                onClick={() => setShowPostDownloadModal(false)}
+                className="absolute top-4 right-4 p-2 text-zinc-500 hover:text-white transition-colors z-10"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              <div className="w-16 h-16 mx-auto bg-gold/10 rounded-full flex items-center justify-center mb-6 border border-gold/20 shadow-[0_0_20px_rgba(255,215,0,0.2)]">
+                <Heart className="w-8 h-8 text-gold" />
+              </div>
+
+              <h2 className="text-2xl font-serif text-white mb-3">Loved your photos?</h2>
+              <p className="text-zinc-400 text-sm mb-8 leading-relaxed">
+                Thank you for downloading your memories! Would you like to explore more of our cinematic photography?
+              </p>
+
+              <button
+                onClick={() => { window.scrollTo(0,0); navigate('/'); }}
+                className="w-full py-4 bg-gradient-to-r from-gold to-yellow-600 text-black font-semibold rounded-xl hover:scale-[1.02] transition-all shadow-[0_0_20px_rgba(255,215,0,0.2)] mb-3"
+              >
+                Discover Yogi Studio
+              </button>
+              
+              <button 
+                onClick={() => setShowPostDownloadModal(false)}
+                className="text-zinc-500 text-xs font-medium uppercase tracking-widest hover:text-white transition-colors py-2"
+              >
+                Maybe Later
+              </button>
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
 
