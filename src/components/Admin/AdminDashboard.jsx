@@ -10,7 +10,7 @@ import AddUserSection   from './AddUserSection';
 import PortfolioManager from './PortfolioManager';
 import UserManagement   from './UserManagement';
 import AIPhotoModel     from './AIPhotoModel';
-import { ref, deleteObject } from 'firebase/storage';
+import { ref, deleteObject, listAll } from 'firebase/storage';
 import { storage } from '../../lib/firebase';
 import yogiLogo from '../../assets/Headerlogo.png';
 import { adminFetch } from '../../lib/api';
@@ -174,6 +174,20 @@ export default function AdminDashboard() {
         }
       }
     }
+
+    // Completely wipe AI Photos & Index from Firebase Storage
+    try {
+      // Delete the JSON index
+      await deleteObject(ref(storage, `events/${id}/face_index.json`));
+    } catch(e) { console.log('No AI face_index.json to delete or error:', e); }
+
+    try {
+      // List and delete all photos inside the event's AI photos folder
+      const aiPhotosRef = ref(storage, `events/${id}/photos`);
+      const listResult = await listAll(aiPhotosRef);
+      const deletePromises = listResult.items.map(itemRef => deleteObject(itemRef));
+      await Promise.all(deletePromises);
+    } catch(e) { console.log('No AI photos to delete or error:', e); }
 
     try {
       const res = await adminFetch(`/admin/events/${id}?phone=${encodeURIComponent(eventToDel.customerPhone)}`, {

@@ -1,6 +1,6 @@
 import * as tf from '@tensorflow/tfjs';
 import '@tensorflow/tfjs-backend-webgl';
-import * as faceapi from 'face-api.js';
+import * as faceapi from '@vladmandic/face-api';
 
 let isInitialized = false;
 
@@ -46,6 +46,7 @@ export const initializeFaceApi = async () => {
 export const extractAllFaces = async (input) => {
   if (!isInitialized) await initializeFaceApi();
 
+  console.log('FaceAPI: Starting face detection...');
   // We use SsdMobilenetv1Options for highest accuracy on the Admin side
   const options = new faceapi.SsdMobilenetv1Options({ minConfidence: 0.5 });
   
@@ -53,6 +54,7 @@ export const extractAllFaces = async (input) => {
     .withFaceLandmarks()
     .withFaceDescriptors();
 
+  console.log(`FaceAPI: Found ${detections.length} faces.`);
   return detections.map(d => d.descriptor);
 };
 

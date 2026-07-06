@@ -76,8 +76,16 @@ export default function DesktopNav({ onLogin, onHome }) {
             ))}
           </nav>
 
-          {/* Login Button */}
-          <motion.button
+          {/* AI Search & Login */}
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => navigate('/ai-search')}
+              className="flex items-center gap-2 px-5 py-2 rounded-full bg-gold text-black text-xs tracking-[0.15em] uppercase font-semibold hover:bg-yellow-500 transition-all cursor-pointer shadow-[0_0_15px_rgba(212,175,55,0.3)]"
+            >
+              AI Photo Model
+            </button>
+
+            <motion.button
             onClick={onLogin}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
@@ -87,6 +95,7 @@ export default function DesktopNav({ onLogin, onHome }) {
             Login
           </motion.button>
         </div>
+      </div>
       </div>
     </motion.header>
   );

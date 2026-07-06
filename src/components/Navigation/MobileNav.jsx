@@ -81,15 +81,24 @@ export default function MobileNav({ onLogin, onHome }) {
             </motion.button>
           </div>
 
-          {/* Login */}
-          <motion.button
-            onClick={() => { setIsOpen(false); onLogin(); }}
-            whileTap={{ scale: 0.9 }}
-            className="flex items-center gap-1.5 px-4 py-1.5 rounded-full border border-gold/30 text-gold text-[10px] tracking-[0.15em] uppercase font-medium hover:bg-gold/10 transition-all cursor-pointer"
-          >
-            <LogIn className="w-3 h-3" />
-            Login
-          </motion.button>
+          {/* Buttons */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => { setIsOpen(false); navigate('/ai-search'); }}
+              className="px-3 py-1.5 rounded-full bg-gold text-black text-[10px] tracking-[0.1em] uppercase font-semibold hover:bg-yellow-500 transition-all cursor-pointer shadow-[0_0_10px_rgba(212,175,55,0.3)]"
+            >
+              AI Model
+            </button>
+
+            <motion.button
+              onClick={() => { setIsOpen(false); onLogin(); }}
+              whileTap={{ scale: 0.9 }}
+              className="flex items-center gap-1.5 px-4 py-1.5 rounded-full border border-gold/30 text-gold text-[10px] tracking-[0.15em] uppercase font-medium hover:bg-gold/10 transition-all cursor-pointer"
+            >
+              <LogIn className="w-3 h-3" />
+              Login
+            </motion.button>
+          </div>
         </div>
       </div>
 
