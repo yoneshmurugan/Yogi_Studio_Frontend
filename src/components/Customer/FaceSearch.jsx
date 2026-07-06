@@ -840,9 +840,28 @@ export default function FaceSearch() {
                 ))}
               </div>
 
-              {/* Bottom branding */}
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.5 }} className="mt-10 text-center">
-                <div className="h-[1px] bg-gradient-to-r from-transparent via-zinc-800/60 to-transparent mb-6" />
+              {/* Bottom branding & CTA */}
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.5 }} className="mt-10 text-center flex flex-col items-center">
+                <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-zinc-800/60 to-transparent mb-6" />
+                
+                <AnimatePresence>
+                  {downloadStatus === 'done' && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 20, height: 0 }}
+                      animate={{ opacity: 1, y: 0, height: 'auto' }}
+                      className="mb-8 overflow-hidden"
+                    >
+                      <h3 className="text-white font-serif text-xl md:text-2xl mb-4">Loved your photos?</h3>
+                      <button
+                        onClick={() => { window.scrollTo(0,0); navigate('/'); }}
+                        className="px-8 py-3 bg-gradient-to-r from-gold to-yellow-600 text-black font-medium rounded-full hover:scale-105 transition-all shadow-[0_0_30px_rgba(255,215,0,0.2)]"
+                      >
+                        Discover Yogi Studio
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
                 <p className="text-zinc-700 text-[11px] tracking-[0.15em] uppercase">Powered by Yogi Studio AI</p>
               </motion.div>
             </motion.div>
