@@ -763,7 +763,13 @@ export default function FaceSearch() {
               </div>
 
               {/* Download */}
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9 }} className="flex justify-center mb-8">
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9 }} className="flex flex-col items-center justify-center mb-8">
+                
+                <div className="flex items-center gap-2 text-zinc-400 mb-5 bg-zinc-900/50 px-4 py-2 rounded-full border border-zinc-800/80 shadow-lg">
+                  <Trash2 className="w-3.5 h-3.5 text-red-400" />
+                  <span className="text-xs font-medium tracking-wide">Hint: Remove photos that aren't yours before downloading</span>
+                </div>
+
                 <motion.button
                   whileHover={{ scale: 1.03, boxShadow: '0 0 30px rgba(255,215,0,0.1)' }}
                   whileTap={{ scale: 0.97 }}
