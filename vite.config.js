@@ -12,7 +12,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,jpg,jpeg}'],
-        maximumFileSizeToCacheInBytes: 10 * 1024 * 1024
+        maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
+        navigateFallback: '/index.html'
       },
       manifest: {
         name: 'Yogi Digital Studio',
