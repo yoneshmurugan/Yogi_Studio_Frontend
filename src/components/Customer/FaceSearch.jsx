@@ -813,7 +813,7 @@ export default function FaceSearch() {
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.6 + idx * 0.07, duration: 0.6, ease: 'easeOut' }}
-                    className="mb-1.5 md:mb-3 inline-block w-full rounded-xl md:rounded-2xl overflow-hidden cursor-pointer group relative break-inside-avoid shadow-[0_4px_20px_rgba(0,0,0,0.4)] transform-gpu"
+                    className="mb-1.5 md:mb-3 inline-block w-full rounded-xl md:rounded-2xl overflow-hidden cursor-pointer group relative break-inside-avoid shadow-[0_4px_20px_rgba(0,0,0,0.4)]"
                     onClick={() => setSelectedImageIdx(idx)}
                   >
                     <img src={url} alt={`Photo ${idx + 1}`} className="block w-full h-auto object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
@@ -894,14 +894,13 @@ export default function FaceSearch() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/[0.98] backdrop-blur-xl"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-xl"
             onClick={() => setSelectedImageIdx(null)}
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
           >
             {/* Top bar */}
-            <div className="absolute top-0 left-0 right-0 p-4 flex items-center justify-between z-10">
+            <div className="absolute top-0 left-0 right-0 p-4 flex items-center justify-between z-[60]">
               <span className="text-white/30 text-sm font-medium bg-white/5 backdrop-blur-sm px-3 py-1.5 rounded-full border border-white/5">
                 {selectedImageIdx + 1} / {matchedPhotos.length}
               </span>
@@ -914,13 +913,13 @@ export default function FaceSearch() {
 
             {/* Navigation arrows */}
             {selectedImageIdx > 0 && (
-              <button className="absolute left-2 md:left-6 top-1/2 -translate-y-1/2 z-10 p-2.5 md:p-3 bg-white/5 backdrop-blur-md rounded-full text-white/40 hover:text-white hover:bg-white/10 transition-all border border-white/5"
+              <button className="absolute left-2 md:left-6 top-1/2 -translate-y-1/2 z-[60] p-2.5 md:p-3 bg-white/5 backdrop-blur-md rounded-full text-white/40 hover:text-white hover:bg-white/10 transition-all border border-white/5"
                 onClick={(e) => { e.stopPropagation(); setSelectedImageIdx(i => i - 1); }}>
                 <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
               </button>
             )}
             {selectedImageIdx < matchedPhotos.length - 1 && (
-              <button className="absolute right-2 md:right-6 top-1/2 -translate-y-1/2 z-10 p-2.5 md:p-3 bg-white/5 backdrop-blur-md rounded-full text-white/40 hover:text-white hover:bg-white/10 transition-all border border-white/5"
+              <button className="absolute right-2 md:right-6 top-1/2 -translate-y-1/2 z-[60] p-2.5 md:p-3 bg-white/5 backdrop-blur-md rounded-full text-white/40 hover:text-white hover:bg-white/10 transition-all border border-white/5"
                 onClick={(e) => { e.stopPropagation(); setSelectedImageIdx(i => i + 1); }}>
                 <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
               </button>
@@ -930,11 +929,11 @@ export default function FaceSearch() {
             <AnimatePresence mode="wait">
               <motion.div
                 key={selectedImageIdx}
-                initial={{ scale: 0.93, opacity: 0, x: 40 }}
-                animate={{ scale: 1, opacity: 1, x: 0 }}
-                exit={{ scale: 0.93, opacity: 0, x: -40 }}
+                initial={{ scale: 0.93, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.93, opacity: 0 }}
                 transition={{ type: 'spring', stiffness: 350, damping: 30 }}
-                className="flex items-center justify-center max-w-[93vw] max-h-[82vh]"
+                className="absolute inset-0 w-full h-full flex items-center justify-center overflow-hidden"
                 onClick={(e) => e.stopPropagation()}
               >
                 <TransformWrapper
@@ -947,7 +946,7 @@ export default function FaceSearch() {
                   <TransformComponent wrapperStyle={{ width: "100%", height: "100%" }} contentStyle={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
                     <img
                       src={matchedPhotos[selectedImageIdx]}
-                      className="max-w-full max-h-[82vh] object-contain rounded-xl md:rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.8)]"
+                      className="max-w-[100vw] max-h-[100vh] object-contain"
                       draggable={false}
                     />
                   </TransformComponent>
