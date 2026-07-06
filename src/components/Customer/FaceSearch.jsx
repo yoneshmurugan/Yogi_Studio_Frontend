@@ -295,9 +295,9 @@ export default function FaceSearch() {
     setErrorMsg(''); setStatus('idle'); setMatchedPhotos([]); 
 
     try {
-      // Request camera
+      // Request camera without strict dimensions to prevent hardware zooming
       const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: 'user', width: { ideal: 720 }, height: { ideal: 1280 } } 
+        video: { facingMode: 'user' } 
       });
       streamRef.current = stream;
       setCameraMsg("Initializing AI engine...");
@@ -884,7 +884,7 @@ export default function FaceSearch() {
           >
             {/* Header */}
             <div className="absolute top-0 left-0 right-0 p-6 z-10 flex justify-between items-center bg-gradient-to-b from-black/80 to-transparent">
-              <h2 className="text-white font-serif text-xl tracking-wide">Yogi AI Assistant</h2>
+              <h2 className="text-white font-serif text-xl tracking-wide">Yogi Studio AI Selfie Assistant</h2>
               <button onClick={closeCamera} className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center backdrop-blur-md">
                 <X className="w-5 h-5 text-white" />
               </button>
