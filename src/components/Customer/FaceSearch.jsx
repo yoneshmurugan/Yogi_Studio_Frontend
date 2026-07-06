@@ -833,7 +833,7 @@ export default function FaceSearch() {
                     className="mb-1.5 md:mb-3 inline-block w-full rounded-xl md:rounded-2xl overflow-hidden cursor-pointer group relative break-inside-avoid shadow-[0_4px_20px_rgba(0,0,0,0.4)]"
                     onClick={() => setSelectedImageIdx(idx)}
                   >
-                    <img src={url} alt={`Photo ${idx + 1}`} className="block w-full h-auto object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
+                    <img src={url} alt={`Photo ${idx + 1}`} className="block w-full h-auto object-cover" />
                     {/* Hover overlay */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400" />
                     {/* Expand icon */}
