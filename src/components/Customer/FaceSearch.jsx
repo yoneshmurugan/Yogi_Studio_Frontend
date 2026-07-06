@@ -358,10 +358,25 @@ export default function FaceSearch() {
       try { indexUrl = await getDownloadURL(ref(storage, `events/${eventId}/face_index.json`)); }
       catch { throw new Error("Event not found. Double-check your Event Code."); }
       const payload = { eventId, indexUrl, selfieVector: Array.from(descriptor) };
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/match-face?t=${Date.now()}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-      if (!response.ok) { const d = await response.json().catch(() => ({})); throw new Error(d.message || 'Something went wrong.'); }
-      const data = await response.json();
-      setMatchedPhotos(data.photos || []);
+      
+      // Using XMLHttpRequest instead of fetch to bypass Safari's notorious HTTP/2 Keep-Alive POST bug
+      const response = await new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', `${import.meta.env.VITE_API_BASE_URL}/match-face?t=${Date.now()}`);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.onload = () => {
+          try {
+            const data = JSON.parse(xhr.responseText);
+            resolve({ ok: xhr.status >= 200 && xhr.status < 300, data });
+          } catch (e) { reject(new Error('Invalid JSON response from server')); }
+        };
+        xhr.onerror = () => reject(new Error('Network connection dropped by Safari'));
+        xhr.send(JSON.stringify(payload));
+      });
+
+      if (!response.ok) throw new Error(response.data.message || response.data.error || 'Something went wrong.');
+      
+      setMatchedPhotos(response.data.photos || []);
       setStatus('complete');
     } catch (err) { 
       console.error(err); 
