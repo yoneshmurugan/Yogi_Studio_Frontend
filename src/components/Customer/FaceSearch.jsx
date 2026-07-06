@@ -359,29 +359,27 @@ export default function FaceSearch() {
       catch { throw new Error("Event not found. Double-check your Event Code."); }
       const payload = { eventId, indexUrl, selfieVector: Array.from(descriptor) };
       
-      // Using XMLHttpRequest instead of fetch to bypass Safari's notorious HTTP/2 Keep-Alive POST bug
-      const response = await new Promise((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        xhr.open('POST', `${import.meta.env.VITE_API_BASE_URL}/match-face?t=${Date.now()}`);
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.onload = () => {
-          try {
-            const data = JSON.parse(xhr.responseText);
-            resolve({ ok: xhr.status >= 200 && xhr.status < 300, data });
-          } catch (e) { reject(new Error('Invalid JSON response from server')); }
-        };
-        xhr.onerror = () => reject(new Error('Network connection dropped by Safari'));
-        xhr.send(JSON.stringify(payload));
+      // By sending as text/plain, we bypass the CORS OPTIONS preflight request entirely.
+      // Safari notoriously drops connections if too many OPTIONS requests happen or if it fails to cache them.
+      // AWS Lambda JSON.parse() doesn't care about the Content-Type header.
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/match-face`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify(payload)
       });
 
-      if (!response.ok) throw new Error(response.data.message || response.data.error || 'Something went wrong.');
+      if (!response.ok) { 
+        const d = await response.json().catch(() => ({})); 
+        throw new Error(d.message || d.error || 'Something went wrong.'); 
+      }
       
-      setMatchedPhotos(response.data.photos || []);
+      const data = await response.json();
+      setMatchedPhotos(data.photos || []);
       setStatus('complete');
     } catch (err) { 
       console.error(err); 
       setStatus('error'); 
-      setErrorMsg(`Error: ${err.message}. Details: ${JSON.stringify(err, Object.getOwnPropertyNames(err))}`); 
+      setErrorMsg(`Error: ${err.message}`); 
     }
   };
 
