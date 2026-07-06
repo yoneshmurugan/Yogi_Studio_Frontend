@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
 import { Camera as CameraIcon, Loader2, ArrowLeft, Image as ImageIcon, Search, Download, CheckCircle2, X, Sparkles, Heart, Shield, ChevronLeft, ChevronRight, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import { extractSingleFace, detectLiveFaceBox } from '../../lib/faceApi';
 import { ref, getDownloadURL } from 'firebase/storage';
 import { storage } from '../../lib/firebase';
@@ -198,12 +199,12 @@ export default function FaceSearch() {
 
   // Auto-scroll to results
   useEffect(() => {
-    if (status === 'complete' && matchedPhotos.length > 0) {
+    if (status === 'complete') {
       setTimeout(() => {
         resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }, 500);
     }
-  }, [status, matchedPhotos.length]);
+  }, [status]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -357,7 +358,7 @@ export default function FaceSearch() {
       try { indexUrl = await getDownloadURL(ref(storage, `events/${eventId}/face_index.json`)); }
       catch { throw new Error("Event not found. Double-check your Event Code."); }
       const payload = { eventId, indexUrl, selfieVector: Array.from(descriptor) };
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/match-face`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/match-face?t=${Date.now()}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
       if (!response.ok) { const d = await response.json().catch(() => ({})); throw new Error(d.message || 'Something went wrong.'); }
       const data = await response.json();
       setMatchedPhotos(data.photos || []);
@@ -815,7 +816,7 @@ export default function FaceSearch() {
                     className="mb-1.5 md:mb-3 inline-block w-full rounded-xl md:rounded-2xl overflow-hidden cursor-pointer group relative break-inside-avoid shadow-[0_4px_20px_rgba(0,0,0,0.4)] transform-gpu"
                     onClick={() => setSelectedImageIdx(idx)}
                   >
-                    <img src={url} alt={`Photo ${idx + 1}`} className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-700 ease-out" loading="lazy" />
+                    <img src={url} alt={`Photo ${idx + 1}`} className="block w-full h-auto object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
                     {/* Hover overlay */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400" />
                     {/* Expand icon */}
@@ -927,17 +928,31 @@ export default function FaceSearch() {
 
             {/* Image */}
             <AnimatePresence mode="wait">
-              <motion.img
+              <motion.div
                 key={selectedImageIdx}
                 initial={{ scale: 0.93, opacity: 0, x: 40 }}
                 animate={{ scale: 1, opacity: 1, x: 0 }}
                 exit={{ scale: 0.93, opacity: 0, x: -40 }}
                 transition={{ type: 'spring', stiffness: 350, damping: 30 }}
-                src={matchedPhotos[selectedImageIdx]}
-                className="max-w-[93vw] max-h-[82vh] object-contain rounded-xl md:rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.8)]"
+                className="flex items-center justify-center max-w-[93vw] max-h-[82vh]"
                 onClick={(e) => e.stopPropagation()}
-                draggable={false}
-              />
+              >
+                <TransformWrapper
+                  initialScale={1}
+                  minScale={1}
+                  maxScale={5}
+                  centerOnInit={true}
+                  doubleClick={{ mode: "zoomIn", step: 1.5 }}
+                >
+                  <TransformComponent wrapperStyle={{ width: "100%", height: "100%" }} contentStyle={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <img
+                      src={matchedPhotos[selectedImageIdx]}
+                      className="max-w-full max-h-[82vh] object-contain rounded-xl md:rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.8)]"
+                      draggable={false}
+                    />
+                  </TransformComponent>
+                </TransformWrapper>
+              </motion.div>
             </AnimatePresence>
           </motion.div>
         )}
