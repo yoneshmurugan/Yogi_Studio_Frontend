@@ -157,9 +157,9 @@ export default function FaceSearch() {
               if (isGood) {
                 setCameraMsg("Perfect! Hold still...");
                 goodFramesCount.current += 1;
-                setCameraProgress(Math.min((goodFramesCount.current / 12) * 100, 100)); // ~1.2s
+                setCameraProgress(Math.min((goodFramesCount.current / 8) * 100, 100)); // ~0.8s
                 
-                if (goodFramesCount.current >= 12) {
+                if (goodFramesCount.current >= 8) {
                   // Capture!
                   cancelAnimationFrame(requestRef.current);
                   handleAutoCapture();
@@ -315,6 +315,11 @@ export default function FaceSearch() {
       setStatus('analyzing');
       const img = new Image(); img.src = dataUrl;
       await new Promise((res, rej) => { img.onload = res; img.onerror = rej; });
+      
+      // CRITICAL: Yield the main thread so the browser can paint the 'Analyzing' UI 
+      // before faceApi locks up the CPU/GPU for a few seconds.
+      await new Promise(r => setTimeout(r, 150));
+      
       const descriptor = await extractSingleFace(img);
       if (!descriptor) throw new Error("No face detected. Try a clearer, well-lit photo.");
       img.src = '';
@@ -643,14 +648,14 @@ export default function FaceSearch() {
                         {status === 'idle' || status === 'error' ? (
                           <><CameraIcon className="w-5 h-5" /> Take Selfie & Search</>
                         ) : status === 'analyzing' ? (
-                          <><Loader2 className="w-5 h-5 animate-spin" /> Recognising your face...</>
+                          <><Sparkles className="w-5 h-5 text-gold" /> AI Processing Face...</>
                         ) : (
                           <><Sparkles className="w-5 h-5 animate-pulse" /> Finding your moments...</>
                         )}
                       </span>
                       {isProcessing && (
                         <motion.span initial={{ opacity: 0 }} animate={{ opacity: 0.5 }} className="text-[11px] font-normal">
-                          {status === 'analyzing' ? 'AI is mapping your unique features' : 'Scanning the event gallery'}
+                          {status === 'analyzing' ? 'This may take a moment. Please wait...' : 'Scanning the event gallery...'}
                         </motion.span>
                       )}
                     </motion.button>
@@ -902,7 +907,7 @@ export default function FaceSearch() {
               
               {/* Target Oval Overlay */}
               <div className="absolute inset-0 z-10 pointer-events-none flex flex-col items-center justify-center">
-                <div className="w-[70vw] max-w-[320px] h-[55vh] max-h-[450px] rounded-[150px] border-[3px] border-gold/40 shadow-[0_0_0_9999px_rgba(0,0,0,0.65)] relative overflow-hidden transition-all duration-300">
+                <div className="w-[85vw] max-w-[360px] h-[55vh] max-h-[450px] rounded-[150px] border-[3px] border-gold/40 shadow-[0_0_0_9999px_rgba(0,0,0,0.65)] relative overflow-hidden transition-all duration-300">
                   {/* Scan line effect inside oval */}
                   <motion.div
                     animate={{ top: ['0%', '100%', '0%'] }}
