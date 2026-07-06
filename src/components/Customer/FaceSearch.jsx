@@ -827,8 +827,8 @@ export default function FaceSearch() {
                 {matchedPhotos.map((url, idx) => (
                   <motion.div
                     key={idx}
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
                     transition={{ delay: 0.6 + idx * 0.07, duration: 0.6, ease: 'easeOut' }}
                     className="mb-1.5 md:mb-3 inline-block w-full rounded-xl md:rounded-2xl overflow-hidden cursor-pointer group relative break-inside-avoid shadow-[0_4px_20px_rgba(0,0,0,0.4)]"
                     onClick={() => setSelectedImageIdx(idx)}
