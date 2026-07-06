@@ -168,9 +168,9 @@ export default function FaceSearch() {
               if (isGood) {
                 setCameraMsg("Perfect! Hold still...");
                 goodFramesCount.current += 1;
-                setCameraProgress(Math.min((goodFramesCount.current / 12) * 100, 100)); // ~1.2s
+                setCameraProgress(Math.min((goodFramesCount.current / 18) * 100, 100)); // ~1.8s
                 
-                if (goodFramesCount.current >= 12) {
+                if (goodFramesCount.current >= 18) {
                   // Capture!
                   cancelAnimationFrame(requestRef.current);
                   handleAutoCapture();
