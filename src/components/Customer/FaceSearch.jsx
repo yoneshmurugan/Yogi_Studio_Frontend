@@ -104,6 +104,15 @@ export default function FaceSearch() {
   const [showPostDownloadModal, setShowPostDownloadModal] = useState(false);
   const [selectedImageIdx, setSelectedImageIdx] = useState(null);
   
+  // Custom JS Masonry State to bypass Safari CSS columns bugs
+  const [columnsCount, setColumnsCount] = useState(typeof window !== 'undefined' && window.innerWidth >= 768 ? 3 : 2);
+
+  useEffect(() => {
+    const handleResize = () => setColumnsCount(window.innerWidth >= 768 ? 3 : 2);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   // Camera Assistant States
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [cameraMsg, setCameraMsg] = useState("Initializing camera...");
@@ -822,42 +831,53 @@ export default function FaceSearch() {
                 </motion.button>
               </motion.div>
 
-              {/* Masonry Gallery */}
-              <div className="columns-2 md:columns-3 gap-1.5 md:gap-3">
-                {matchedPhotos.map((url, idx) => (
-                  <motion.div
-                    key={idx}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.6 + idx * 0.07, duration: 0.6, ease: 'easeOut' }}
-                    className="mb-1.5 md:mb-3 inline-block w-full rounded-xl md:rounded-2xl overflow-hidden cursor-pointer group relative break-inside-avoid shadow-[0_4px_20px_rgba(0,0,0,0.4)]"
-                    onClick={() => setSelectedImageIdx(idx)}
-                  >
-                    <img src={url} alt={`Photo ${idx + 1}`} className="block w-full h-auto object-cover" />
-                    {/* Hover overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400" />
-                    {/* Expand icon */}
-                    <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0">
-                      <div className="w-9 h-9 bg-black/40 backdrop-blur-xl rounded-full flex items-center justify-center border border-white/10 shadow-lg">
-                        <Search className="w-4 h-4 text-white" />
-                      </div>
-                    </div>
-                    {/* Remove Photo */}
-                    <div className="absolute top-2.5 right-2.5 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300">
-                      <button 
-                        onClick={(e) => removePhoto(e, idx)}
-                        className="w-8 h-8 bg-black/60 hover:bg-red-500/80 backdrop-blur-xl text-white rounded-full flex items-center justify-center border border-white/10 transition-colors"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                    {/* Counter */}
-                    <div className="absolute top-2.5 left-2.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <span className="text-[10px] bg-black/40 backdrop-blur-xl text-white/60 px-2.5 py-1 rounded-full border border-white/5 font-medium">
-                        {idx + 1} / {matchedPhotos.length}
-                      </span>
-                    </div>
-                  </motion.div>
+              {/* Masonry Gallery (JS Chunked to bypass Safari CSS columns bugs) */}
+              <div className="flex gap-1.5 md:gap-3 w-full">
+                {Array.from({ length: columnsCount }).map((_, colIdx) => (
+                  <div key={colIdx} className="flex-1 flex flex-col gap-1.5 md:gap-3">
+                    {matchedPhotos
+                      .map((url, idx) => ({ url, originalIdx: idx }))
+                      .filter((_, idx) => idx % columnsCount === colIdx)
+                      .map(({ url, originalIdx }) => (
+                        <motion.div
+                          key={originalIdx}
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ delay: 0.6 + originalIdx * 0.07, duration: 0.6, ease: 'easeOut' }}
+                          className="w-full rounded-xl md:rounded-2xl overflow-hidden cursor-pointer group relative shadow-[0_4px_20px_rgba(0,0,0,0.4)]"
+                          onClick={() => setSelectedImageIdx(originalIdx)}
+                        >
+                          <img src={url} alt={`Photo ${originalIdx + 1}`} className="block w-full h-auto object-cover" />
+                          
+                          {/* Hover overlay */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400" />
+                          
+                          {/* Expand icon */}
+                          <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0">
+                            <div className="w-9 h-9 bg-black/40 backdrop-blur-xl rounded-full flex items-center justify-center border border-white/10 shadow-lg">
+                              <Search className="w-4 h-4 text-white" />
+                            </div>
+                          </div>
+                          
+                          {/* Remove Photo */}
+                          <div className="absolute top-2.5 right-2.5 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300">
+                            <button 
+                              onClick={(e) => removePhoto(e, originalIdx)}
+                              className="w-8 h-8 bg-black/60 hover:bg-red-500/80 backdrop-blur-xl text-white rounded-full flex items-center justify-center border border-white/10 transition-colors"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                          
+                          {/* Counter */}
+                          <div className="absolute top-2.5 left-2.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <span className="text-[10px] bg-black/40 backdrop-blur-xl text-white/60 px-2.5 py-1 rounded-full border border-white/5 font-medium">
+                              {originalIdx + 1} / {matchedPhotos.length}
+                            </span>
+                          </div>
+                        </motion.div>
+                      ))}
+                  </div>
                 ))}
               </div>
 
