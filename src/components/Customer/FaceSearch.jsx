@@ -363,7 +363,11 @@ export default function FaceSearch() {
       const data = await response.json();
       setMatchedPhotos(data.photos || []);
       setStatus('complete');
-    } catch (err) { console.error(err); setStatus('error'); setErrorMsg(err.message || 'Something went wrong.'); }
+    } catch (err) { 
+      console.error(err); 
+      setStatus('error'); 
+      setErrorMsg(`Error: ${err.message}. Details: ${JSON.stringify(err, Object.getOwnPropertyNames(err))}`); 
+    }
   };
 
   const handleFileCapture = async (e) => {
