@@ -231,30 +231,22 @@ export default function FaceSearch() {
      ═══════════════════════════════════════════════════════════ */
   return (
     <div className="min-h-screen bg-[#020202] relative overflow-x-hidden">
-      <NoiseOverlay />
-
-      {/* ═══ CINEMATIC BACKGROUND ═══ */}
+      {/* ═══ CINEMATIC BACKGROUND (Optimized for Mobile) ═══ */}
       <div className="fixed inset-0 pointer-events-none z-0">
         {/* Giant ambient orb top-right */}
-        <motion.div
-          animate={{ x: [0, 60, -40, 0], y: [0, -50, 30, 0], scale: [1, 1.4, 0.8, 1] }}
-          transition={{ duration: 22, repeat: Infinity, ease: 'easeInOut' }}
-          className="absolute -top-[200px] -right-[200px] w-[700px] h-[700px] rounded-full blur-[180px]"
-          style={{ background: 'radial-gradient(circle, rgba(212,160,23,0.06) 0%, transparent 70%)' }}
+        <div
+          className="absolute -top-[200px] -right-[200px] w-[700px] h-[700px] rounded-full"
+          style={{ background: 'radial-gradient(circle, rgba(212,160,23,0.06) 0%, transparent 60%)' }}
         />
         {/* Orb bottom-left */}
-        <motion.div
-          animate={{ x: [0, -50, 40, 0], y: [0, 50, -40, 0], scale: [1, 0.7, 1.3, 1] }}
-          transition={{ duration: 28, repeat: Infinity, ease: 'easeInOut' }}
-          className="absolute -bottom-[200px] -left-[200px] w-[600px] h-[600px] rounded-full blur-[180px]"
-          style={{ background: 'radial-gradient(circle, rgba(245,158,11,0.04) 0%, transparent 70%)' }}
+        <div
+          className="absolute -bottom-[200px] -left-[200px] w-[600px] h-[600px] rounded-full"
+          style={{ background: 'radial-gradient(circle, rgba(245,158,11,0.04) 0%, transparent 60%)' }}
         />
         {/* Center pulse */}
-        <motion.div
-          animate={{ opacity: [0.02, 0.05, 0.02], scale: [0.8, 1.1, 0.8] }}
-          transition={{ duration: 12, repeat: Infinity }}
-          className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[500px] h-[500px] rounded-full blur-[200px]"
-          style={{ background: 'radial-gradient(circle, rgba(255,215,0,0.04) 0%, transparent 70%)' }}
+        <div
+          className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[500px] h-[500px] rounded-full"
+          style={{ background: 'radial-gradient(circle, rgba(255,215,0,0.04) 0%, transparent 60%)' }}
         />
 
         {/* Architectural grid */}
