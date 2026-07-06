@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
-import { Camera as CameraIcon, Loader2, ArrowLeft, Image as ImageIcon, Search, Download, CheckCircle2, X, Sparkles, Heart, Shield, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Camera as CameraIcon, Loader2, ArrowLeft, Image as ImageIcon, Search, Download, CheckCircle2, X, Sparkles, Heart, Shield, ChevronLeft, ChevronRight, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { extractSingleFace, detectLiveFaceBox } from '../../lib/faceApi';
 import { ref, getDownloadURL } from 'firebase/storage';
@@ -138,7 +138,7 @@ export default function FaceSearch() {
               setCameraProgress(0);
               goodFramesCount.current = 0;
             } else {
-              const { box } = detection;
+              const { box, score } = detection;
               const vW = videoRef.current.videoWidth;
               const vH = videoRef.current.videoHeight;
               
@@ -148,10 +148,18 @@ export default function FaceSearch() {
 
               let isGood = true;
 
-              if (boxW < 20) { setCameraMsg("Move closer"); isGood = false; }
-              else if (boxW > 60) { setCameraMsg("Move slightly back"); isGood = false; }
-              else if (Math.abs(boxX - 50) > 18 || Math.abs(boxY - 50) > 20) {
-                setCameraMsg("Center your face in the oval"); isGood = false;
+              if (score < 0.55) { 
+                setCameraMsg("Poor lighting or angle. Face the camera clearly."); 
+                isGood = false; 
+              } else if (boxW < 25) { 
+                setCameraMsg("Too far! Move closer for better quality."); 
+                isGood = false; 
+              } else if (boxW > 55) { 
+                setCameraMsg("Too close! Move slightly back."); 
+                isGood = false; 
+              } else if (Math.abs(boxX - 50) > 15 || Math.abs(boxY - 50) > 18) {
+                setCameraMsg("Center your face in the oval."); 
+                isGood = false;
               }
 
               if (isGood) {
@@ -220,6 +228,12 @@ export default function FaceSearch() {
       if (diff > 0) setSelectedImageIdx(i => Math.min(i + 1, matchedPhotos.length - 1));
       else setSelectedImageIdx(i => Math.max(i - 1, 0));
     }
+  };
+
+  // ── Remove false positive photo ──
+  const removePhoto = (e, idxToRemove) => {
+    e.stopPropagation();
+    setMatchedPhotos(prev => prev.filter((_, idx) => idx !== idxToRemove));
   };
 
   // ── Download with watermark ──
@@ -800,6 +814,15 @@ export default function FaceSearch() {
                       <div className="w-9 h-9 bg-black/40 backdrop-blur-xl rounded-full flex items-center justify-center border border-white/10 shadow-lg">
                         <Search className="w-4 h-4 text-white" />
                       </div>
+                    </div>
+                    {/* Remove Photo */}
+                    <div className="absolute top-2.5 right-2.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <button 
+                        onClick={(e) => removePhoto(e, idx)}
+                        className="w-8 h-8 bg-black/60 hover:bg-red-500/80 backdrop-blur-xl text-white rounded-full flex items-center justify-center border border-white/10 transition-colors"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
                     </div>
                     {/* Counter */}
                     <div className="absolute top-2.5 left-2.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">

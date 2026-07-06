@@ -116,6 +116,9 @@ export const detectLiveFaceBox = async (videoElement) => {
       y: face.box[1],
       width: face.box[2],
       height: face.box[3]
-    }
+    },
+    score: face.score || face.boxScore || 0,
+    videoWidth: videoElement.videoWidth || videoElement.width,
+    videoHeight: videoElement.videoHeight || videoElement.height
   };
 };
