@@ -805,15 +805,14 @@ export default function FaceSearch() {
               </motion.div>
 
               {/* Masonry Gallery */}
-              <div className="columns-2 md:columns-3 gap-1.5 md:gap-3 space-y-1.5 md:space-y-3">
+              <div className="columns-2 md:columns-3 gap-1.5 md:gap-3">
                 {matchedPhotos.map((url, idx) => (
                   <motion.div
                     key={idx}
-                    initial={{ opacity: 0, y: 40 }}
-                    animate={{ opacity: 1, y: 0 }}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.6 + idx * 0.07, duration: 0.6, ease: 'easeOut' }}
-                    whileHover={{ y: -6, transition: { duration: 0.3 } }}
-                    className="rounded-xl md:rounded-2xl overflow-hidden cursor-pointer group relative break-inside-avoid shadow-[0_4px_20px_rgba(0,0,0,0.4)] transform-gpu will-change-transform"
+                    className="mb-1.5 md:mb-3 inline-block w-full rounded-xl md:rounded-2xl overflow-hidden cursor-pointer group relative break-inside-avoid shadow-[0_4px_20px_rgba(0,0,0,0.4)] transform-gpu"
                     onClick={() => setSelectedImageIdx(idx)}
                   >
                     <img src={url} alt={`Photo ${idx + 1}`} className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-700 ease-out" loading="lazy" />
