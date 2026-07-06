@@ -9,6 +9,7 @@ import AdminOverview    from './AdminOverview';
 import AddUserSection   from './AddUserSection';
 import PortfolioManager from './PortfolioManager';
 import UserManagement   from './UserManagement';
+import AIPhotoModel     from './AIPhotoModel';
 import { ref, deleteObject } from 'firebase/storage';
 import { storage } from '../../lib/firebase';
 import yogiLogo from '../../assets/Headerlogo.png';
@@ -38,6 +39,7 @@ export const seedFolders = [
 // ── Nav items ─────────────────────────────────────────────────────────────────
 const navItems = [
   { id: 'overview',  label: 'Dashboard', icon: LayoutDashboard },
+  { id: 'aimodel',   label: 'AI Photo Model', icon: Camera },
   { id: 'adduser',   label: 'Add User',  icon: UserPlus },
   { id: 'portfolio', label: 'Portfolio', icon: Images },
   { id: 'users',     label: 'Users',     icon: Users },
@@ -478,6 +480,7 @@ export default function AdminDashboard() {
                     onUserAdded={(u) => { addUser(u); navigate('/admin/users'); }}
                   />
                 } />
+                <Route path="aimodel" element={<AIPhotoModel />} />
                 <Route path="portfolio" element={<PortfolioManager />} />
                 <Route path="users" element={
                   <UserManagement
