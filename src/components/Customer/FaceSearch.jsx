@@ -167,9 +167,9 @@ export default function FaceSearch() {
               if (isGood) {
                 setCameraMsg("Perfect! Hold still...");
                 goodFramesCount.current += 1;
-                setCameraProgress(Math.min((goodFramesCount.current / 8) * 100, 100)); // ~0.8s
+                setCameraProgress(Math.min((goodFramesCount.current / 12) * 100, 100)); // ~1.2s
                 
-                if (goodFramesCount.current >= 8) {
+                if (goodFramesCount.current >= 12) {
                   // Capture!
                   cancelAnimationFrame(requestRef.current);
                   handleAutoCapture();
@@ -809,11 +809,11 @@ export default function FaceSearch() {
                 {matchedPhotos.map((url, idx) => (
                   <motion.div
                     key={idx}
-                    initial={{ opacity: 0, y: 40, rotateX: 15 }}
-                    animate={{ opacity: 1, y: 0, rotateX: 0 }}
+                    initial={{ opacity: 0, y: 40 }}
+                    animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.6 + idx * 0.07, duration: 0.6, ease: 'easeOut' }}
                     whileHover={{ y: -6, transition: { duration: 0.3 } }}
-                    className="rounded-xl md:rounded-2xl overflow-hidden cursor-pointer group relative break-inside-avoid shadow-[0_4px_20px_rgba(0,0,0,0.4)]"
+                    className="rounded-xl md:rounded-2xl overflow-hidden cursor-pointer group relative break-inside-avoid shadow-[0_4px_20px_rgba(0,0,0,0.4)] transform-gpu will-change-transform"
                     onClick={() => setSelectedImageIdx(idx)}
                   >
                     <img src={url} alt={`Photo ${idx + 1}`} className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-700 ease-out" loading="lazy" />
