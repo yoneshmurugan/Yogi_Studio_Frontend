@@ -1,119 +1,121 @@
-import * as tf from '@tensorflow/tfjs';
-import '@tensorflow/tfjs-backend-webgl';
-import * as faceapi from '@vladmandic/face-api';
+import { Human } from '@vladmandic/human';
 
-let isInitialized = false;
-let isLiveInitialized = false;
+// The Human library uses advanced MobileFaceNet and BlazeFace models.
+const config = {
+  // Use jsdelivr CDN to load weights dynamically
+  modelBasePath: 'https://cdn.jsdelivr.net/npm/@vladmandic/human/models/',
+  face: {
+    enabled: true,
+    detector: { 
+      rotation: true, // Handles angled faces
+      return: true, 
+      maxDetected: 50 // For group event photos
+    },
+    mesh: { enabled: true }, // Required for accurate alignment before description
+    description: { enabled: true }, // Extracts 1024-d face embedding
+    iris: { enabled: false },
+    emotion: { enabled: false },
+    antispoof: { enabled: false },
+    liveness: { enabled: false }
+  },
+  body: { enabled: false },
+  hand: { enabled: false },
+  object: { enabled: false },
+  gesture: { enabled: false },
+  // Optional pre-processing
+  filter: { enabled: true, equalization: true } // Helps with poor lighting
+};
+
+let human = null;
+let liveHuman = null;
 
 /**
- * Initializes the TensorFlow backend and loads the required models.
- * We load ssdMobilenetv1 for Admin processing (higher accuracy)
- * and tinyFaceDetector for attendee selfies (faster, lighter).
+ * Initializes the AI engine and loads the WebGL models.
  */
 export const initializeFaceApi = async () => {
-  if (isInitialized) return;
-
+  if (human) return;
   try {
-    // 1. Force WebGL backend for GPU acceleration
-    await tf.setBackend('webgl');
-    await tf.ready();
-
-    const MODEL_URL = '/models';
-
-    // 2. Load the models
-    // High accuracy detection (Admin)
-    await faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL);
-    // Fast detection (Attendee)
-    await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
-    
-    // Landmark and Recognition nets are required for descriptor extraction
-    await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
-    await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
-
-    isInitialized = true;
-    console.log('FaceAPI initialized successfully with WebGL backend.');
+    human = new Human(config);
+    await human.load(); // Fetch models
+    await human.warmup(); // Warmup GPU
+    console.log('Human AI (Admin) initialized successfully.');
   } catch (error) {
-    console.error('Error initializing FaceAPI:', error);
+    console.error('Error initializing Human AI:', error);
     throw error;
   }
 };
 
 /**
- * Extracts 128-d face descriptors for all faces found in an image element.
+ * Extracts 1024-d face descriptors for all faces found in an image element.
  * Useful for the Admin batch processing.
- * @param {HTMLImageElement | HTMLVideoElement | HTMLCanvasElement} input 
- * @returns {Promise<Float32Array[]>} Array of 128-d face descriptors
  */
 export const extractAllFaces = async (input) => {
-  if (!isInitialized) await initializeFaceApi();
+  if (!human) await initializeFaceApi();
 
-  console.log('FaceAPI: Starting face detection...');
-  // We use SsdMobilenetv1Options for highest accuracy on the Admin side
-  const options = new faceapi.SsdMobilenetv1Options({ minConfidence: 0.5 });
-  
-  const detections = await faceapi.detectAllFaces(input, options)
-    .withFaceLandmarks()
-    .withFaceDescriptors();
+  console.log('Human AI: Starting face detection...');
+  const res = await human.detect(input);
 
-  console.log(`FaceAPI: Found ${detections.length} faces.`);
-  return detections.map(d => d.descriptor);
+  console.log(`Human AI: Found ${res.face.length} faces.`);
+  // Return the 1024-d float array (embedding)
+  return res.face.map(f => f.embedding);
 };
 
 /**
- * Extracts a single 128-d face descriptor for the largest face found in an image.
+ * Extracts a single 1024-d face descriptor for the largest face found in an image.
  * Useful for the Attendee selfie capture.
- * @param {HTMLImageElement | HTMLVideoElement | HTMLCanvasElement} input 
- * @returns {Promise<Float32Array | null>} The 128-d face descriptor or null if no face found
  */
 export const extractSingleFace = async (input) => {
-  if (!isInitialized) await initializeFaceApi();
+  if (!human) await initializeFaceApi();
 
-  // We use TinyFaceDetectorOptions for fast client-side selfie processing
-  const options = new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.5 });
+  const res = await human.detect(input);
+  if (!res || !res.face || res.face.length === 0) return null;
 
-  const detection = await faceapi.detectSingleFace(input, options)
-    .withFaceLandmarks()
-    .withFaceDescriptor();
-
-  if (!detection) return null;
-  return detection.descriptor;
+  // Sort by largest face box (width * height)
+  res.face.sort((a, b) => (b.box[2] * b.box[3]) - (a.box[2] * a.box[3]));
+  
+  return res.face[0].embedding;
 };
 
 /**
- * Fast initialization for mobile live tracking (skips ssdMobilenetv1).
+ * Fast initialization for mobile live tracking (optimized for 1 face).
  */
 export const initializeLiveFaceApi = async () => {
-  if (isLiveInitialized) return;
+  if (liveHuman) return;
 
   try {
-    await tf.setBackend('webgl');
-    await tf.ready();
-    const MODEL_URL = '/models';
+    // Clone config but optimize for single face speed
+    const liveConfig = JSON.parse(JSON.stringify(config));
+    liveConfig.face.detector.maxDetected = 1;
     
-    // Only load tiny face detector and landmarks/recognition
-    await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
-    await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
-    await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
-
-    isLiveInitialized = true;
-    console.log('Live FaceAPI initialized successfully.');
+    liveHuman = new Human(liveConfig);
+    await liveHuman.load();
+    console.log('Live Human AI initialized successfully.');
   } catch (error) {
-    console.error('Error initializing Live FaceAPI:', error);
+    console.error('Error initializing Live Human AI:', error);
     throw error;
   }
 };
 
 /**
- * Ultra-fast bounding box detection for real-time video streaming.
- * Skips descriptor extraction for high FPS.
- * @param {HTMLVideoElement} video 
- * @returns {Promise<faceapi.FaceDetection | null>}
+ * Rapid live detection returning the bounding box of the largest face.
+ * Returns { box: { x, y, width, height } }
  */
-export const detectLiveFaceBox = async (video) => {
-  if (!isLiveInitialized) await initializeLiveFaceApi();
+export const detectLiveFaceBox = async (videoElement) => {
+  if (!liveHuman) await initializeLiveFaceApi();
 
-  const options = new faceapi.TinyFaceDetectorOptions({ inputSize: 160, scoreThreshold: 0.5 });
-  const detection = await faceapi.detectSingleFace(video, options);
+  const res = await liveHuman.detect(videoElement);
+  if (!res || !res.face || res.face.length === 0) return null;
+
+  res.face.sort((a, b) => (b.box[2] * b.box[3]) - (a.box[2] * a.box[3]));
+  const face = res.face[0];
   
-  return detection; // Contains .box with x, y, width, height
+  // face.box in Human is [x, y, width, height]
+  return {
+    box: {
+      x: face.box[0],
+      y: face.box[1],
+      width: face.box[2],
+      height: face.box[3]
+    }
+  };
 };
