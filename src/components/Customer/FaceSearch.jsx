@@ -292,7 +292,18 @@ export default function FaceSearch() {
 
   const triggerCamera = async () => {
     if (!eventId) { setErrorMsg('Please enter an Event Code.'); return; }
-    setErrorMsg(''); setStatus('idle'); setMatchedPhotos([]); 
+    setErrorMsg(''); setStatus('checking'); setMatchedPhotos([]); 
+
+    try {
+      // Validate Event exists before opening camera
+      await getDownloadURL(ref(storage, `events/${eventId}/face_index.json`));
+    } catch (error) {
+      setStatus('error');
+      setErrorMsg("Event not found. Double-check your Event Code.");
+      return;
+    }
+    
+    setStatus('idle');
 
     try {
       // Request camera without strict dimensions to prevent hardware zooming
@@ -354,7 +365,7 @@ export default function FaceSearch() {
     { id: 'results', label: 'Found', icon: Heart },
   ];
   const activeStep = status === 'idle' || status === 'error' ? -1 : status === 'capturing' ? 0 : status === 'analyzing' ? 1 : status === 'fetching' ? 2 : status === 'complete' ? 3 : -1;
-  const isProcessing = ['capturing', 'analyzing', 'fetching'].includes(status);
+  const isProcessing = ['checking', 'capturing', 'analyzing', 'fetching'].includes(status);
   const isComplete = status === 'complete';
 
   // Staggered letter animation for the title
@@ -647,6 +658,8 @@ export default function FaceSearch() {
                       <span className="flex items-center gap-2.5">
                         {status === 'idle' || status === 'error' ? (
                           <><CameraIcon className="w-5 h-5" /> Take Selfie & Search</>
+                        ) : status === 'checking' ? (
+                          <><Loader2 className="w-5 h-5 animate-spin" /> Verifying Event...</>
                         ) : status === 'analyzing' ? (
                           <><Sparkles className="w-5 h-5 text-gold" /> AI Processing Face...</>
                         ) : (
@@ -655,7 +668,9 @@ export default function FaceSearch() {
                       </span>
                       {isProcessing && (
                         <motion.span initial={{ opacity: 0 }} animate={{ opacity: 0.5 }} className="text-[11px] font-normal">
-                          {status === 'analyzing' ? 'This may take a moment. Please wait...' : 'Scanning the event gallery...'}
+                          {status === 'checking' ? 'Connecting to Yogi Studio servers...' : 
+                           status === 'analyzing' ? 'This may take a moment. Please wait...' : 
+                           'Scanning the event gallery...'}
                         </motion.span>
                       )}
                     </motion.button>
