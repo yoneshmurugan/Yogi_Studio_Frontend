@@ -151,10 +151,10 @@ export default function FaceSearch() {
               if (score < 0.55) { 
                 setCameraMsg("Poor lighting or angle. Face the camera clearly."); 
                 isGood = false; 
-              } else if (boxW < 25) { 
+              } else if (boxW < 18) { 
                 setCameraMsg("Too far! Move closer for better quality."); 
                 isGood = false; 
-              } else if (boxW > 55) { 
+              } else if (boxW > 60) { 
                 setCameraMsg("Too close! Move slightly back."); 
                 isGood = false; 
               } else if (Math.abs(boxX - 50) > 15 || Math.abs(boxY - 50) > 18) {
@@ -816,7 +816,7 @@ export default function FaceSearch() {
                       </div>
                     </div>
                     {/* Remove Photo */}
-                    <div className="absolute top-2.5 right-2.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <div className="absolute top-2.5 right-2.5 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300">
                       <button 
                         onClick={(e) => removePhoto(e, idx)}
                         className="w-8 h-8 bg-black/60 hover:bg-red-500/80 backdrop-blur-xl text-white rounded-full flex items-center justify-center border border-white/10 transition-colors"
