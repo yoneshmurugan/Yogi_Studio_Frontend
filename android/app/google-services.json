@@ -12,7 +12,20 @@
           "package_name": "com.yogistudio.app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "956024111859-li1h5q9fghmt6gt0ai8qvgfgra35h6sj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.yogistudio.app",
+            "certificate_hash": "1a96a4b5e0127f1fc4fa6335728c730c72f0c29c"
+          }
+        },
+        {
+          "client_id": "956024111859-6pk2a083io6o9lsco6c38v6d8b06c21b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDrXzGiuVg6A_eSsY58yXg6qIHPDTzBjlk"
@@ -20,7 +33,20 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "956024111859-6pk2a083io6o9lsco6c38v6d8b06c21b.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "956024111859-ecgkfpj422qvbql3gclmqho8bjthh857.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.yogistudio.app",
+                "app_store_id": "6761088485"
+              }
+            }
+          ]
         }
       }
     }

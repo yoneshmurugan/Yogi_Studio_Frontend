@@ -8,6 +8,10 @@
     },
     "FirebaseAuthentication": {
       "providers": ["phone"]
+    },
+    "StatusBar": {
+      "overlaysWebView": true,
+      "style": "DARK"
     }
   }
 }

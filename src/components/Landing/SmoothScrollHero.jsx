@@ -212,10 +212,12 @@ const CenterImage = ({ sectionHeight, isMobile }) => {
         {/* Scroll Hint Mobile */}
         <motion.div 
           style={{ opacity: hintOpacity }}
-          className="absolute bottom-20 left-1/2 -translate-x-1/2 flex flex-col items-center justify-center animate-bounce z-20 pointer-events-none"
+          className="absolute bottom-20 inset-x-0 flex justify-center z-20 pointer-events-none"
         >
-          <span className="text-[10px] text-[#d4af37] font-semibold uppercase tracking-[0.2em] mb-2 drop-shadow-md">Scroll to Explore</span>
-          <div className="w-px h-8 bg-gradient-to-b from-[#d4af37] to-transparent" />
+          <div className="flex flex-col items-center animate-bounce">
+            <span className="text-[10px] text-[#d4af37] font-semibold uppercase tracking-[0.2em] mb-2 drop-shadow-md">Scroll to Explore</span>
+            <div className="w-px h-8 bg-gradient-to-b from-[#d4af37] to-transparent" />
+          </div>
         </motion.div>
       </div>
     );
@@ -246,10 +248,12 @@ const CenterImage = ({ sectionHeight, isMobile }) => {
       {/* Scroll Hint Desktop */}
       <motion.div 
         style={{ opacity: hintOpacity }}
-        className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center justify-center animate-bounce z-20 pointer-events-none"
+        className="absolute bottom-12 inset-x-0 flex justify-center z-20 pointer-events-none"
       >
-        <span className="text-xs text-[#d4af37] font-semibold uppercase tracking-[0.3em] mb-3 drop-shadow-md">Scroll to Explore</span>
-        <div className="w-px h-12 bg-gradient-to-b from-[#d4af37] to-transparent" />
+        <div className="flex flex-col items-center animate-bounce">
+          <span className="text-xs text-[#d4af37] font-semibold uppercase tracking-[0.3em] mb-3 drop-shadow-md">Scroll to Explore</span>
+          <div className="w-px h-12 bg-gradient-to-b from-[#d4af37] to-transparent" />
+        </div>
       </motion.div>
     </div>
   );

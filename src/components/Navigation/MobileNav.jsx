@@ -58,10 +58,10 @@ export default function MobileNav({ onLogin, onHome }) {
       initial={{ y: -60, opacity: 0 }}
       animate={{ y: hidden && !isOpen ? "-100%" : 0, opacity: 1 }}
       transition={{ duration: 0.4, ease: "easeInOut" }}
-      className="fixed top-0 left-0 right-0 z-50 md:hidden safe-top"
+      className="fixed top-0 left-0 right-0 z-50 md:hidden"
     >
-      <div className="glass-strong border-b border-white/5 relative z-50">
-        <div className="flex items-center justify-between px-4 h-16">
+      <div className="glass-strong border-b border-white/5 relative z-50 pt-3 md:pt-4">
+        <div className="flex items-center justify-between px-4 h-14">
           <div className="flex items-center gap-3">
             {/* Hamburger Menu */}
             <button 
