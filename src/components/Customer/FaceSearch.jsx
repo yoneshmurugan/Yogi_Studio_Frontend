@@ -7,6 +7,7 @@ import { extractSingleFace, detectLiveFaceBox } from '../../lib/faceApi';
 import { ref, getDownloadURL } from 'firebase/storage';
 import { storage } from '../../lib/firebase';
 import { saveAs } from 'file-saver';
+import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
 import yogiLogo from '../../assets/Headerlogo.png';
 
 /* ═══════════════════════════════════════════════════════════
@@ -251,6 +252,7 @@ export default function FaceSearch() {
   // ── Download with watermark ──
   const handleDownloadAll = async () => {
     if (matchedPhotos.length === 0) return;
+    Haptics.impact({ style: ImpactStyle.Medium }).catch(() => {});
     setDownloadStatus('downloading');
     setDownloadProgress({ current: 0, total: matchedPhotos.length });
     try {
@@ -285,6 +287,7 @@ export default function FaceSearch() {
         if (blob) { saveAs(blob, `${eventId}_YogiStudio_Photo_${idx + 1}.jpg`); await new Promise(r => setTimeout(r, 300)); }
         setDownloadProgress({ current: idx + 1, total: matchedPhotos.length });
       }
+      Haptics.notification({ type: NotificationType.Success }).catch(() => {});
       setDownloadStatus('done');
       setHasDownloaded(true);
       setShowPostDownloadModal(true);
@@ -302,6 +305,7 @@ export default function FaceSearch() {
 
   const handleAutoCapture = () => {
     if (!videoRef.current) return;
+    Haptics.impact({ style: ImpactStyle.Medium }).catch(() => {});
     const canvas = document.createElement('canvas');
     canvas.width = videoRef.current.videoWidth;
     canvas.height = videoRef.current.videoHeight;
@@ -318,16 +322,64 @@ export default function FaceSearch() {
     processImageCapture(dataUrl);
   };
 
+  const findEventIndexUrl = async (rawId) => {
+    const cleanId = rawId ? rawId.trim() : '';
+    if (!cleanId) throw new Error('Please enter an Event Code.');
+    
+    // Check exact, lower, upper case variations
+    const candidates = Array.from(new Set([
+      cleanId,
+      cleanId.toLowerCase(),
+      cleanId.toUpperCase()
+    ]));
+
+    let lastError = null;
+    for (const candidate of candidates) {
+      try {
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Event verification timed out after 12 seconds.')), 12000)
+        );
+        const url = await Promise.race([
+          getDownloadURL(ref(storage, `events/${candidate}/face_index.json`)),
+          timeoutPromise
+        ]);
+        return { url, resolvedEventId: candidate };
+      } catch (err) {
+        // Fallback: Check direct public REST URL if getDownloadURL times out or fails
+        try {
+          const bucket = import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || storage.app?.options?.storageBucket;
+          if (bucket) {
+            const directUrl = `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/events%2F${encodeURIComponent(candidate)}%2Fface_index.json?alt=media`;
+            const checkRes = await fetch(directUrl, { method: 'GET' });
+            if (checkRes.ok) {
+              return { url: directUrl, resolvedEventId: candidate };
+            }
+          }
+        } catch (fallbackErr) {
+          // Ignore fallback errors and continue
+        }
+        lastError = err;
+      }
+    }
+    throw lastError || new Error(`Event '${cleanId}' not found.`);
+  };
+
   const triggerCamera = async () => {
-    if (!eventId) { setErrorMsg('Please enter an Event Code.'); return; }
+    if (!eventId || !eventId.trim()) { setErrorMsg('Please enter an Event Code.'); return; }
+    Haptics.impact({ style: ImpactStyle.Light }).catch(() => {});
     setErrorMsg(''); setStatus('checking'); setMatchedPhotos([]); 
 
     try {
-      // Validate Event exists before opening camera
-      await getDownloadURL(ref(storage, `events/${eventId}/face_index.json`));
+      const { resolvedEventId } = await findEventIndexUrl(eventId);
+      if (resolvedEventId !== eventId) setEventId(resolvedEventId);
     } catch (error) {
+      console.error("Event validation error:", error.code || error.message || error);
+      Haptics.notification({ type: NotificationType.Error }).catch(() => {});
       setStatus('error');
-      setErrorMsg("Event not found. Double-check your Event Code.");
+      const isTimeout = error.message && error.message.toLowerCase().includes('timed out');
+      setErrorMsg(isTimeout 
+        ? "Network timeout while verifying event. Check internet connection and try again." 
+        : `Event '${eventId.trim()}' not found. Double-check your Event Code.`);
       return;
     }
     
@@ -344,6 +396,7 @@ export default function FaceSearch() {
       goodFramesCount.current = 0;
       setIsCameraOpen(true);
     } catch (err) {
+      Haptics.impact({ style: ImpactStyle.Light }).catch(() => {});
       console.warn("Camera denied/unavailable. Falling back to native file upload.");
       fileInputRef.current?.click();
     }
@@ -352,6 +405,7 @@ export default function FaceSearch() {
   const processImageCapture = async (dataUrl) => {
     try {
       setStatus('analyzing');
+      Haptics.impact({ style: ImpactStyle.Light }).catch(() => {});
       const img = new Image(); img.src = dataUrl;
       await new Promise((res, rej) => { img.onload = res; img.onerror = rej; });
       
@@ -364,9 +418,15 @@ export default function FaceSearch() {
       img.src = '';
       setStatus('fetching');
       let indexUrl;
-      try { indexUrl = await getDownloadURL(ref(storage, `events/${eventId}/face_index.json`)); }
-      catch { throw new Error("Event not found. Double-check your Event Code."); }
-      const payload = { eventId, indexUrl, selfieVector: Array.from(descriptor) };
+      let resolvedEventId = eventId ? eventId.trim() : '';
+      try {
+        const res = await findEventIndexUrl(resolvedEventId);
+        indexUrl = res.url;
+        resolvedEventId = res.resolvedEventId;
+      } catch (err) {
+        throw new Error(`Event '${resolvedEventId}' not found. Double-check your Event Code.`);
+      }
+      const payload = { eventId: resolvedEventId, indexUrl, selfieVector: Array.from(descriptor) };
       
       // By sending as text/plain, we bypass the CORS OPTIONS preflight request entirely.
       // Safari notoriously drops connections if too many OPTIONS requests happen or if it fails to cache them.
@@ -385,8 +445,10 @@ export default function FaceSearch() {
       const data = await response.json();
       setMatchedPhotos(data.photos || []);
       setStatus('complete');
+      Haptics.notification({ type: NotificationType.Success }).catch(() => {});
     } catch (err) { 
       console.error(err); 
+      Haptics.notification({ type: NotificationType.Error }).catch(() => {});
       setStatus('error'); 
       setErrorMsg(`Error: ${err.message}`); 
     }
@@ -395,6 +457,7 @@ export default function FaceSearch() {
   const handleFileCapture = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    Haptics.impact({ style: ImpactStyle.Light }).catch(() => {});
     e.target.value = '';
     try {
       const dataUrl = await new Promise((res, rej) => { const r = new FileReader(); r.onload = (e) => res(e.target.result); r.onerror = rej; r.readAsDataURL(file); });
@@ -481,13 +544,13 @@ export default function FaceSearch() {
         ))}
       </div>
 
-      <div className="relative z-10 pt-20 pb-20 px-4 md:px-6 flex flex-col items-center min-h-screen">
+      <div className="relative z-10 pt-32 md:pt-24 pb-20 px-4 md:px-6 flex flex-col items-center min-h-screen">
         {/* Back */}
         <motion.button
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           onClick={() => navigate(-1)}
-          className="fixed top-5 left-4 md:left-8 z-20 flex items-center gap-2 text-gray-600 hover:text-white transition-all bg-black/60 backdrop-blur-2xl rounded-full px-4 py-2 border border-zinc-800/40 hover:border-gold/20"
+          className="fixed top-20 md:top-6 left-4 md:left-8 z-20 flex items-center gap-2 text-gray-600 hover:text-white transition-all bg-black/60 backdrop-blur-2xl rounded-full px-4 py-2 border border-zinc-800/40 hover:border-gold/20"
         >
           <ArrowLeft className="w-4 h-4" />
           <span className="text-sm hidden md:inline">Back</span>
@@ -640,6 +703,12 @@ export default function FaceSearch() {
                         type="text"
                         value={eventId}
                         onChange={(e) => setEventId(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && eventId && !isProcessing && !isComplete) {
+                            e.preventDefault();
+                            triggerCamera();
+                          }
+                        }}
                         placeholder="Enter your event code"
                         className="w-full bg-[#050505] border border-zinc-800/60 rounded-xl px-4 py-3.5 text-white text-base focus:outline-none focus:border-gold/30 focus:shadow-[0_0_0_3px_rgba(255,215,0,0.04),0_0_25px_rgba(255,215,0,0.04)] transition-all placeholder:text-zinc-800 tracking-wide group-hover:border-zinc-700/80"
                         disabled={isProcessing || isComplete}

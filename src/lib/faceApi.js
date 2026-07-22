@@ -36,10 +36,14 @@ export const initializeFaceApi = async () => {
   if (human) return;
   try {
     human = new Human(config);
-    await human.load(); // Fetch models
-    await human.warmup(); // Warmup GPU
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('AI Model download timed out. Check network connection or retry.')), 12000)
+    );
+    await Promise.race([human.load(), timeoutPromise]); // Fetch models with timeout
+    await Promise.race([human.warmup(), timeoutPromise]); // Warmup GPU with timeout
     console.log('Human AI (Admin) initialized successfully.');
   } catch (error) {
+    human = null;
     console.error('Error initializing Human AI:', error);
     throw error;
   }
@@ -88,9 +92,13 @@ export const initializeLiveFaceApi = async () => {
     liveConfig.face.detector.maxDetected = 1;
     
     liveHuman = new Human(liveConfig);
-    await liveHuman.load();
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Live AI Model download timed out.')), 10000)
+    );
+    await Promise.race([liveHuman.load(), timeoutPromise]);
     console.log('Live Human AI initialized successfully.');
   } catch (error) {
+    liveHuman = null;
     console.error('Error initializing Live Human AI:', error);
     throw error;
   }

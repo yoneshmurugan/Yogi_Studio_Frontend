@@ -11,6 +11,8 @@ import LoginPage from './components/Login/LoginPage';
 import AdminDashboard from './components/Admin/AdminDashboard';
 import CustomerPortal from './components/Customer/CustomerPortal';
 import ProtectedRoute from './components/ProtectedRoute';
+import PrivacyPolicy from './components/Legal/PrivacyPolicy';
+import FaceSearch from './components/Customer/FaceSearch';
 
 const pageTransition = {
   initial: { opacity: 0, y: 20 },
@@ -103,6 +105,8 @@ function App() {
               <Route path="/testimonials" element={<TestimonialsPage />} />
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/login" element={<LoginPage onLoginSuccess={handleLoginSuccess} onBack={handleNavigateHome} />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="/ai-search" element={<FaceSearch />} />
             </Routes>
           </motion.main>
         </AnimatePresence>

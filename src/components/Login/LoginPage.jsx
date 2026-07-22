@@ -8,11 +8,6 @@ import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
 import GoldButton from '../ui/GoldButton';
 import yogiLogo from '../../assets/yogi-logo-removebg-preview.png';
 
-const ADMIN_DEMO = {
-  email: 'admin@gmail',
-  password: '123456',
-};
-
 export default function LoginPage({ onLoginSuccess, onBack }) {
   // 'client' | 'admin'
   const [loginMode, setLoginMode] = useState('client');
@@ -98,35 +93,44 @@ export default function LoginPage({ onLoginSuccess, onBack }) {
 
       if (Capacitor.isNativePlatform()) {
         // --- Native Flow (Bypasses reCAPTCHA) ---
-        // Native plugin returns void and fires an event when the code is sent
-        const verificationId = await new Promise((resolve, reject) => {
-          let sentListener = null;
-          let errListener = null;
+        const result = await Promise.race([
+          new Promise((resolve, reject) => {
+            let sentListener = null;
+            let errListener = null;
 
-          const cleanup = () => {
-            if (sentListener) sentListener.remove();
-            if (errListener) errListener.remove();
-          };
+            const cleanup = () => {
+              if (sentListener) sentListener.remove();
+              if (errListener) errListener.remove();
+            };
 
-          FirebaseAuthentication.addListener('phoneCodeSent', (event) => {
-            cleanup();
-            resolve(event.verificationId);
-          }).then(l => sentListener = l);
+            FirebaseAuthentication.addListener('phoneCodeSent', (event) => {
+              cleanup();
+              resolve(event.verificationId);
+            }).then(l => sentListener = l);
 
-          FirebaseAuthentication.addListener('phoneVerificationFailed', (event) => {
-            cleanup();
-            reject(new Error(event.message));
-          }).then(l => errListener = l);
+            FirebaseAuthentication.addListener('phoneVerificationFailed', (event) => {
+              cleanup();
+              reject(new Error(event.message));
+            }).then(l => errListener = l);
 
-          FirebaseAuthentication.signInWithPhoneNumber({
-            phoneNumber: formattedPhone,
-          }).catch((err) => {
-            cleanup();
-            reject(err);
-          });
-        });
+            FirebaseAuthentication.signInWithPhoneNumber({
+              phoneNumber: formattedPhone,
+            }).then((res) => {
+              if (res && res.verificationId) {
+                cleanup();
+                resolve(res.verificationId);
+              }
+            }).catch((err) => {
+              cleanup();
+              reject(err);
+            });
+          }),
+          new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('Phone verification timed out on iOS. Check network or signal.')), 15000)
+          )
+        ]);
         
-        setConfirmationResult(verificationId);
+        setConfirmationResult(result);
       } else {
         // --- Web Flow (Requires reCAPTCHA) ---
         setupRecaptcha();
@@ -141,7 +145,7 @@ export default function LoginPage({ onLoginSuccess, onBack }) {
       setTimeout(() => otpInputRef.current?.focus(), 100);
     } catch (err) {
       console.error("Login Flow Error:", err);
-      setError("Failed to process request. Check terminal console logs.");
+      setError(err.message || "Failed to process request. Try again.");
       setIsLoading(false);
     }
   };
@@ -205,11 +209,17 @@ export default function LoginPage({ onLoginSuccess, onBack }) {
     setIsLoading(true);
 
     try {
-      // Authenticate with Firebase using Email/Password
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      
-      // Fetch the secure Firebase ID token
-      const idToken = await userCredential.user.getIdToken(true);
+      let idToken = '';
+      if (Capacitor.isNativePlatform()) {
+        // --- Native Flow using Capacitor Firebase Plugin ---
+        await FirebaseAuthentication.signInWithEmailAndPassword({ email, password });
+        const tokenRes = await FirebaseAuthentication.getIdToken({ forceRefresh: true });
+        idToken = tokenRes.token;
+      } else {
+        // --- Web Flow using Firebase JS SDK ---
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        idToken = await userCredential.user.getIdToken(true);
+      }
       
       // Store token for backend auth verification
       sessionStorage.setItem('adminToken', idToken);
@@ -218,8 +228,7 @@ export default function LoginPage({ onLoginSuccess, onBack }) {
       onLoginSuccess('admin');
     } catch (err) {
       console.error("Admin Login Error:", err);
-      // Firebase throws specific errors we can catch, but a generic message is safer for security
-      setError('Invalid admin credentials or unauthorized.');
+      setError(err.message || 'Invalid admin credentials or unauthorized.');
       setIsLoading(false);
     }
   };

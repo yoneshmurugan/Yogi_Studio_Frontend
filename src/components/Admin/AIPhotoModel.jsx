@@ -86,8 +86,11 @@ export default function AIPhotoModel() {
   const fetchIndexedEvents = async () => {
     setIsLoadingEvents(true);
     try {
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Storage list request timed out')), 7000)
+      );
       const eventsRef = ref(storage, 'events');
-      const result = await listAll(eventsRef);
+      const result = await Promise.race([listAll(eventsRef), timeoutPromise]);
       // folders is a reserved prefix for portfolio
       const validEvents = result.prefixes
         .map(p => p.name)
@@ -97,7 +100,7 @@ export default function AIPhotoModel() {
         validEvents.map(async (eventName) => {
           try {
             const indexRef = ref(storage, `events/${eventName}/face_index.json`);
-            const url = await getDownloadURL(indexRef);
+            const url = await Promise.race([getDownloadURL(indexRef), new Promise((_, r) => setTimeout(() => r(new Error('timeout')), 12000))]);
             const res = await fetch(url);
             const data = await res.json();
             
@@ -211,7 +214,7 @@ export default function AIPhotoModel() {
       let existingSizeBytes = 0;
       try {
         const indexRef = ref(storage, `events/${eventId}/face_index.json`);
-        const url = await getDownloadURL(indexRef);
+        const url = await Promise.race([getDownloadURL(indexRef), new Promise((_, r) => setTimeout(() => r(new Error('timeout')), 12000))]);
         const res = await fetch(url);
         const data = await res.json();
         if (data && Array.isArray(data.photos)) {
@@ -269,13 +272,12 @@ export default function AIPhotoModel() {
       await uploadString(indexRef, indexData, 'raw', { contentType: 'application/json' });
 
       setStatus('complete');
-      setProgress({ current: files.length, total: files.length, currentAction: 'Done!' });
-      fetchIndexedEvents();
-      
+      setFiles([]);
+      await fetchIndexedEvents();
     } catch (err) {
-      console.error(err);
+      console.error('Processing error:', err);
       setStatus('error');
-      setErrorMessage(err.message || 'An error occurred during processing.');
+      setErrorMessage(err.message || 'Error occurred during processing.');
     }
   };
 
@@ -311,6 +313,12 @@ export default function AIPhotoModel() {
                 onChange={(e) => {
                   setEventId(e.target.value);
                   setIsDropdownOpen(true);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    setIsDropdownOpen(false);
+                  }
                 }}
                 placeholder="e.g. EVENT_123"
                 className="w-full bg-black border border-zinc-800 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-gold transition-colors pr-10"

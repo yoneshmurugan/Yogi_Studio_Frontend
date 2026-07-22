@@ -19,11 +19,16 @@
 /* ─── Global Resets ─── */
 html {
   scroll-behavior: smooth;
+  touch-action: pan-x pan-y;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
   background-color: #000000;
   font-family: var(--font-sans);
+  touch-action: pan-x pan-y;
+  -webkit-touch-callout: none;
+  overscroll-behavior-y: none;
 }
 
 /* ─── Selection Colors ─── */
