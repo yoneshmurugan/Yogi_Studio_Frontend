@@ -58,10 +58,10 @@ export default function MobileNav({ onLogin, onHome }) {
       initial={{ y: -60, opacity: 0 }}
       animate={{ y: hidden && !isOpen ? "-100%" : 0, opacity: 1 }}
       transition={{ duration: 0.4, ease: "easeInOut" }}
-      className="fixed top-0 left-0 right-0 z-50 md:hidden"
+      className="fixed top-0 left-0 right-0 z-50 md:hidden safe-top"
     >
-      <div className="glass-strong border-b border-white/5 relative z-50 pt-3 md:pt-4">
-        <div className="flex items-center justify-between px-4 h-14">
+      <div className="glass-strong border-b border-white/5 relative z-50">
+        <div className="flex items-center justify-between px-4 h-16">
           <div className="flex items-center gap-3">
             {/* Hamburger Menu */}
             <button 
@@ -81,15 +81,24 @@ export default function MobileNav({ onLogin, onHome }) {
             </motion.button>
           </div>
 
-          {/* Login */}
-          <motion.button
-            onClick={() => { setIsOpen(false); onLogin(); }}
-            whileTap={{ scale: 0.9 }}
-            className="flex items-center gap-1.5 px-4 py-1.5 rounded-full border border-gold/30 text-gold text-[10px] tracking-[0.15em] uppercase font-medium hover:bg-gold/10 transition-all cursor-pointer"
-          >
-            <LogIn className="w-3 h-3" />
-            Login
-          </motion.button>
+          {/* Buttons */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => { setIsOpen(false); navigate('/ai-search'); }}
+              className="px-3 py-1.5 rounded-full bg-gold text-black text-[10px] tracking-[0.1em] uppercase font-semibold hover:bg-yellow-500 transition-all cursor-pointer shadow-[0_0_10px_rgba(212,175,55,0.3)]"
+            >
+              AI Model
+            </button>
+
+            <motion.button
+              onClick={() => { setIsOpen(false); onLogin(); }}
+              whileTap={{ scale: 0.9 }}
+              className="flex items-center gap-1.5 px-4 py-1.5 rounded-full border border-gold/30 text-gold text-[10px] tracking-[0.15em] uppercase font-medium hover:bg-gold/10 transition-all cursor-pointer"
+            >
+              <LogIn className="w-3 h-3" />
+              Login
+            </motion.button>
+          </div>
         </div>
       </div>
 

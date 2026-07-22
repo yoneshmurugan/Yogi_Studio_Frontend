@@ -9,7 +9,8 @@ import AdminOverview    from './AdminOverview';
 import AddUserSection   from './AddUserSection';
 import PortfolioManager from './PortfolioManager';
 import UserManagement   from './UserManagement';
-import { ref, deleteObject } from 'firebase/storage';
+import AIPhotoModel     from './AIPhotoModel';
+import { ref, deleteObject, listAll } from 'firebase/storage';
 import { storage } from '../../lib/firebase';
 import yogiLogo from '../../assets/Headerlogo.png';
 import { adminFetch } from '../../lib/api';
@@ -38,6 +39,7 @@ export const seedFolders = [
 // ── Nav items ─────────────────────────────────────────────────────────────────
 const navItems = [
   { id: 'overview',  label: 'Dashboard', icon: LayoutDashboard },
+  { id: 'aimodel',   label: 'AI Photo Model', icon: Camera },
   { id: 'adduser',   label: 'Add User',  icon: UserPlus },
   { id: 'portfolio', label: 'Portfolio', icon: Images },
   { id: 'users',     label: 'Users',     icon: Users },
@@ -172,6 +174,20 @@ export default function AdminDashboard() {
         }
       }
     }
+
+    // Completely wipe AI Photos & Index from Firebase Storage
+    try {
+      // Delete the JSON index
+      await deleteObject(ref(storage, `events/${id}/face_index.json`));
+    } catch(e) { console.log('No AI face_index.json to delete or error:', e); }
+
+    try {
+      // List and delete all photos inside the event's AI photos folder
+      const aiPhotosRef = ref(storage, `events/${id}/photos`);
+      const listResult = await listAll(aiPhotosRef);
+      const deletePromises = listResult.items.map(itemRef => deleteObject(itemRef));
+      await Promise.all(deletePromises);
+    } catch(e) { console.log('No AI photos to delete or error:', e); }
 
     try {
       const res = await adminFetch(`/admin/events/${id}?phone=${encodeURIComponent(eventToDel.customerPhone)}`, {
@@ -386,13 +402,13 @@ export default function AdminDashboard() {
   );
 
   return (
-    <div className="flex min-h-screen-safe bg-[#050505]">
+    <div className="flex min-h-screen bg-[#050505]">
 
       {/* ── Desktop Sidebar ── */}
       <motion.aside
         animate={{ width: sidebarOpen ? 240 : 72 }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
-        className="hidden md:flex flex-shrink-0 flex-col border-r border-white/[0.06] bg-[#0B0B0B] relative z-20 overflow-hidden safe-top safe-bottom"
+        className="hidden md:flex flex-shrink-0 flex-col border-r border-white/[0.06] bg-[#0B0B0B] relative z-20 overflow-hidden"
       >
         <SidebarContent isMobile={false} />
       </motion.aside>
@@ -413,7 +429,7 @@ export default function AdminDashboard() {
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed top-0 left-0 bottom-0 w-64 bg-[#0B0B0B] border-r border-white/[0.06] z-50 flex flex-col shadow-2xl md:hidden safe-top safe-bottom"
+              className="fixed top-0 left-0 bottom-0 w-64 bg-[#0B0B0B] border-r border-white/[0.06] z-50 flex flex-col shadow-2xl md:hidden"
             >
               <SidebarContent isMobile={true} />
             </motion.aside>
@@ -425,7 +441,7 @@ export default function AdminDashboard() {
       <div className="flex-1 flex flex-col overflow-hidden w-full relative">
 
         {/* Header */}
-        <header className="flex items-center justify-between px-4 md:px-8 py-4 md:py-5 border-b border-white/[0.06] bg-[#0B0B0B]/80 backdrop-blur-sm flex-shrink-0 sticky top-0 z-30 safe-top">
+        <header className="flex items-center justify-between px-4 md:px-8 py-4 md:py-5 border-b border-white/[0.06] bg-[#0B0B0B]/80 backdrop-blur-sm flex-shrink-0 sticky top-0 z-30">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setMobileMenuOpen(true)}
@@ -453,7 +469,7 @@ export default function AdminDashboard() {
         </header>
 
         {/* Page content */}
-        <main className="flex-1 overflow-y-auto w-full safe-bottom">
+        <main className="flex-1 overflow-y-auto w-full">
           <AnimatePresence mode="wait">
             <motion.div
               key={location.pathname}
@@ -478,6 +494,7 @@ export default function AdminDashboard() {
                     onUserAdded={(u) => { addUser(u); navigate('/admin/users'); }}
                   />
                 } />
+                <Route path="aimodel" element={<AIPhotoModel />} />
                 <Route path="portfolio" element={<PortfolioManager />} />
                 <Route path="users" element={
                   <UserManagement
