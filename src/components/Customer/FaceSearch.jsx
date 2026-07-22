@@ -7,6 +7,7 @@ import { extractSingleFace, detectLiveFaceBox } from '../../lib/faceApi';
 import { ref, getDownloadURL } from 'firebase/storage';
 import { storage } from '../../lib/firebase';
 import { saveAs } from 'file-saver';
+import { saveMultipleFilesHelper } from '../../lib/nativeSave';
 import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
 import yogiLogo from '../../assets/Headerlogo.png';
 
@@ -282,10 +283,16 @@ export default function FaceSearch() {
         img.onerror = () => resolve(null);
         img.src = url;
       });
+      const blobItems = [];
       for (let idx = 0; idx < matchedPhotos.length; idx++) {
         const blob = await applyWatermark(matchedPhotos[idx]);
-        if (blob) { saveAs(blob, `${eventId}_YogiStudio_Photo_${idx + 1}.jpg`); await new Promise(r => setTimeout(r, 300)); }
+        if (blob) {
+          blobItems.push({ blob, filename: `${eventId}_YogiStudio_Photo_${idx + 1}.jpg` });
+        }
         setDownloadProgress({ current: idx + 1, total: matchedPhotos.length });
+      }
+      if (blobItems.length > 0) {
+        await saveMultipleFilesHelper(blobItems, 'Yogi Studio Memories');
       }
       Haptics.notification({ type: NotificationType.Success }).catch(() => {});
       setDownloadStatus('done');
@@ -326,42 +333,44 @@ export default function FaceSearch() {
     const cleanId = rawId ? rawId.trim() : '';
     if (!cleanId) throw new Error('Please enter an Event Code.');
     
-    // Check exact, lower, upper case variations
+    // Check exact, lower, upper case variations concurrently
     const candidates = Array.from(new Set([
       cleanId,
       cleanId.toLowerCase(),
       cleanId.toUpperCase()
     ]));
 
-    let lastError = null;
-    for (const candidate of candidates) {
-      try {
-        const timeoutPromise = new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('Event verification timed out after 12 seconds.')), 12000)
-        );
-        const url = await Promise.race([
-          getDownloadURL(ref(storage, `events/${candidate}/face_index.json`)),
-          timeoutPromise
-        ]);
-        return { url, resolvedEventId: candidate };
-      } catch (err) {
-        // Fallback: Check direct public REST URL if getDownloadURL times out or fails
+    const bucket = import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || storage.app?.options?.storageBucket || 'yogistudio-2a41a.appspot.com';
+
+    const checkCandidate = async (candidate) => {
+      // 1. Fast path: check direct REST URL first (instant on native and web)
+      if (bucket) {
         try {
-          const bucket = import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || storage.app?.options?.storageBucket;
-          if (bucket) {
-            const directUrl = `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/events%2F${encodeURIComponent(candidate)}%2Fface_index.json?alt=media`;
-            const checkRes = await fetch(directUrl, { method: 'GET' });
-            if (checkRes.ok) {
-              return { url: directUrl, resolvedEventId: candidate };
-            }
+          const directUrl = `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/events%2F${encodeURIComponent(candidate)}%2Fface_index.json?alt=media`;
+          const checkRes = await fetch(directUrl, { method: 'GET' });
+          if (checkRes.ok) {
+            return { url: directUrl, resolvedEventId: candidate };
           }
-        } catch (fallbackErr) {
-          // Ignore fallback errors and continue
+        } catch (e) {
+          // ignore network check errors
         }
-        lastError = err;
       }
+      // 2. Secondary path: Firebase getDownloadURL with short 3-second timeout
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('timeout')), 3000)
+      );
+      const url = await Promise.race([
+        getDownloadURL(ref(storage, `events/${candidate}/face_index.json`)),
+        timeoutPromise
+      ]);
+      return { url, resolvedEventId: candidate };
+    };
+
+    try {
+      return await Promise.any(candidates.map(checkCandidate));
+    } catch (aggregateError) {
+      throw new Error(`Event '${cleanId}' not found. Double-check your Event Code.`);
     }
-    throw lastError || new Error(`Event '${cleanId}' not found.`);
   };
 
   const triggerCamera = async () => {

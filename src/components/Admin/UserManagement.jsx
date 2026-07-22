@@ -13,6 +13,7 @@ import { storage } from '../../lib/firebase';
 import { ErrorBoundary } from '../ErrorBoundary';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
+import { saveFileHelper } from '../../lib/nativeSave';
 import { useParams, useNavigate } from 'react-router-dom';
 
 // ── Constants ──────────────────────────────────────────────────────────────────
@@ -417,7 +418,7 @@ function EventDetail({
       });
       
       const content = await zip.generateAsync({ type: 'blob' });
-      saveAs(content, `${safeName}_Selections.zip`);
+      await saveFileHelper(content, `${safeName}_Selections.zip`, 'Save Selections Zip');
     } catch (err) {
       console.error("Zip generation failed:", err);
       alert("Failed to create zip file.");
@@ -458,7 +459,7 @@ function EventDetail({
       URL.revokeObjectURL(url);
       
       canvas.toBlob((pngBlob) => {
-        saveAs(pngBlob, `${event.eventName}_Access_Pass.png`);
+        saveFileHelper(pngBlob, `${event.eventName}_Access_Pass.png`, 'Save Access Pass');
       }, "image/png");
     };
     img.src = url;
