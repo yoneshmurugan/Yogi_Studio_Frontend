@@ -65,14 +65,25 @@ export default function PrivacyPolicy() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-serif text-white mb-4">5. Data Security</h2>
+            <h2 className="text-2xl font-serif text-white mb-4">5. Face Data & Biometric Information</h2>
+            <p className="mb-3">Our application utilizes facial recognition technology (AI Selfie Search) to help you quickly find your photos from a specific event. We are committed to ensuring the absolute privacy and security of your biometric data. Here is exactly how your Face Data is handled:</p>
+            <ul className="list-disc pl-6 space-y-2 text-silver/70">
+              <li><strong>What face data is collected:</strong> When you use the "AI Search" feature, we capture a temporary live selfie from your device's camera. We process this image to generate a mathematical representation of your facial features (a facial vector or descriptor).</li>
+              <li><strong>Use of face data:</strong> The generated facial vector is used strictly for the sole purpose of comparing it against the pre-indexed facial vectors of the photographs within the specific event you are attending. This allows the app to instantly filter and display only the photos in which you appear.</li>
+              <li><strong>Storage and Retention:</strong> Your live selfie and the resulting facial vector are processed <strong>locally and temporarily</strong> in your device's active memory. They are <strong>never</strong> transmitted to, uploaded to, or stored on our servers or databases. The face data is instantly and permanently deleted from memory the moment the search is complete or the application is closed. We do not retain any face data.</li>
+              <li><strong>Sharing of face data:</strong> Your face data (selfie and facial vectors) is <strong>never</strong> shared with, sold to, or disclosed to any third parties, advertising networks, or external services under any circumstances.</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-serif text-white mb-4">6. Data Security</h2>
             <p>
               We have put in place appropriate security measures to prevent your personal data from being accidentally lost, used or accessed in an unauthorised way, altered or disclosed. In addition, we limit access to your personal data to those employees, agents, contractors and other third parties who have a business need to know.
             </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-serif text-white mb-4">6. Your Legal Rights</h2>
+            <h2 className="text-2xl font-serif text-white mb-4">7. Your Legal Rights</h2>
             <p className="mb-3">Under certain circumstances, you have rights under data protection laws in relation to your personal data, including the right to:</p>
             <ul className="list-disc pl-6 space-y-2 text-silver/70">
               <li>Request access to your personal data.</li>
@@ -86,7 +97,7 @@ export default function PrivacyPolicy() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-serif text-white mb-4">7. Contact Us</h2>
+            <h2 className="text-2xl font-serif text-white mb-4">8. Contact Us</h2>
             <p>
               If you have any questions about this privacy policy or our privacy practices, please contact us at:
               <br /><br />
