@@ -462,7 +462,7 @@ export default function AdminDashboard() {
             <div className="w-8 h-8 md:w-9 md:h-9 rounded-full flex items-center justify-center shrink-0 overflow-hidden border border-white/10">
               <img src={yogiLogo} alt="Admin Profile" className="w-full h-full object-cover" />
             </div>
-            <button onClick={() => navigate('/')} className="p-2 ml-1 md:ml-0 rounded-lg text-silver/40 hover:text-white hover:bg-white/[0.05] transition-colors">
+            <button onClick={() => navigate('/')} title="Logout" className="p-2 ml-1 md:ml-0 rounded-lg text-silver/40 hover:text-white hover:bg-white/[0.05] transition-colors">
               <LogOut className="w-4 h-4 md:w-5 md:h-5" />
             </button>
           </div>

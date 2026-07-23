@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Camera, Calendar, Folder, FileImage, CheckCircle2, ArrowLeft } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Camera, Calendar, Folder, FileImage, CheckCircle2, ArrowLeft, LogOut, UserX, AlertTriangle } from 'lucide-react';
 import WelcomeHeader from './WelcomeHeader';
 import FolderGrid from './FolderGrid';
 import PhotoGrid from './PhotoGrid';
@@ -13,6 +13,9 @@ import UndoToast from './UndoToast';
 import { Routes, Route, useNavigate, useParams, Navigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
+import { getAuth, deleteUser, signOut } from 'firebase/auth';
+import { Capacitor } from '@capacitor/core';
+import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
 
 export default function CustomerPortal() {
   return (
@@ -49,6 +52,51 @@ function CustomerPortalInner() {
   const error = queryError?.message || '';
 
   const [activeEvent, setActiveEvent] = useState(null);
+
+  const [showCustomerSettings, setShowCustomerSettings] = useState(false);
+  const [showCustomerDeleteConfirm, setShowCustomerDeleteConfirm] = useState(false);
+  const [isDeletingCustomer, setIsDeletingCustomer] = useState(false);
+
+  const handleCustomerLogout = async () => {
+    localStorage.removeItem('studio_session_token');
+    try {
+      if (Capacitor.isNativePlatform()) {
+        await FirebaseAuthentication.signOut();
+      } else {
+        const auth = getAuth();
+        if (auth.currentUser) await signOut(auth);
+      }
+    } catch(e) { console.error("Sign out error", e); }
+    navigate('/');
+  };
+
+  const handleCustomerDeleteAccount = async () => {
+    try {
+      setIsDeletingCustomer(true);
+      if (Capacitor.isNativePlatform()) {
+        // Native deletion using Capacitor Firebase Auth
+        await FirebaseAuthentication.deleteUser();
+        localStorage.removeItem('studio_session_token');
+        navigate('/');
+      } else {
+        // Web deletion using Firebase JS SDK
+        const auth = getAuth();
+        const user = auth.currentUser;
+        if (user) {
+          await deleteUser(user);
+          localStorage.removeItem('studio_session_token');
+          navigate('/');
+        } else {
+          alert('Could not authenticate your session. Please sign out and log back in to delete your account.');
+        }
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Failed to delete account. You may need to sign out and log back in to verify your identity before deleting.');
+    } finally {
+      setIsDeletingCustomer(false);
+    }
+  };
 
   const activeFolderId = folderId ? parseInt(folderId, 10) : null;
   
@@ -373,6 +421,17 @@ function CustomerPortalInner() {
 
     return (
       <div className="min-h-screen-safe bg-[#050505] relative flex flex-col items-center justify-start px-4 py-24 sm:py-32 overflow-hidden safe-top">
+        
+        {/* Customer Global Controls */}
+        <div className="absolute top-4 right-4 sm:top-8 sm:right-8 z-50 flex items-center gap-2">
+          <button onClick={() => setShowCustomerDeleteConfirm(true)} title="Delete Account" className="p-2 sm:p-2.5 rounded-full bg-red-500/10 text-red-500/80 hover:bg-red-500/20 hover:text-red-500 transition-colors backdrop-blur-md">
+            <UserX className="w-4 h-4 sm:w-5 sm:h-5" />
+          </button>
+          <button onClick={handleCustomerLogout} title="Logout" className="p-2 sm:p-2.5 rounded-full bg-white/5 text-silver/60 hover:bg-white/10 hover:text-white transition-colors backdrop-blur-md">
+            <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
+          </button>
+        </div>
+
         {/* Dynamic Animated Background Elements */}
         <motion.div 
           animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.5, 0.3] }}
@@ -667,6 +726,16 @@ function CustomerPortalInner() {
         onUndo={handleUndo}
       />
 
+      {/* Customer Global Controls */}
+      <div className="fixed top-4 right-4 sm:top-6 sm:right-6 z-50 flex items-center gap-2">
+        <button onClick={() => setShowCustomerDeleteConfirm(true)} title="Delete Account" className="p-2 sm:p-2.5 rounded-full bg-red-500/10 text-red-500/80 hover:bg-red-500/20 hover:text-red-500 transition-colors backdrop-blur-md">
+          <UserX className="w-4 h-4 sm:w-5 sm:h-5" />
+        </button>
+        <button onClick={handleCustomerLogout} title="Logout" className="p-2 sm:p-2.5 rounded-full bg-white/5 text-silver/60 hover:bg-white/10 hover:text-white transition-colors backdrop-blur-md">
+          <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
+        </button>
+      </div>
+
       {/* Sticky action bar (Global) */}
       <StickyActionBar
         selectedCount={selectedIds.size}
@@ -675,6 +744,69 @@ function CustomerPortalInner() {
         onOpenSummary={() => setDrawerOpen(true)}
         onFinalise={() => setFinaliseOpen(true)}
       />
+
+      {/* Delete Account Modal */}
+      <AnimatePresence>
+        {showCustomerDeleteConfirm && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowCustomerDeleteConfirm(false)}
+              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="relative bg-[#111] border border-red-500/20 rounded-2xl p-6 w-full max-w-md shadow-2xl"
+            >
+              <div className="flex items-center gap-4 text-red-500 mb-4">
+                <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center shrink-0">
+                  <UserX className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-serif text-white">Delete Customer Account</h3>
+                  <p className="text-sm text-silver/60">This action cannot be undone.</p>
+                </div>
+              </div>
+              
+              <div className="space-y-4 mb-8 text-silver/80 text-sm">
+                <p>Are you sure you want to permanently delete your account?</p>
+                <p className="text-red-400/80 flex items-start gap-2">
+                  <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0" />
+                  <span>You will lose access to all your galleries immediately.</span>
+                </p>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button
+                  onClick={() => setShowCustomerDeleteConfirm(false)}
+                  disabled={isDeletingCustomer}
+                  className="flex-1 px-4 py-3 rounded-xl font-medium text-silver hover:text-white bg-white/5 hover:bg-white/10 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleCustomerDeleteAccount}
+                  disabled={isDeletingCustomer}
+                  className="flex-1 px-4 py-3 rounded-xl font-medium text-white bg-red-500/80 hover:bg-red-500 transition-colors flex items-center justify-center gap-2"
+                >
+                  {isDeletingCustomer ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                      Deleting...
+                    </>
+                  ) : (
+                    'Yes, Delete My Account'
+                  )}
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }
