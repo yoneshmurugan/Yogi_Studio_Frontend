@@ -263,8 +263,11 @@ export default function AIPhotoModel() {
     const link = `${window.location.origin}/ai-search?eventId=${eventId}`;
     const text = `Find your photos from ${eventId}!\n\nOption 1: Click the link below and take a selfie.\nOption 2: Go to yogidigitalstudio.in and enter "${eventId}" as the Event Code.\n\nYogi Studio AI will instantly find and deliver all your photos!\n\n${link}`;
     
+    // Check if the device is mobile. Desktop share APIs are notoriously buggy on Windows.
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
     try {
-      if (navigator.share) {
+      if (isMobile && navigator.share) {
         await navigator.share({
           title: 'Your Event Photos',
           text: text
@@ -274,7 +277,6 @@ export default function AIPhotoModel() {
         alert('Share link and instructions copied to clipboard!');
       }
     } catch (err) {
-      // If user cancelled, do nothing. Otherwise (like on Windows), fallback to clipboard.
       if (err.name !== 'AbortError') {
         try {
           await navigator.clipboard.writeText(text);
