@@ -7,7 +7,7 @@ import { extractSingleFace, detectLiveFaceBox } from '../../lib/faceApi';
 import { ref, getDownloadURL } from 'firebase/storage';
 import { storage } from '../../lib/firebase';
 import { saveAs } from 'file-saver';
-import { saveMultipleFilesHelper } from '../../lib/nativeSave';
+import { saveMultipleFilesHelper, saveFileHelper } from '../../lib/nativeSave';
 import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
 import yogiLogo from '../../assets/Headerlogo.png';
 
@@ -1019,11 +1019,24 @@ export default function FaceSearch() {
               <span className="text-white/30 text-sm font-medium bg-white/5 backdrop-blur-sm px-3 py-1.5 rounded-full border border-white/5">
                 {selectedImageIdx + 1} / {matchedPhotos.length}
               </span>
-              <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                className="p-2.5 bg-white/5 backdrop-blur-sm rounded-full text-white/60 hover:text-white hover:bg-white/10 transition-all border border-white/5"
-                onClick={() => setSelectedImageIdx(null)}>
-                <X className="w-5 h-5" />
-              </motion.button>
+              <div className="flex items-center gap-3">
+                <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                  className="p-2.5 bg-white/5 backdrop-blur-sm rounded-full text-white/60 hover:text-white hover:bg-white/10 transition-all border border-white/5"
+                  onClick={async (e) => {
+                    e.stopPropagation();
+                    const url = matchedPhotos[selectedImageIdx];
+                    const blob = await fetch(url).then(r => r.blob());
+                    await saveFileHelper(blob, `${eventId}_Photo_${selectedImageIdx + 1}.jpg`, 'Yogi Studio Photo');
+                    Haptics.notification({ type: NotificationType.Success }).catch(() => {});
+                  }}>
+                  <Download className="w-5 h-5" />
+                </motion.button>
+                <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                  className="p-2.5 bg-white/5 backdrop-blur-sm rounded-full text-white/60 hover:text-white hover:bg-white/10 transition-all border border-white/5"
+                  onClick={(e) => { e.stopPropagation(); setSelectedImageIdx(null); }}>
+                  <X className="w-5 h-5" />
+                </motion.button>
+              </div>
             </div>
 
             {/* Navigation arrows */}

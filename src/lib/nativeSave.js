@@ -88,21 +88,11 @@ export async function saveMultipleFilesHelper(blobItems, batchTitle = 'Yogi Stud
         fileUris.push(savedFile.uri);
       }
 
-      // Optionally offer the native share sheet if they also want to AirDrop/Share directly
-      if (fileUris.length > 0) {
-        try {
-          await Share.share({
-            title: batchTitle,
-            files: fileUris,
-            dialogTitle: batchTitle
-          });
-        } catch (shareErr) {
-          // User dismissed share sheet or silent completion
-        }
-      }
+      // Finished saving to gallery silently. No share sheet for bulk to prevent infinite loops.
       return true;
     } catch (err) {
-      console.error('Native batch save error:', err);
+      console.error('Native bulk save error:', err);
+      // fallback
       for (const item of blobItems) {
         saveAs(item.blob, item.filename);
       }
