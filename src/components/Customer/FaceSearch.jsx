@@ -7,6 +7,7 @@ import { extractSingleFace, detectLiveFaceBox } from '../../lib/faceApi';
 import { ref, getDownloadURL } from 'firebase/storage';
 import { storage } from '../../lib/firebase';
 import { saveAs } from 'file-saver';
+import JSZip from 'jszip';
 import watermarkLogo from '../../assets/Logodownlaod.png';
 
 /* ═══════════════════════════════════════════════════════════
@@ -103,6 +104,7 @@ export default function FaceSearch() {
   const [hasDownloaded, setHasDownloaded] = useState(false);
   const [showPostDownloadModal, setShowPostDownloadModal] = useState(false);
   const [selectedImageIdx, setSelectedImageIdx] = useState(null);
+  const [isSingleDownloading, setIsSingleDownloading] = useState(false);
   
   // Custom JS Masonry State to bypass Safari CSS columns bugs
   const [columnsCount, setColumnsCount] = useState(typeof window !== 'undefined' && window.innerWidth >= 768 ? 3 : 2);
@@ -283,11 +285,19 @@ export default function FaceSearch() {
     setDownloadStatus('downloading');
     setDownloadProgress({ current: 0, total: matchedPhotos.length });
     try {
+      const zip = new JSZip();
       for (let idx = 0; idx < matchedPhotos.length; idx++) {
         const blob = await applyWatermark(matchedPhotos[idx]);
-        if (blob) { saveAs(blob, `${eventId}_YogiStudio_Photo_${idx + 1}.jpg`); await new Promise(r => setTimeout(r, 300)); }
+        if (blob) { 
+          zip.file(`${eventId}_YogiStudio_Photo_${idx + 1}.jpg`, blob);
+        }
         setDownloadProgress({ current: idx + 1, total: matchedPhotos.length });
       }
+      
+      setDownloadProgress({ current: matchedPhotos.length, total: matchedPhotos.length, statusText: 'Zipping...' });
+      const zipBlob = await zip.generateAsync({ type: 'blob' });
+      saveAs(zipBlob, `${eventId}_YogiStudio_Memories.zip`);
+      
       setDownloadStatus('done');
       setHasDownloaded(true);
       setShowPostDownloadModal(true);
@@ -815,7 +825,11 @@ export default function FaceSearch() {
                     <div className="flex flex-col items-center justify-center w-full min-w-[200px] px-2 py-1">
                       <div className="flex items-center gap-2 mb-1.5">
                         <Loader2 className="w-4 h-4 animate-spin text-gold" />
-                        <span className="text-sm font-medium">Downloading {downloadProgress.current} / {downloadProgress.total}</span>
+                        <span className="text-sm font-medium">
+                          {downloadProgress.statusText 
+                            ? downloadProgress.statusText 
+                            : `Downloading ${downloadProgress.current} / ${downloadProgress.total}`}
+                        </span>
                       </div>
                       <div className="w-full bg-zinc-800 rounded-full h-1.5 overflow-hidden">
                         <motion.div
@@ -946,22 +960,30 @@ export default function FaceSearch() {
               </span>
               <div className="flex items-center gap-3">
                 <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                  className="p-2.5 bg-white/5 backdrop-blur-sm rounded-full text-white/60 hover:text-white hover:bg-white/10 transition-all border border-white/5"
+                  disabled={isSingleDownloading}
+                  className="p-2.5 bg-white/5 backdrop-blur-sm rounded-full text-white/60 hover:text-white hover:bg-white/10 transition-all border border-white/5 disabled:opacity-50"
                   onClick={async (e) => {
                     e.stopPropagation();
-                    const url = matchedPhotos[selectedImageIdx];
-                    const blob = await applyWatermark(url);
-                    if (blob) {
-                      saveAs(blob, `${eventId}_Photo_${selectedImageIdx + 1}.jpg`);
-                    } else {
-                      // Fallback if canvas fails
-                      const rawBlob = await fetch(url).then(r => r.blob());
-                      saveAs(rawBlob, `${eventId}_Photo_${selectedImageIdx + 1}.jpg`);
+                    if (isSingleDownloading) return;
+                    setIsSingleDownloading(true);
+                    try {
+                      const url = matchedPhotos[selectedImageIdx];
+                      const blob = await applyWatermark(url);
+                      if (blob) {
+                        saveAs(blob, `${eventId}_Photo_${selectedImageIdx + 1}.jpg`);
+                      } else {
+                        // Fallback if canvas fails
+                        const rawBlob = await fetch(url).then(r => r.blob());
+                        saveAs(rawBlob, `${eventId}_Photo_${selectedImageIdx + 1}.jpg`);
+                      }
+                    } finally {
+                      setIsSingleDownloading(false);
                     }
                   }}>
-                  <Download className="w-5 h-5" />
+                  {isSingleDownloading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Download className="w-5 h-5" />}
                 </motion.button>
                 <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                  disabled={isSingleDownloading}
                   className="p-2.5 bg-white/5 backdrop-blur-sm rounded-full text-white/60 hover:text-white hover:bg-white/10 transition-all border border-white/5"
                   onClick={(e) => { e.stopPropagation(); setSelectedImageIdx(null); }}>
                   <X className="w-5 h-5" />
