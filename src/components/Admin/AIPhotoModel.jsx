@@ -274,7 +274,15 @@ export default function AIPhotoModel() {
         alert('Share link and instructions copied to clipboard!');
       }
     } catch (err) {
-      console.error('Error sharing:', err);
+      // If user cancelled, do nothing. Otherwise (like on Windows), fallback to clipboard.
+      if (err.name !== 'AbortError') {
+        try {
+          await navigator.clipboard.writeText(text);
+          alert('Share link and instructions copied to clipboard!');
+        } catch (clipboardErr) {
+          console.error('Clipboard fallback failed:', clipboardErr);
+        }
+      }
     }
   };
 
