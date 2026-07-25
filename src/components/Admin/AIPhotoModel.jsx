@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Upload, Camera, Loader2, CheckCircle2, AlertCircle, Trash2, Folder, ChevronDown, QrCode, Download, X, Share2, Edit2 } from 'lucide-react';
 import QRCodeStyling from 'qr-code-styling';
-import html2canvas from 'html2canvas';
+import * as htmlToImage from 'html-to-image';
 import { ref, uploadBytes, getDownloadURL, uploadString, listAll, deleteObject } from 'firebase/storage';
 import { storage } from '../../lib/firebase';
 import { extractAllFaces } from '../../lib/faceApi';
@@ -189,12 +189,14 @@ export default function AIPhotoModel() {
       // Wait for it to re-render the canvas
       await new Promise(r => setTimeout(r, 200));
 
-      // 2. Take the screenshot
-      const canvas = await html2canvas(vipCardRef.current, {
-        scale: scale,
-        useCORS: true,
+      // 2. Take the screenshot with perfect CSS preservation
+      const dataUrl = await htmlToImage.toPng(vipCardRef.current, {
+        pixelRatio: scale,
         backgroundColor: '#0a0a0a',
-        logging: false
+        style: {
+          transform: 'scale(1)',
+          transformOrigin: 'top left'
+        }
       });
       
       // 3. Restore the QR code's internal resolution
@@ -202,14 +204,13 @@ export default function AIPhotoModel() {
         qrCodeInstance.current.update({ width: originalSize, height: originalSize });
       }
       
-      const image = canvas.toDataURL("image/png");
       const link = document.createElement('a');
-      link.href = image;
+      link.href = dataUrl;
       link.download = `${qrEventId}_VIP_Pass.png`;
       link.click();
     } catch (err) {
       console.error('Error generating VIP card image:', err);
-      alert('Failed to generate image. Please try again.');
+      alert('Failed to generate image. Safari users may need to try twice due to security restrictions.');
     }
   };
 
