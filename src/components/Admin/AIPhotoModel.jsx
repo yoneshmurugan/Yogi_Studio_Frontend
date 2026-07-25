@@ -27,6 +27,7 @@ export default function AIPhotoModel() {
   
   const canvasRef = useRef(null);
   const videoRef = useRef(null);
+  const dropdownRef = useRef(null);
   const qrRef = useRef(null);
   const vipCardRef = useRef(null);
   const qrCodeInstance = useRef(null);
