@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Upload, Camera, Loader2, CheckCircle2, AlertCircle, Trash2, Folder, ChevronDown, QrCode, Download, X } from 'lucide-react';
+import { Upload, Camera, Loader2, CheckCircle2, AlertCircle, Trash2, Folder, ChevronDown, QrCode, Download, X, Share2 } from 'lucide-react';
 import QRCodeStyling from 'qr-code-styling';
 import { ref, uploadBytes, getDownloadURL, uploadString, listAll, deleteObject } from 'firebase/storage';
 import { storage } from '../../lib/firebase';
@@ -149,6 +149,25 @@ export default function AIPhotoModel() {
     } finally {
       setIsDeleting(false);
       setEventToDelete(null);
+    }
+  };
+
+  const handleShareLink = async (eventId) => {
+    const link = `${window.location.origin}/ai-search?eventId=${eventId}`;
+    const text = `Find your photos from ${eventId}!\n\n1. Click the link below.\n2. Take a quick selfie.\n3. Yogi Studio AI will instantly find and deliver all your photos from the event!\n\n${link}`;
+    
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: 'Your Event Photos',
+          text: text
+        });
+      } else {
+        await navigator.clipboard.writeText(text);
+        alert('Share link and instructions copied to clipboard!');
+      }
+    } catch (err) {
+      console.error('Error sharing:', err);
     }
   };
 
@@ -483,6 +502,13 @@ export default function AIPhotoModel() {
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => handleShareLink(event.id)}
+                    className="p-2 text-gray-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-all"
+                    title="Share Event Link"
+                  >
+                    <Share2 className="w-5 h-5" />
+                  </button>
                   <button
                     onClick={() => setQrEventId(event.id)}
                     className="p-2 text-gray-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-all"
