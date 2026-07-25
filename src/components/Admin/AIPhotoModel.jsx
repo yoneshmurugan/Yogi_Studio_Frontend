@@ -158,17 +158,16 @@ export default function AIPhotoModel() {
     }
   };
 
-  // Helper to resize image on a canvas
+  // Helper to dynamically resize image on an in-memory canvas (allows parallel processing)
   const processImageToCanvas = (file) => {
     return new Promise((resolve, reject) => {
       const img = new Image();
       img.onload = () => {
-        const canvas = canvasRef.current;
-        if (!canvas) return reject(new Error('Canvas not found'));
+        const canvas = document.createElement('canvas'); // Create unique memory canvas
         const ctx = canvas.getContext('2d');
         
-        // Max dimension 1080p for memory optimization
-        const MAX_DIM = 1080;
+        // Lowered to 800px for lightning-fast GPU AI processing
+        const MAX_DIM = 800;
         let width = img.width;
         let height = img.height;
 
@@ -226,35 +225,51 @@ export default function AIPhotoModel() {
 
       const faceIndex = [...existingPhotos];
       let newBytesUploaded = 0;
+      let processedCount = 0;
 
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        setProgress({ current: i + 1, total: files.length, currentAction: `Processing ${file.name}...` });
+      // Process in parallel batches of 5 photos to max out GPU and Network
+      const BATCH_SIZE = 5;
+      
+      for (let i = 0; i < files.length; i += BATCH_SIZE) {
+        const batch = files.slice(i, i + BATCH_SIZE);
         
-        // 1. Resize Image
-        const canvas = await processImageToCanvas(file);
-        
-        // 2. Extract Faces using local GPU
-        const faceDescriptors = await extractAllFaces(canvas);
-        
-        if (faceDescriptors.length > 0) {
-          // 3. Compress and Upload image to Firebase Storage
-          setProgress({ current: i + 1, total: files.length, currentAction: `Uploading ${file.name}...` });
-          
-          const compressedBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.85));
-          
-          const imageRef = ref(storage, `events/${eventId}/photos/${file.name}`);
-          const uploadRes = await uploadBytes(imageRef, compressedBlob);
-          newBytesUploaded += uploadRes.metadata.size;
-          const downloadUrl = await getDownloadURL(imageRef);
+        setProgress({ 
+          current: processedCount, 
+          total: files.length, 
+          currentAction: `Processing batch ${Math.floor(i / BATCH_SIZE) + 1}...` 
+        });
 
-          // 4. Push to index
-          faceIndex.push({
-            photoUrl: downloadUrl,
-            // Convert Float32Array to standard array for JSON serialization
-            faceEmbeddings: faceDescriptors.map(desc => Array.from(desc))
+        // Run entire batch in parallel
+        await Promise.all(batch.map(async (file) => {
+          // 1. Resize Image
+          const canvas = await processImageToCanvas(file);
+          
+          // 2. Extract Faces using local GPU
+          const faceDescriptors = await extractAllFaces(canvas);
+          
+          if (faceDescriptors.length > 0) {
+            // 3. Compress and Upload image to Firebase Storage
+            const compressedBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.85));
+            const imageRef = ref(storage, `events/${eventId}/photos/${file.name}`);
+            const uploadRes = await uploadBytes(imageRef, compressedBlob);
+            
+            newBytesUploaded += uploadRes.metadata.size;
+            const downloadUrl = await getDownloadURL(imageRef);
+
+            // 4. Push to index (thread-safe array push)
+            faceIndex.push({
+              photoUrl: downloadUrl,
+              faceEmbeddings: faceDescriptors.map(desc => Array.from(desc))
+            });
+          }
+          
+          processedCount++;
+          setProgress({ 
+            current: processedCount, 
+            total: files.length, 
+            currentAction: `Processed ${processedCount} / ${files.length} photos` 
           });
-        }
+        }));
       }
 
       // 5. Upload unified index JSON to Firebase Storage
