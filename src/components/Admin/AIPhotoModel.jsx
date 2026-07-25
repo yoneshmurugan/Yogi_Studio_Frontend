@@ -39,7 +39,7 @@ export default function AIPhotoModel() {
         qrCodeInstance.current = new QRCodeStyling({
           width: 300,
           height: 300,
-          type: "svg",
+          type: "canvas",
           margin: 15,
           data: `${window.location.origin}/ai-search?eventId=${qrEventId}`,
           image: appStoreLogo,
@@ -178,12 +178,29 @@ export default function AIPhotoModel() {
   const handleDownloadQr = async (scale) => {
     if (!vipCardRef.current || !qrEventId) return;
     try {
+      // 1. Temporarily bump up the QR code's internal resolution before capture
+      const originalSize = 300;
+      const scaledSize = originalSize * scale;
+      
+      if (qrCodeInstance.current) {
+        qrCodeInstance.current.update({ width: scaledSize, height: scaledSize });
+      }
+      
+      // Wait for it to re-render the canvas
+      await new Promise(r => setTimeout(r, 200));
+
+      // 2. Take the screenshot
       const canvas = await html2canvas(vipCardRef.current, {
-        scale: scale, // e.g. 1.5 for Web, 6 for Print
+        scale: scale,
         useCORS: true,
         backgroundColor: '#0a0a0a',
         logging: false
       });
+      
+      // 3. Restore the QR code's internal resolution
+      if (qrCodeInstance.current) {
+        qrCodeInstance.current.update({ width: originalSize, height: originalSize });
+      }
       
       const image = canvas.toDataURL("image/png");
       const link = document.createElement('a');
@@ -192,6 +209,7 @@ export default function AIPhotoModel() {
       link.click();
     } catch (err) {
       console.error('Error generating VIP card image:', err);
+      alert('Failed to generate image. Please try again.');
     }
   };
 
@@ -697,14 +715,19 @@ export default function AIPhotoModel() {
                 <div className="absolute -bottom-2 -left-2 w-6 h-6 border-b-2 border-l-2 border-gold rounded-bl-xl pointer-events-none" />
                 <div className="absolute -bottom-2 -right-2 w-6 h-6 border-b-2 border-r-2 border-gold rounded-br-xl pointer-events-none" />
                 
-                <div ref={qrRef} className="w-[200px] h-[200px] flex items-center justify-center overflow-hidden [&>svg]:w-full [&>svg]:h-full" />
+                <div ref={qrRef} className="w-[200px] h-[200px] flex items-center justify-center overflow-hidden [&>svg]:w-full [&>svg]:h-full [&>canvas]:w-full [&>canvas]:h-full" />
               </div>
 
               <div className="mt-8 text-center relative z-10">
                 <p className="text-[11px] text-zinc-500 mb-2 font-medium tracking-[0.1em] uppercase">Powered by Yogi Studio AI</p>
-                <p className="text-sm text-zinc-300 font-medium bg-white/5 py-2 px-4 rounded-lg inline-block border border-white/5">
-                  Or enter code <strong className="text-gold">"{qrEventId}"</strong> on website
-                </p>
+                <div className="text-sm text-zinc-300 font-medium bg-white/5 py-3 px-5 rounded-xl inline-block border border-white/10">
+                  <p className="mb-1">
+                    Or visit <span className="text-white font-semibold">yogidigitalstudio.in</span> &rarr; <span className="text-white font-semibold">AI Search</span>
+                  </p>
+                  <p>
+                    and enter code: <strong className="text-gold text-lg tracking-wide ml-1">"{qrEventId}"</strong>
+                  </p>
+                </div>
               </div>
             </div>
 
