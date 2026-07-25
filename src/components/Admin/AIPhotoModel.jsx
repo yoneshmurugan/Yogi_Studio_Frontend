@@ -171,6 +171,15 @@ export default function AIPhotoModel() {
     }
   };
 
+  const handleDownloadQr = async (size) => {
+    if (qrCodeInstance.current && qrEventId) {
+      qrCodeInstance.current.update({ width: size, height: size });
+      await new Promise(r => setTimeout(r, 100)); // wait for redraw
+      await qrCodeInstance.current.download({ name: `${qrEventId}_VIP_QRCode_${size}px`, extension: "png" });
+      qrCodeInstance.current.update({ width: 300, height: 300 }); // restore UI size
+    }
+  };
+
   const handleRenameEvent = async () => {
     if (!eventToRename || !newEventId.trim() || eventToRename === newEventId.trim()) return;
     setIsRenaming(true);
@@ -210,7 +219,7 @@ export default function AIPhotoModel() {
 
   const handleShareLink = async (eventId) => {
     const link = `${window.location.origin}/ai-search?eventId=${eventId}`;
-    const text = `Find your photos from ${eventId}!\n\n1. Click the link below.\n2. Take a quick selfie.\n3. Yogi Studio AI will instantly find and deliver all your photos from the event!\n\n${link}`;
+    const text = `Find your photos from ${eventId}!\n\nOption 1: Click the link below and take a selfie.\nOption 2: Go to yogidigitalstudio.in and enter "${eventId}" as the Event Code.\n\nYogi Studio AI will instantly find and deliver all your photos!\n\n${link}`;
     
     try {
       if (navigator.share) {
@@ -684,17 +693,25 @@ export default function AIPhotoModel() {
               </div>
 
               <div className="mt-8 text-center relative z-10">
-                <p className="text-[11px] text-zinc-500 mb-6 font-medium tracking-[0.1em] uppercase">Powered by Yogi Studio AI</p>
-                <button
-                  onClick={() => {
-                    if (qrCodeInstance.current) {
-                      qrCodeInstance.current.download({ name: `${qrEventId}_VIP_QRCode`, extension: "png" });
-                    }
-                  }}
-                  className="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 via-gold to-amber-500 hover:opacity-90 text-black font-bold tracking-wide transition-all shadow-[0_0_20px_rgba(255,215,0,0.3)] flex items-center justify-center gap-2"
-                >
-                  <Download className="w-4 h-4" /> Save QR Code
-                </button>
+                <p className="text-[11px] text-zinc-500 mb-2 font-medium tracking-[0.1em] uppercase">Powered by Yogi Studio AI</p>
+                <p className="text-sm text-zinc-300 mb-6 font-medium bg-white/5 py-2 px-4 rounded-lg inline-block border border-white/5">
+                  Or enter code <strong className="text-gold">"{qrEventId}"</strong> on website
+                </p>
+                
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => handleDownloadQr(500)}
+                    className="flex-1 py-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white font-medium text-sm transition-all flex items-center justify-center gap-2 border border-zinc-700"
+                  >
+                    <Download className="w-4 h-4" /> Small (Web)
+                  </button>
+                  <button
+                    onClick={() => handleDownloadQr(2000)}
+                    className="flex-1 py-3 rounded-xl bg-gradient-to-r from-amber-500 via-gold to-amber-500 hover:opacity-90 text-black font-bold text-sm tracking-wide transition-all shadow-[0_0_20px_rgba(255,215,0,0.3)] flex items-center justify-center gap-2"
+                  >
+                    <Download className="w-4 h-4" /> Large (Print)
+                  </button>
+                </div>
               </div>
             </div>
           </motion.div>
