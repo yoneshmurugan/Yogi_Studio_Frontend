@@ -9,7 +9,7 @@ import { storage } from '../../lib/firebase';
 import { saveAs } from 'file-saver';
 import { saveMultipleFilesHelper, saveFileHelper } from '../../lib/nativeSave';
 import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
-import yogiLogo from '../../assets/Headerlogo.png';
+import watermarkLogo from '../../assets/Logodownlaod.png';
 
 /* ═══════════════════════════════════════════════════════════
    VISUAL COMPONENTS
@@ -250,6 +250,35 @@ export default function FaceSearch() {
     setMatchedPhotos(prev => prev.filter((_, idx) => idx !== idxToRemove));
   };
 
+  // ── Reusable Watermark Helper ──
+  const applyWatermark = (url) => new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      const wm = new Image();
+      wm.src = watermarkLogo;
+      wm.onload = () => {
+        const c = document.createElement('canvas');
+        c.width = img.width; c.height = img.height;
+        const ctx = c.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        // Watermark size and position
+        const wmW = img.width * 0.15, wmH = wm.height * (wmW / wm.width), pad = img.width * 0.03;
+        ctx.globalAlpha = 0.9;
+        ctx.drawImage(wm, img.width - wmW - pad, img.height - wmH - pad, wmW, wmH);
+        c.toBlob((b) => resolve(b), 'image/jpeg', 0.92);
+      };
+      wm.onerror = () => {
+        const c = document.createElement('canvas');
+        c.width = img.width; c.height = img.height;
+        c.getContext('2d').drawImage(img, 0, 0);
+        c.toBlob((b) => resolve(b), 'image/jpeg', 0.92);
+      };
+    };
+    img.onerror = () => resolve(null);
+    img.src = url;
+  });
+
   // ── Download with watermark ──
   const handleDownloadAll = async () => {
     if (matchedPhotos.length === 0) return;
@@ -257,32 +286,6 @@ export default function FaceSearch() {
     setDownloadStatus('downloading');
     setDownloadProgress({ current: 0, total: matchedPhotos.length });
     try {
-      const applyWatermark = (url) => new Promise((resolve) => {
-        const img = new Image();
-        img.crossOrigin = 'anonymous';
-        img.onload = () => {
-          const wm = new Image();
-          wm.src = yogiLogo;
-          wm.onload = () => {
-            const c = document.createElement('canvas');
-            c.width = img.width; c.height = img.height;
-            const ctx = c.getContext('2d');
-            ctx.drawImage(img, 0, 0);
-            const wmW = img.width * 0.15, wmH = wm.height * (wmW / wm.width), pad = img.width * 0.03;
-            ctx.globalAlpha = 0.9;
-            ctx.drawImage(wm, img.width - wmW - pad, img.height - wmH - pad, wmW, wmH);
-            c.toBlob((b) => resolve(b), 'image/jpeg', 0.92);
-          };
-          wm.onerror = () => {
-            const c = document.createElement('canvas');
-            c.width = img.width; c.height = img.height;
-            c.getContext('2d').drawImage(img, 0, 0);
-            c.toBlob((b) => resolve(b), 'image/jpeg', 0.92);
-          };
-        };
-        img.onerror = () => resolve(null);
-        img.src = url;
-      });
       const blobItems = [];
       for (let idx = 0; idx < matchedPhotos.length; idx++) {
         const blob = await applyWatermark(matchedPhotos[idx]);
@@ -1025,8 +1028,14 @@ export default function FaceSearch() {
                   onClick={async (e) => {
                     e.stopPropagation();
                     const url = matchedPhotos[selectedImageIdx];
-                    const blob = await fetch(url).then(r => r.blob());
-                    await saveFileHelper(blob, `${eventId}_Photo_${selectedImageIdx + 1}.jpg`, 'Yogi Studio Photo');
+                    const blob = await applyWatermark(url);
+                    if (blob) {
+                      await saveFileHelper(blob, `${eventId}_Photo_${selectedImageIdx + 1}.jpg`, 'Yogi Studio Photo');
+                    } else {
+                      // Fallback if canvas fails
+                      const rawBlob = await fetch(url).then(r => r.blob());
+                      await saveFileHelper(rawBlob, `${eventId}_Photo_${selectedImageIdx + 1}.jpg`, 'Yogi Studio Photo');
+                    }
                     Haptics.notification({ type: NotificationType.Success }).catch(() => {});
                   }}>
                   <Download className="w-5 h-5" />
