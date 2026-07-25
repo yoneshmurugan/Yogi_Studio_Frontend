@@ -166,8 +166,9 @@ export default function AIPhotoModel() {
         const canvas = document.createElement('canvas'); // Create unique memory canvas
         const ctx = canvas.getContext('2d');
         
-        // Lowered to 800px for lightning-fast GPU AI processing
-        const MAX_DIM = 800;
+        // Restore to 2048px (4K/DSLR handling) to prevent low-resolution embedding collapse
+        // Blurry/downscaled faces produce generic math vectors, leading to false positives.
+        const MAX_DIM = 2048;
         let width = img.width;
         let height = img.height;
 
