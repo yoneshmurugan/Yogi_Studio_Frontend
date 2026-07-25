@@ -24,6 +24,8 @@ export default function AIPhotoModel() {
   const [newEventId, setNewEventId] = useState('');
   const [isRenaming, setIsRenaming] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isDownloadingSmall, setIsDownloadingSmall] = useState(false);
+  const [isDownloadingLarge, setIsDownloadingLarge] = useState(false);
   
   const canvasRef = useRef(null);
   const videoRef = useRef(null);
@@ -177,9 +179,20 @@ export default function AIPhotoModel() {
 
   const handleDownloadQr = async (scale) => {
     if (!vipCardRef.current || !qrEventId) return;
+    
+    if (scale === 1.5) setIsDownloadingSmall(true);
+    else setIsDownloadingLarge(true);
+    
     try {
-      // Small delay to ensure any fonts or styles are fully settled before capture
-      await new Promise(r => setTimeout(r, 100));
+      // Temporarily bump the internal SVG resolution so html-to-image captures crisp paths
+      const originalSize = 300;
+      const massiveSize = 1800; // 6x the original for ultra crispness
+      if (qrCodeInstance.current) {
+        qrCodeInstance.current.update({ width: massiveSize, height: massiveSize });
+      }
+
+      // Small delay to ensure the SVG rerenders and styles settle
+      await new Promise(r => setTimeout(r, 250));
 
       // 2. Take the screenshot with perfect CSS preservation
       const dataUrl = await htmlToImage.toPng(vipCardRef.current, {
@@ -191,6 +204,11 @@ export default function AIPhotoModel() {
         }
       });
       
+      // Restore QR Code size
+      if (qrCodeInstance.current) {
+        qrCodeInstance.current.update({ width: originalSize, height: originalSize });
+      }
+      
       const link = document.createElement('a');
       link.href = dataUrl;
       link.download = `${qrEventId}_VIP_Pass.png`;
@@ -198,6 +216,9 @@ export default function AIPhotoModel() {
     } catch (err) {
       console.error('Error generating VIP card image:', err);
       alert('Failed to generate image. Safari users may need to try twice due to security restrictions.');
+    } finally {
+      setIsDownloadingSmall(false);
+      setIsDownloadingLarge(false);
     }
   };
 
@@ -696,14 +717,19 @@ export default function AIPhotoModel() {
               </div>
 
               {/* The QR Container */}
-              <div className="relative bg-white p-4 rounded-2xl mx-auto w-fit shadow-[0_0_40px_rgba(255,215,0,0.2)]">
-                {/* Corner accents */}
-                <div className="absolute -top-2 -left-2 w-6 h-6 border-t-2 border-l-2 border-gold rounded-tl-xl pointer-events-none" />
-                <div className="absolute -top-2 -right-2 w-6 h-6 border-t-2 border-r-2 border-gold rounded-tr-xl pointer-events-none" />
-                <div className="absolute -bottom-2 -left-2 w-6 h-6 border-b-2 border-l-2 border-gold rounded-bl-xl pointer-events-none" />
-                <div className="absolute -bottom-2 -right-2 w-6 h-6 border-b-2 border-r-2 border-gold rounded-br-xl pointer-events-none" />
+              <div className="relative mx-auto w-fit mt-2">
+                {/* Custom Glow Effect (Fixes html-to-image box-shadow shift bug) */}
+                <div className="absolute inset-0 bg-gold/20 blur-xl rounded-2xl transform scale-105" />
                 
-                <div ref={qrRef} className="w-[200px] h-[200px] flex items-center justify-center overflow-hidden [&>svg]:w-full [&>svg]:h-full" />
+                <div className="relative bg-white p-4 rounded-2xl">
+                  {/* Corner accents */}
+                  <div className="absolute -top-2 -left-2 w-6 h-6 border-t-2 border-l-2 border-gold rounded-tl-xl pointer-events-none" />
+                  <div className="absolute -top-2 -right-2 w-6 h-6 border-t-2 border-r-2 border-gold rounded-tr-xl pointer-events-none" />
+                  <div className="absolute -bottom-2 -left-2 w-6 h-6 border-b-2 border-l-2 border-gold rounded-bl-xl pointer-events-none" />
+                  <div className="absolute -bottom-2 -right-2 w-6 h-6 border-b-2 border-r-2 border-gold rounded-br-xl pointer-events-none" />
+                  
+                  <div ref={qrRef} className="w-[200px] h-[200px] flex items-center justify-center overflow-hidden [&>svg]:w-full [&>svg]:h-full" />
+                </div>
               </div>
 
               <div className="mt-8 text-center relative z-10">
@@ -731,15 +757,17 @@ export default function AIPhotoModel() {
               <div className="flex gap-3">
                 <button
                   onClick={() => handleDownloadQr(1.5)}
-                  className="flex-1 py-3 rounded-xl bg-[#111] hover:bg-[#1a1a1a] text-white font-medium text-sm transition-all flex items-center justify-center gap-2 border border-zinc-800"
+                  disabled={isDownloadingSmall || isDownloadingLarge}
+                  className="flex-1 py-3 rounded-xl bg-[#111] hover:bg-[#1a1a1a] disabled:opacity-50 text-white font-medium text-sm transition-all flex items-center justify-center gap-2 border border-zinc-800"
                 >
-                  <Download className="w-4 h-4" /> Small (Web)
+                  {isDownloadingSmall ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />} Small (Web)
                 </button>
                 <button
                   onClick={() => handleDownloadQr(6)}
-                  className="flex-1 py-3 rounded-xl bg-gradient-to-r from-amber-500 via-gold to-amber-500 hover:opacity-90 text-black font-bold text-sm tracking-wide transition-all shadow-[0_0_20px_rgba(255,215,0,0.3)] flex items-center justify-center gap-2"
+                  disabled={isDownloadingSmall || isDownloadingLarge}
+                  className="flex-1 py-3 rounded-xl bg-gradient-to-r from-amber-500 via-gold to-amber-500 hover:opacity-90 disabled:opacity-50 text-black font-bold text-sm tracking-wide transition-all shadow-[0_0_20px_rgba(255,215,0,0.3)] flex items-center justify-center gap-2"
                 >
-                  <Download className="w-4 h-4" /> Large (Print)
+                  {isDownloadingLarge ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />} Large (Print)
                 </button>
               </div>
             </div>
