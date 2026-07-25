@@ -1,111 +1,141 @@
-# 📸 Yogi Digital Studio — Frontend & Mobile App
+<div align="center">
 
-Welcome to the **Yogi Digital Studio** Frontend & Mobile Client repository! This application is a cutting-edge, dynamic digital studio platform built for photography studios and their clients to seamlessly view, share, download, and curate memories with high-resolution performance.
+# 📸 Yogi Digital Studio — Frontend & Cross-Platform Suite
 
----
+A state-of-the-art, AI-powered digital photo studio client platform built for professional photography studios and their VIP clients to seamlessly explore, download, and curate high-resolution memories across Web, iOS, and Android devices.
 
-## 📲 Download the App
+<br />
 
-| Platform | Download Link | Status |
-| :--- | :--- | :--- |
-| **Google Play Store (Android)** | <!-- REPLACE_WITH_YOUR_PLAYSTORE_LINK_HERE --> *(Coming Soon)* | Under Review / Available |
-| **Apple App Store (iOS & iPadOS)** | <!-- REPLACE_WITH_YOUR_APPSTORE_LINK_HERE --> *(Coming Soon)* | Under Review / Available |
-| **Live Web App** | [https://yogidigitalstudio.in](https://yogidigitalstudio.in) | Live 🚀 |
+![React](https://img.shields.io/badge/React_18-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![Vite](https://img.shields.io/badge/Vite_Bundler-646CFF?style=for-the-badge&logo=vite&logoColor=white)
+![Capacitor](https://img.shields.io/badge/Capacitor_Mobile-1199F7?style=for-the-badge&logo=capacitor&logoColor=white)
+![iOS](https://img.shields.io/badge/iOS_&_iPadOS-000000?style=for-the-badge&logo=apple&logoColor=white)
+![Android](https://img.shields.io/badge/Android_OS-3DDC84?style=for-the-badge&logo=android&logoColor=white)
+![Firebase Auth](https://img.shields.io/badge/Firebase_Auth-039BE5?style=for-the-badge&logo=Firebase&logoColor=white)
+![Framer Motion](https://img.shields.io/badge/Framer_Motion-0055FF?style=for-the-badge&logo=framer&logoColor=white)
+![TanStack Query](https://img.shields.io/badge/TanStack_Query-FF4154?style=for-the-badge&logo=react-query&logoColor=white)
 
-*(Note: Replace the placeholders above with your official Play Store and App Store URLs once published!)*
+</div>
 
----
-
-## 🌟 Key Features
-
-### 👤 Client Portal & Customer Experience
-- **Secure SMS OTP Login:** Fast, frictionless authentication powered by Firebase Auth.
-- **Face Recognition Ready:** Built-in disclosures and local processing design to seamlessly scan and highlight photos of a specific client without third-party sharing.
-- **Dynamic Interactive Lightbox:** Smooth zooming, swiping, and browsing powered by Framer Motion and sleek modern UX.
-- **Native Memory Preservation:** Save single images or export all high-resolution memories directly to the device’s **native Camera Roll / Photo Library** (using `@capacitor-community/media`).
-- **Apple Compliant Account Deletion:** Secure self-serve account management inside the app allowing customers to delete their authenticated identity (compliant with App Store Guideline 5.1.1(v)).
-
-### 🛠️ Admin Dashboard (Photographer Suite)
-- **Studio Command Center:** Complete real-time overview of active events, uploaded galleries, and studio clients.
-- **Event & Folder Management:** Create structured gallery hierarchies, upload bulk event shots, and manage portfolio highlights.
-- **AI Photo Model Suite:** Integrated workflows to power cutting-edge AI photo transformation features.
-- **Client Access Management:** Add new clients and grant exclusive access to protected event collections.
+<br />
 
 ---
 
-## 🔀 Repository Branch Structure & Mobile Support
+## 📲 Download & Access the Application
 
-This repository utilizes a **multi-platform branching strategy** to manage both standard modern web deployments and specialized native mobile wrappers:
+| Platform | Download / Application URL | Status | Supported Repository Branch |
+| :--- | :--- | :--- | :--- |
+| **Google Play Store (Android)** | <!-- REPLACE_WITH_YOUR_PLAYSTORE_LINK_HERE --> *(Coming Soon)* | Under Review / Available | `mobile` (Capacitor Android) |
+| **Apple App Store (iOS & iPadOS)** | <!-- REPLACE_WITH_YOUR_APPSTORE_LINK_HERE --> *(Coming Soon)* | Under Review / Available | `mobile` (Capacitor iOS) |
+| **Live Web Studio & PWA** | [https://yogidigitalstudio.in](https://yogidigitalstudio.in) | Live 🚀 | `main` (Standard Web) |
 
-### 🌐 `main` Branch — Core Web Application & PWA
-- Optimized for standard browser viewing and Progressive Web App (PWA) installation.
-- Lightweight bundling, blazing-fast HMR via **Vite**, and responsive layouts.
-- Hosts the official public website, Client Portal, and desktop-optimized Admin Panel.
-
-### 📱 `mobile` Branch — iOS & Android Native Builds
-- Integrated natively with **Capacitor** (`ios/` and `android/` directories).
-- **iOS & iPadOS Optimized:** Includes full interface orientation configurations (`Info.plist`), multitasking support for iPads, and native Apple Push Notification service (APNs) fallback bindings.
-- **Android Capabilities:** Optimized file permissions, SDK configurations, and Google Services integration for seamless Play Store deployment.
-- **Native Device Sensors & Hardware:** Deep integration with Capacitor Haptics, native Camera Roll saving, and Native Firebase Authentication bypasses for smooth native app performance.
+*(Note: Replace the placeholders above with your official App Store and Play Store direct install URLs once live!)*
 
 ---
 
-## 🛠️ Tech Stack & Architecture
+## 🏗️ System Architecture & Cross-Platform Execution
 
-- **Core Framework:** React 18, Vite
-- **Styling & Aesthetics:** Vanilla CSS with custom modern design system tokens, Framer Motion animations
-- **Mobile Runtime:** Capacitor (iOS + Android)
-- **Authentication:** Firebase Authentication (Phone Number SMS OTP & Email Admin Login)
-- **State & Data Management:** TanStack React Query (`@tanstack/react-query`)
-- **Backend API Integration:** Communicates with the secure AWS Serverless backend (`api.yogidigitalstudio.in`).
+The platform is designed around a unified React core that compiles seamlessly into progressive browser experiences and hardware-accelerated mobile binaries using **Capacitor**.
 
----
+```mermaid
+graph TD
+    subgraph Client Platforms ["Client Execution Environments"]
+        WEB["🌐 Browser / PWA (main branch)"]
+        IOS["🍎 iPhone & iPadOS Native App (mobile branch)"]
+        AND["🤖 Android Mobile App (mobile branch)"]
+    end
 
-## 🚀 Getting Started (Development Setup)
+    subgraph Native Engine ["Capacitor Native Hardware Bridge"]
+        FS["📷 Device Camera Roll<br/>(@capacitor-community/media)"]
+        HAP["📳 Haptic Touch Engine<br/>(@capacitor/haptics)"]
+        AUTH_NATIVE["🔐 APNs Silent Verification & Auth<br/>(@capacitor-firebase/authentication)"]
+    end
 
-### 1️⃣ Prerequisites
-- **Node.js** (v18 or above recommended)
-- **npm** or yarn
-- **Xcode** (for iOS native testing) & **CocoaPods** installed
-- **Android Studio** (for Android builds)
+    subgraph Cloud Backend & Security ["Cloud Infrastructure & AI Services"]
+        FIREBASE["🔥 Firebase Cloud Auth<br/>(SMS OTP & Custom Tokens)"]
+        AWS["⚡ AWS Serverless API<br/>(api.yogidigitalstudio.in)"]
+        S3["☁️ AWS S3 & DynamoDB<br/>(High-Res Galleries & AI Matcher)"]
+    end
 
-### 2️⃣ Installation & Web Development
-```bash
-# Clone the project and navigate to the root directory
-git clone https://github.com/yoneshmurugan/Yogi_Studio_Frontend.git
-cd Yogi_Studio_Frontend
+    WEB --> FIREBASE
+    WEB --> AWS
+    
+    IOS ---> FS & HAP & AUTH_NATIVE
+    AND ---> FS & HAP & AUTH_NATIVE
+    
+    AUTH_NATIVE ==> FIREBASE
+    AWS ===> S3
+    IOS ==> AWS
+    AND ==> AWS
 
-# Install dependencies
-npm install
-
-# Start the Vite local development server
-npm run dev
-```
-Open your browser at `http://localhost:5173`.
-
-### 3️⃣ Building & Running for Mobile (iOS & Android)
-
-To access and build the iOS and Android packages, ensure you switch to the **`mobile` branch**:
-
-```bash
-# Switch to the dedicated mobile development branch
-git checkout mobile
-npm install
-
-# Step 1: Build the production bundle of the React application
-npm run build
-
-# Step 2: Sync the built assets and plugins to the native iOS and Android folders
-npx cap sync
-
-# Step 3A: Launch Xcode to test/publish on iPhone or iPad
-npx cap open ios
-
-# Step 3B: Launch Android Studio to test/publish on Android devices
-npx cap open android
+    classDef platforms fill:#1f2937,stroke:#3b82f6,stroke-width:2px,color:#fff;
+    classDef hardware fill:#0d9488,stroke:#0f766e,stroke-width:2px,color:#fff;
+    classDef cloud fill:#4f46e5,stroke:#4338ca,stroke-width:2px,color:#fff;
+    
+    class WEB,IOS,AND platforms;
+    class FS,HAP,AUTH_NATIVE hardware;
+    class FIREBASE,AWS,S3 cloud;
 ```
 
 ---
 
-## 📄 License & Ownership
-All design assets, photographs, logos, and codebase architecture are strictly confidential and proprietary property of **Yogi Digital Studio**.
+## 🔄 Client Portal Gallery Workflow
+
+Here is how customers interact with the platform—from instant passwordless SMS login to preserving memories directly on their device:
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Client as 👤 Studio Client
+    participant App as 📱 Mobile / Web Client
+    participant FB as 🔥 Firebase Authentication
+    participant API as ⚡ AWS Serverless Backend
+    participant Dev as 🖼️ Native Device Library
+
+    Client->>App: Enter Registered Phone Number
+    App->>FB: Request Passwordless SMS OTP (APNs verified on native)
+    FB-->>Client: Receive Instant 6-Digit Code
+    Client->>App: Verify OTP Token
+    App->>API: Authenticate & Fetch Assigned Studio Events
+    API-->>App: Return Gallery Trees, Folders, & High-Res Thumbnails
+    
+    rect rgb(20, 20, 40)
+        Note right of Client: 🎨 Interactive Gallery Exploration
+        Client->>App: Open Dynamic Lightbox / AI Face Match Filter
+        App->>App: Render Framer Motion Zoom & Swipes + Haptic Feedback
+    end
+    
+    Client->>App: Click "Save All Memories" / Download Photo
+    App->>Dev: Write Original Resolution Media Straight to Camera Roll!
+    Dev-->>Client: ✅ High-Res Memories Saved Automatically
+```
+
+---
+
+## 🌟 Comprehensive Feature Suite
+
+### 👤 VIP Client Portal & Customer Experience
+- **Frictionless SMS Login:** Fast, secure phone verification powered by Firebase Authentication without passwords.
+- **AI Face Match & Local Privacy:** Built-in biometric disclosure frameworks designed to filter galleries for photos containing the client without transmitting or reselling personal identity metrics to third-parties.
+- **Fluid Lightbox Navigation:** Smooth zooming, swiping, and browsing engineered with Framer Motion and rich modern HSL dark themes.
+- **Native Media Preservation:** Download a single showcase photo or batch-export complete event archives natively directly into iPhone, iPad, and Android photo albums.
+- **Apple Compliant Self-Serve Privacy:** Complete account deletion tools integrated straight into the customer profile dashboard—compliant with **App Store Guideline 5.1.1(v)** to destroy personal authentication records instantly upon request.
+
+### 🛠️ Photographer Command Center (Admin Suite)
+- **Studio Dashboard & Analytics:** Complete overview of published events, registered studio VIPs, and storage performance.
+- **Deep Folder Structure Curations:** Organize weddings, commercial shoots, and portraits into nested subfolders with bespoke cover selections.
+- **AI Photo Model Manager:** Direct interface to generate and inspect generative models trained on custom promotional assets.
+- **Event Access Controls:** Easily assign confidential event passcodes and grant explicit access permissions to individual client phone numbers.
+
+---
+
+## 🔀 Multi-Branch Architecture
+
+This repository adopts a specialized branching paradigm to serve both web and compiled mobile app binaries cleanly:
+* **`main` Branch (Core Web & PWA):** Serves lightweight bundles optimized for desktop photographers and web browsers.
+* **`mobile` Branch (Native App Ecosystem):** Contains embedded Xcode (`ios/`) and Android Studio (`android/`) working workspaces, native iOS APNs silent push fallback interceptors, and iPad multitasking layout capabilities.
+
+---
+
+## 📄 Ownership & Confidentiality
+All digital designs, UI/UX workflows, source architecture, and photography assets are exclusive and proprietary intellectual property of **Yogi Digital Studio**.
