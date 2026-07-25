@@ -26,7 +26,7 @@ A state-of-the-art, AI-powered digital photo studio client platform built for pr
 | Platform | Download / Application URL | Status | Supported Repository Branch |
 | :--- | :--- | :--- | :--- |
 | **Google Play Store (Android)** | <!-- REPLACE_WITH_YOUR_PLAYSTORE_LINK_HERE --> *(Coming Soon)* | Under Review / Available | `mobile` (Capacitor Android) |
-| **Apple App Store (iOS & iPadOS)** | <!-- REPLACE_WITH_YOUR_APPSTORE_LINK_HERE --> *(Coming Soon)* | Under Review / Available | `mobile` (Capacitor iOS) |
+| **Apple App Store (iOS & iPadOS)** | [Download on App Store](https://apps.apple.com/in/app/yogi-digital-studio/id6790760209) | Live 🚀 | `mobile` (Capacitor iOS) |
 | **Live Web Studio & PWA** | [https://yogidigitalstudio.in](https://yogidigitalstudio.in) | Live 🚀 | `main` (Standard Web) |
 
 *(Note: Replace the placeholders above with your official App Store and Play Store direct install URLs once live!)*
