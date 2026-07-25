@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Upload, Camera, Loader2, CheckCircle2, AlertCircle, Trash2, Folder, ChevronDown, QrCode, Download, X, Share2, Edit2 } from 'lucide-react';
 import QRCodeStyling from 'qr-code-styling';
+import html2canvas from 'html2canvas';
 import { ref, uploadBytes, getDownloadURL, uploadString, listAll, deleteObject } from 'firebase/storage';
 import { storage } from '../../lib/firebase';
 import { extractAllFaces } from '../../lib/faceApi';
@@ -25,8 +26,9 @@ export default function AIPhotoModel() {
   const [isDeleting, setIsDeleting] = useState(false);
   
   const canvasRef = useRef(null);
-  const dropdownRef = useRef(null);
+  const videoRef = useRef(null);
   const qrRef = useRef(null);
+  const vipCardRef = useRef(null);
   const qrCodeInstance = useRef(null);
 
   // Initialize and update QR code
@@ -36,6 +38,7 @@ export default function AIPhotoModel() {
         qrCodeInstance.current = new QRCodeStyling({
           width: 300,
           height: 300,
+          type: "svg",
           margin: 15,
           data: `${window.location.origin}/ai-search?eventId=${qrEventId}`,
           image: appStoreLogo,
@@ -171,12 +174,23 @@ export default function AIPhotoModel() {
     }
   };
 
-  const handleDownloadQr = async (size) => {
-    if (qrCodeInstance.current && qrEventId) {
-      qrCodeInstance.current.update({ width: size, height: size });
-      await new Promise(r => setTimeout(r, 100)); // wait for redraw
-      await qrCodeInstance.current.download({ name: `${qrEventId}_VIP_QRCode_${size}px`, extension: "png" });
-      qrCodeInstance.current.update({ width: 300, height: 300 }); // restore UI size
+  const handleDownloadQr = async (scale) => {
+    if (!vipCardRef.current || !qrEventId) return;
+    try {
+      const canvas = await html2canvas(vipCardRef.current, {
+        scale: scale, // e.g. 1.5 for Web, 6 for Print
+        useCORS: true,
+        backgroundColor: '#0a0a0a',
+        logging: false
+      });
+      
+      const image = canvas.toDataURL("image/png");
+      const link = document.createElement('a');
+      link.href = image;
+      link.download = `${qrEventId}_VIP_Pass.png`;
+      link.click();
+    } catch (err) {
+      console.error('Error generating VIP card image:', err);
     }
   };
 
@@ -665,17 +679,10 @@ export default function AIPhotoModel() {
             className="w-full max-w-sm relative flex flex-col items-center"
           >
             {/* The VIP Pass Card */}
-            <div className="w-full bg-gradient-to-b from-[#151515] to-[#0a0a0a] border border-gold/30 rounded-[32px] p-8 shadow-[0_20px_80px_rgba(255,215,0,0.15)] relative overflow-hidden">
+            <div ref={vipCardRef} className="w-full bg-gradient-to-b from-[#151515] to-[#0a0a0a] border border-gold/30 rounded-[32px] p-8 pb-10 shadow-[0_20px_80px_rgba(255,215,0,0.15)] relative overflow-hidden">
               {/* Shine effect */}
               <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.05] to-transparent pointer-events-none" />
               
-              <button
-                onClick={() => setQrEventId(null)}
-                className="absolute top-5 right-5 text-zinc-500 hover:text-white transition-colors z-10"
-              >
-                <X className="w-5 h-5" />
-              </button>
-
               <div className="text-center mb-8 relative z-10">
                 <h2 className="text-[10px] font-bold text-gold tracking-[0.3em] uppercase mb-2">Scan for Photos</h2>
                 <h3 className="text-2xl font-serif text-white tracking-wide">{qrEventId}</h3>
@@ -694,24 +701,34 @@ export default function AIPhotoModel() {
 
               <div className="mt-8 text-center relative z-10">
                 <p className="text-[11px] text-zinc-500 mb-2 font-medium tracking-[0.1em] uppercase">Powered by Yogi Studio AI</p>
-                <p className="text-sm text-zinc-300 mb-6 font-medium bg-white/5 py-2 px-4 rounded-lg inline-block border border-white/5">
+                <p className="text-sm text-zinc-300 font-medium bg-white/5 py-2 px-4 rounded-lg inline-block border border-white/5">
                   Or enter code <strong className="text-gold">"{qrEventId}"</strong> on website
                 </p>
-                
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => handleDownloadQr(500)}
-                    className="flex-1 py-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white font-medium text-sm transition-all flex items-center justify-center gap-2 border border-zinc-700"
-                  >
-                    <Download className="w-4 h-4" /> Small (Web)
-                  </button>
-                  <button
-                    onClick={() => handleDownloadQr(2000)}
-                    className="flex-1 py-3 rounded-xl bg-gradient-to-r from-amber-500 via-gold to-amber-500 hover:opacity-90 text-black font-bold text-sm tracking-wide transition-all shadow-[0_0_20px_rgba(255,215,0,0.3)] flex items-center justify-center gap-2"
-                  >
-                    <Download className="w-4 h-4" /> Large (Print)
-                  </button>
-                </div>
+              </div>
+            </div>
+
+            {/* Buttons (Outside VIP Card so they aren't captured) */}
+            <div className="w-full mt-6">
+              <button
+                onClick={() => setQrEventId(null)}
+                className="absolute -top-4 -right-4 w-10 h-10 bg-black/80 hover:bg-black border border-white/10 rounded-full text-zinc-400 hover:text-white transition-colors z-[60] flex items-center justify-center"
+              >
+                <X className="w-5 h-5" />
+              </button>
+              
+              <div className="flex gap-3">
+                <button
+                  onClick={() => handleDownloadQr(1.5)}
+                  className="flex-1 py-3 rounded-xl bg-[#111] hover:bg-[#1a1a1a] text-white font-medium text-sm transition-all flex items-center justify-center gap-2 border border-zinc-800"
+                >
+                  <Download className="w-4 h-4" /> Small (Web)
+                </button>
+                <button
+                  onClick={() => handleDownloadQr(6)}
+                  className="flex-1 py-3 rounded-xl bg-gradient-to-r from-amber-500 via-gold to-amber-500 hover:opacity-90 text-black font-bold text-sm tracking-wide transition-all shadow-[0_0_20px_rgba(255,215,0,0.3)] flex items-center justify-center gap-2"
+                >
+                  <Download className="w-4 h-4" /> Large (Print)
+                </button>
               </div>
             </div>
           </motion.div>
