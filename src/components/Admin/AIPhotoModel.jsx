@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Upload, Camera, Loader2, CheckCircle2, AlertCircle, Trash2, Folder, ChevronDown, QrCode, Download, X } from 'lucide-react';
+import { Upload, Camera, Loader2, CheckCircle2, AlertCircle, Trash2, Folder, ChevronDown, QrCode, Download, X, Share2, Edit2 } from 'lucide-react';
 import QRCodeStyling from 'qr-code-styling';
 import { ref, uploadBytes, getDownloadURL, uploadString, listAll, deleteObject } from 'firebase/storage';
 import { storage } from '../../lib/firebase';
@@ -18,6 +18,10 @@ export default function AIPhotoModel() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [eventToDelete, setEventToDelete] = useState(null);
   const [qrEventId, setQrEventId] = useState(null);
+  const [showQrModal, setShowQrModal] = useState(false);
+  const [eventToRename, setEventToRename] = useState(null);
+  const [newEventId, setNewEventId] = useState('');
+  const [isRenaming, setIsRenaming] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   
   const canvasRef = useRef(null);
@@ -86,11 +90,8 @@ export default function AIPhotoModel() {
   const fetchIndexedEvents = async () => {
     setIsLoadingEvents(true);
     try {
-      const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Storage list request timed out')), 7000)
-      );
       const eventsRef = ref(storage, 'events');
-      const result = await Promise.race([listAll(eventsRef), timeoutPromise]);
+      const result = await listAll(eventsRef);
       // folders is a reserved prefix for portfolio
       const validEvents = result.prefixes
         .map(p => p.name)
@@ -100,7 +101,7 @@ export default function AIPhotoModel() {
         validEvents.map(async (eventName) => {
           try {
             const indexRef = ref(storage, `events/${eventName}/face_index.json`);
-            const url = await Promise.race([getDownloadURL(indexRef), new Promise((_, r) => setTimeout(() => r(new Error('timeout')), 12000))]);
+            const url = await getDownloadURL(indexRef);
             const res = await fetch(url);
             const data = await res.json();
             
@@ -135,17 +136,32 @@ export default function AIPhotoModel() {
     setIsDeleting(true);
     
     try {
-      // 1. Delete the JSON index
-      await deleteObject(ref(storage, `events/${eventToDelete}/face_index.json`)).catch(() => {});
+      const indexRef = ref(storage, `events/${eventToDelete}/face_index.json`);
+      let folderToDelete = eventToDelete;
       
-      // 2. Delete all photos
-      const photosRef = ref(storage, `events/${eventToDelete}/photos`);
+      try {
+        const url = await getDownloadURL(indexRef);
+        const res = await fetch(url);
+        const data = await res.json();
+        if (data.originalEventId) {
+          folderToDelete = data.originalEventId;
+        }
+      } catch (err) {
+        console.warn('Could not read index before deletion. Falling back to default folder.', err);
+      }
+
+      // 1. Delete the JSON index of the current event
+      await deleteObject(indexRef).catch(() => {});
+      
+      // 2. Delete all photos from the actual storage folder (could be the old folder if renamed)
+      const photosRef = ref(storage, `events/${folderToDelete}/photos`);
       const listResult = await listAll(photosRef).catch(() => ({ items: [] }));
       const deletePromises = listResult.items.map(item => deleteObject(item));
       await Promise.all(deletePromises);
       
       // Refresh list
       await fetchIndexedEvents();
+      setEventToDelete(null);
     } catch (err) {
       console.error('Error deleting AI event:', err);
       alert('Error deleting event data.');
@@ -155,23 +171,79 @@ export default function AIPhotoModel() {
     }
   };
 
+  const handleRenameEvent = async () => {
+    if (!eventToRename || !newEventId.trim() || eventToRename === newEventId.trim()) return;
+    setIsRenaming(true);
+    
+    const formattedNewId = newEventId.trim().replace(/\s+/g, '-').toLowerCase();
+    
+    try {
+      // 1. Fetch old index
+      const oldIndexRef = ref(storage, `events/${eventToRename}/face_index.json`);
+      const url = await getDownloadURL(oldIndexRef);
+      const res = await fetch(url);
+      const data = await res.json();
+      
+      // 2. Preserve original storage folder so photos aren't orphaned
+      if (!data.originalEventId) {
+        data.originalEventId = eventToRename;
+      }
+      data.eventId = formattedNewId;
+      
+      // 3. Upload to new folder
+      const newIndexRef = ref(storage, `events/${formattedNewId}/face_index.json`);
+      await uploadString(newIndexRef, JSON.stringify(data), 'raw', { contentType: 'application/json' });
+      
+      // 4. Delete old index
+      await deleteObject(oldIndexRef).catch(() => {});
+      
+      await fetchIndexedEvents();
+      setEventToRename(null);
+      setNewEventId('');
+    } catch (err) {
+      console.error('Error renaming event:', err);
+      alert('Failed to rename event. Please try again.');
+    } finally {
+      setIsRenaming(false);
+    }
+  };
+
+  const handleShareLink = async (eventId) => {
+    const link = `${window.location.origin}/ai-search?eventId=${eventId}`;
+    const text = `Find your photos from ${eventId}!\n\n1. Click the link below.\n2. Take a quick selfie.\n3. Yogi Studio AI will instantly find and deliver all your photos from the event!\n\n${link}`;
+    
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: 'Your Event Photos',
+          text: text
+        });
+      } else {
+        await navigator.clipboard.writeText(text);
+        alert('Share link and instructions copied to clipboard!');
+      }
+    } catch (err) {
+      console.error('Error sharing:', err);
+    }
+  };
+
   const handleFileChange = (e) => {
     if (e.target.files) {
       setFiles(Array.from(e.target.files));
     }
   };
 
-  // Helper to resize image on a canvas
+  // Helper to dynamically resize image on an in-memory canvas (allows parallel processing)
   const processImageToCanvas = (file) => {
     return new Promise((resolve, reject) => {
       const img = new Image();
       img.onload = () => {
-        const canvas = canvasRef.current;
-        if (!canvas) return reject(new Error('Canvas not found'));
+        const canvas = document.createElement('canvas'); // Create unique memory canvas
         const ctx = canvas.getContext('2d');
         
-        // Max dimension 1080p for memory optimization
-        const MAX_DIM = 1080;
+        // Restore to 2048px (4K/DSLR handling) to prevent low-resolution embedding collapse
+        // Blurry/downscaled faces produce generic math vectors, leading to false positives.
+        const MAX_DIM = 2048;
         let width = img.width;
         let height = img.height;
 
@@ -214,7 +286,7 @@ export default function AIPhotoModel() {
       let existingSizeBytes = 0;
       try {
         const indexRef = ref(storage, `events/${eventId}/face_index.json`);
-        const url = await Promise.race([getDownloadURL(indexRef), new Promise((_, r) => setTimeout(() => r(new Error('timeout')), 12000))]);
+        const url = await getDownloadURL(indexRef);
         const res = await fetch(url);
         const data = await res.json();
         if (data && Array.isArray(data.photos)) {
@@ -229,35 +301,51 @@ export default function AIPhotoModel() {
 
       const faceIndex = [...existingPhotos];
       let newBytesUploaded = 0;
+      let processedCount = 0;
 
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        setProgress({ current: i + 1, total: files.length, currentAction: `Processing ${file.name}...` });
+      // Process in parallel batches of 5 photos to max out GPU and Network
+      const BATCH_SIZE = 5;
+      
+      for (let i = 0; i < files.length; i += BATCH_SIZE) {
+        const batch = files.slice(i, i + BATCH_SIZE);
         
-        // 1. Resize Image
-        const canvas = await processImageToCanvas(file);
-        
-        // 2. Extract Faces using local GPU
-        const faceDescriptors = await extractAllFaces(canvas);
-        
-        if (faceDescriptors.length > 0) {
-          // 3. Compress and Upload image to Firebase Storage
-          setProgress({ current: i + 1, total: files.length, currentAction: `Uploading ${file.name}...` });
-          
-          const compressedBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.85));
-          
-          const imageRef = ref(storage, `events/${eventId}/photos/${file.name}`);
-          const uploadRes = await uploadBytes(imageRef, compressedBlob);
-          newBytesUploaded += uploadRes.metadata.size;
-          const downloadUrl = await getDownloadURL(imageRef);
+        setProgress({ 
+          current: processedCount, 
+          total: files.length, 
+          currentAction: `Processing batch ${Math.floor(i / BATCH_SIZE) + 1}...` 
+        });
 
-          // 4. Push to index
-          faceIndex.push({
-            photoUrl: downloadUrl,
-            // Convert Float32Array to standard array for JSON serialization
-            faceEmbeddings: faceDescriptors.map(desc => Array.from(desc))
+        // Run entire batch in parallel
+        await Promise.all(batch.map(async (file) => {
+          // 1. Resize Image
+          const canvas = await processImageToCanvas(file);
+          
+          // 2. Extract Faces using local GPU
+          const faceDescriptors = await extractAllFaces(canvas);
+          
+          if (faceDescriptors.length > 0) {
+            // 3. Compress and Upload image to Firebase Storage
+            const compressedBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.85));
+            const imageRef = ref(storage, `events/${eventId}/photos/${file.name}`);
+            const uploadRes = await uploadBytes(imageRef, compressedBlob);
+            
+            newBytesUploaded += uploadRes.metadata.size;
+            const downloadUrl = await getDownloadURL(imageRef);
+
+            // 4. Push to index (thread-safe array push)
+            faceIndex.push({
+              photoUrl: downloadUrl,
+              faceEmbeddings: faceDescriptors.map(desc => Array.from(desc))
+            });
+          }
+          
+          processedCount++;
+          setProgress({ 
+            current: processedCount, 
+            total: files.length, 
+            currentAction: `Processed ${processedCount} / ${files.length} photos` 
           });
-        }
+        }));
       }
 
       // 5. Upload unified index JSON to Firebase Storage
@@ -272,12 +360,13 @@ export default function AIPhotoModel() {
       await uploadString(indexRef, indexData, 'raw', { contentType: 'application/json' });
 
       setStatus('complete');
-      setFiles([]);
-      await fetchIndexedEvents();
+      setProgress({ current: files.length, total: files.length, currentAction: 'Done!' });
+      fetchIndexedEvents();
+      
     } catch (err) {
-      console.error('Processing error:', err);
+      console.error(err);
       setStatus('error');
-      setErrorMessage(err.message || 'Error occurred during processing.');
+      setErrorMessage(err.message || 'An error occurred during processing.');
     }
   };
 
@@ -313,12 +402,6 @@ export default function AIPhotoModel() {
                 onChange={(e) => {
                   setEventId(e.target.value);
                   setIsDropdownOpen(true);
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    setIsDropdownOpen(false);
-                  }
                 }}
                 placeholder="e.g. EVENT_123"
                 className="w-full bg-black border border-zinc-800 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-gold transition-colors pr-10"
@@ -475,6 +558,20 @@ export default function AIPhotoModel() {
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => handleShareLink(event.id)}
+                    className="p-2 text-gray-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-all"
+                    title="Share Event Link"
+                  >
+                    <Share2 className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() => setEventToRename(event.id)}
+                    className="p-2 text-gray-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-all"
+                    title="Rename Event"
+                  >
+                    <Edit2 className="w-5 h-5" />
+                  </button>
                   <button
                     onClick={() => setQrEventId(event.id)}
                     className="p-2 text-gray-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-all"
