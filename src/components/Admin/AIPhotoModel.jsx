@@ -744,13 +744,12 @@ export default function AIPhotoModel() {
 
               <div className="mt-8 text-center relative z-10">
                 <p className="text-[11px] text-zinc-500 mb-2 font-medium tracking-[0.1em] uppercase">Powered by Yogi Studio AI</p>
-                <div className="text-sm text-zinc-300 font-medium bg-white/5 py-3 px-5 rounded-xl inline-block border border-white/10">
+                <div className="text-sm text-zinc-300 font-medium bg-white/5 py-3 px-5 rounded-xl inline-block border border-white/10 max-w-full">
                   <p className="mb-1">
                     Or visit <span className="text-white font-semibold">yogidigitalstudio.in</span> &rarr; <span className="text-white font-semibold">AI Search</span>
                   </p>
-                  <p>
-                    and enter code: <strong className="text-gold text-lg tracking-wide ml-1">"{qrEventId}"</strong>
-                  </p>
+                  <p className="mb-0.5">and enter code:</p>
+                  <strong className="text-gold text-lg tracking-wide block whitespace-nowrap">"{qrEventId}"</strong>
                 </div>
               </div>
             </div>
