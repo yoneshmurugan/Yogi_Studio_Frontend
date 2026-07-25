@@ -255,24 +255,36 @@ export default function FaceSearch() {
     const img = new Image();
     img.crossOrigin = 'anonymous';
     img.onload = () => {
+      // Scale down image to guarantee 200-300KB final size
+      const MAX_DIM = 1600;
+      let width = img.width;
+      let height = img.height;
+      if (width > height && width > MAX_DIM) {
+        height *= MAX_DIM / width;
+        width = MAX_DIM;
+      } else if (height > MAX_DIM) {
+        width *= MAX_DIM / height;
+        height = MAX_DIM;
+      }
+
       const wm = new Image();
       wm.src = watermarkLogo;
       wm.onload = () => {
         const c = document.createElement('canvas');
-        c.width = img.width; c.height = img.height;
+        c.width = width; c.height = height;
         const ctx = c.getContext('2d');
-        ctx.drawImage(img, 0, 0);
+        ctx.drawImage(img, 0, 0, width, height);
         // Watermark size and position
-        const wmW = img.width * 0.15, wmH = wm.height * (wmW / wm.width), pad = img.width * 0.03;
+        const wmW = width * 0.15, wmH = wm.height * (wmW / wm.width), pad = width * 0.03;
         ctx.globalAlpha = 0.9;
-        ctx.drawImage(wm, img.width - wmW - pad, img.height - wmH - pad, wmW, wmH);
-        c.toBlob((b) => resolve(b), 'image/jpeg', 0.92);
+        ctx.drawImage(wm, width - wmW - pad, height - wmH - pad, wmW, wmH);
+        c.toBlob((b) => resolve(b), 'image/jpeg', 0.75);
       };
       wm.onerror = () => {
         const c = document.createElement('canvas');
-        c.width = img.width; c.height = img.height;
-        c.getContext('2d').drawImage(img, 0, 0);
-        c.toBlob((b) => resolve(b), 'image/jpeg', 0.92);
+        c.width = width; c.height = height;
+        c.getContext('2d').drawImage(img, 0, 0, width, height);
+        c.toBlob((b) => resolve(b), 'image/jpeg', 0.75);
       };
     };
     img.onerror = () => resolve(null);
