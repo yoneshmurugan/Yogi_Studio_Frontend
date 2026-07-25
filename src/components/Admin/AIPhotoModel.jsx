@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Upload, Camera, Loader2, CheckCircle2, AlertCircle, Trash2, Folder, ChevronDown, QrCode, Download, X, Share2 } from 'lucide-react';
+import { Upload, Camera, Loader2, CheckCircle2, AlertCircle, Trash2, Folder, ChevronDown, QrCode, Download, X, Share2, Edit2 } from 'lucide-react';
 import QRCodeStyling from 'qr-code-styling';
 import { ref, uploadBytes, getDownloadURL, uploadString, listAll, deleteObject } from 'firebase/storage';
 import { storage } from '../../lib/firebase';
@@ -18,6 +18,10 @@ export default function AIPhotoModel() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [eventToDelete, setEventToDelete] = useState(null);
   const [qrEventId, setQrEventId] = useState(null);
+  const [showQrModal, setShowQrModal] = useState(false);
+  const [eventToRename, setEventToRename] = useState(null);
+  const [newEventId, setNewEventId] = useState('');
+  const [isRenaming, setIsRenaming] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   
   const canvasRef = useRef(null);
@@ -132,23 +136,75 @@ export default function AIPhotoModel() {
     setIsDeleting(true);
     
     try {
-      // 1. Delete the JSON index
-      await deleteObject(ref(storage, `events/${eventToDelete}/face_index.json`)).catch(() => {});
+      const indexRef = ref(storage, `events/${eventToDelete}/face_index.json`);
+      let folderToDelete = eventToDelete;
       
-      // 2. Delete all photos
-      const photosRef = ref(storage, `events/${eventToDelete}/photos`);
+      try {
+        const url = await getDownloadURL(indexRef);
+        const res = await fetch(url);
+        const data = await res.json();
+        if (data.originalEventId) {
+          folderToDelete = data.originalEventId;
+        }
+      } catch (err) {
+        console.warn('Could not read index before deletion. Falling back to default folder.', err);
+      }
+
+      // 1. Delete the JSON index of the current event
+      await deleteObject(indexRef).catch(() => {});
+      
+      // 2. Delete all photos from the actual storage folder (could be the old folder if renamed)
+      const photosRef = ref(storage, `events/${folderToDelete}/photos`);
       const listResult = await listAll(photosRef).catch(() => ({ items: [] }));
       const deletePromises = listResult.items.map(item => deleteObject(item));
       await Promise.all(deletePromises);
       
       // Refresh list
       await fetchIndexedEvents();
+      setEventToDelete(null);
     } catch (err) {
       console.error('Error deleting AI event:', err);
       alert('Error deleting event data.');
     } finally {
       setIsDeleting(false);
       setEventToDelete(null);
+    }
+  };
+
+  const handleRenameEvent = async () => {
+    if (!eventToRename || !newEventId.trim() || eventToRename === newEventId.trim()) return;
+    setIsRenaming(true);
+    
+    const formattedNewId = newEventId.trim().replace(/\s+/g, '-').toLowerCase();
+    
+    try {
+      // 1. Fetch old index
+      const oldIndexRef = ref(storage, `events/${eventToRename}/face_index.json`);
+      const url = await getDownloadURL(oldIndexRef);
+      const res = await fetch(url);
+      const data = await res.json();
+      
+      // 2. Preserve original storage folder so photos aren't orphaned
+      if (!data.originalEventId) {
+        data.originalEventId = eventToRename;
+      }
+      data.eventId = formattedNewId;
+      
+      // 3. Upload to new folder
+      const newIndexRef = ref(storage, `events/${formattedNewId}/face_index.json`);
+      await uploadString(newIndexRef, JSON.stringify(data), 'raw', { contentType: 'application/json' });
+      
+      // 4. Delete old index
+      await deleteObject(oldIndexRef).catch(() => {});
+      
+      await fetchIndexedEvents();
+      setEventToRename(null);
+      setNewEventId('');
+    } catch (err) {
+      console.error('Error renaming event:', err);
+      alert('Failed to rename event. Please try again.');
+    } finally {
+      setIsRenaming(false);
     }
   };
 
@@ -508,6 +564,13 @@ export default function AIPhotoModel() {
                     title="Share Event Link"
                   >
                     <Share2 className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() => setEventToRename(event.id)}
+                    className="p-2 text-gray-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-all"
+                    title="Rename Event"
+                  >
+                    <Edit2 className="w-5 h-5" />
                   </button>
                   <button
                     onClick={() => setQrEventId(event.id)}
