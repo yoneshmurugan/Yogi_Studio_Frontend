@@ -39,7 +39,7 @@ export default function AIPhotoModel() {
         qrCodeInstance.current = new QRCodeStyling({
           width: 300,
           height: 300,
-          type: "canvas",
+          type: "svg",
           margin: 15,
           data: `${window.location.origin}/ai-search?eventId=${qrEventId}`,
           image: appStoreLogo,
@@ -178,16 +178,8 @@ export default function AIPhotoModel() {
   const handleDownloadQr = async (scale) => {
     if (!vipCardRef.current || !qrEventId) return;
     try {
-      // 1. Temporarily bump up the QR code's internal resolution before capture
-      const originalSize = 300;
-      const scaledSize = originalSize * scale;
-      
-      if (qrCodeInstance.current) {
-        qrCodeInstance.current.update({ width: scaledSize, height: scaledSize });
-      }
-      
-      // Wait for it to re-render the canvas
-      await new Promise(r => setTimeout(r, 200));
+      // Small delay to ensure any fonts or styles are fully settled before capture
+      await new Promise(r => setTimeout(r, 100));
 
       // 2. Take the screenshot with perfect CSS preservation
       const dataUrl = await htmlToImage.toPng(vipCardRef.current, {
@@ -198,11 +190,6 @@ export default function AIPhotoModel() {
           transformOrigin: 'top left'
         }
       });
-      
-      // 3. Restore the QR code's internal resolution
-      if (qrCodeInstance.current) {
-        qrCodeInstance.current.update({ width: originalSize, height: originalSize });
-      }
       
       const link = document.createElement('a');
       link.href = dataUrl;
@@ -716,7 +703,7 @@ export default function AIPhotoModel() {
                 <div className="absolute -bottom-2 -left-2 w-6 h-6 border-b-2 border-l-2 border-gold rounded-bl-xl pointer-events-none" />
                 <div className="absolute -bottom-2 -right-2 w-6 h-6 border-b-2 border-r-2 border-gold rounded-br-xl pointer-events-none" />
                 
-                <div ref={qrRef} className="w-[200px] h-[200px] flex items-center justify-center overflow-hidden [&>svg]:w-full [&>svg]:h-full [&>canvas]:w-full [&>canvas]:h-full" />
+                <div ref={qrRef} className="w-[200px] h-[200px] flex items-center justify-center overflow-hidden [&>svg]:w-full [&>svg]:h-full" />
               </div>
 
               <div className="mt-8 text-center relative z-10">
