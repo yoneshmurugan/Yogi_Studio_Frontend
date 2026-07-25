@@ -700,6 +700,41 @@ export default function AIPhotoModel() {
           </motion.div>
         </div>
       )}
+      {/* Event To Rename Modal */}
+      {eventToRename && (
+        <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <div className="w-full max-w-md bg-[#111] border border-zinc-800 rounded-2xl p-6 text-center">
+            <AlertCircle className="w-12 h-12 text-yellow-500 mx-auto mb-4" />
+            <h3 className="text-xl font-bold text-white mb-2">Rename Event?</h3>
+            <p className="text-zinc-400 text-sm mb-4 leading-relaxed">
+              <strong>Warning:</strong> Changing the Event Name will permanently break the existing Share Link and QR Code. You will need to generate and share new ones. Do you want to proceed?
+            </p>
+            <input 
+              type="text" 
+              value={newEventId}
+              onChange={(e) => setNewEventId(e.target.value)}
+              placeholder="Enter new event ID (e.g. reception2025)"
+              className="w-full bg-black border border-zinc-800 rounded-lg px-4 py-3 text-white placeholder-zinc-600 focus:border-gold focus:outline-none mb-6 text-center"
+            />
+            <div className="flex gap-3">
+              <button
+                onClick={() => { setEventToRename(null); setNewEventId(''); }}
+                className="flex-1 py-3 bg-zinc-900 text-white font-medium rounded-lg hover:bg-zinc-800 transition-colors"
+                disabled={isRenaming}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleRenameEvent}
+                disabled={isRenaming || !newEventId.trim()}
+                className="flex-1 py-3 bg-gradient-to-r from-gold to-yellow-600 text-black font-bold rounded-lg hover:opacity-90 transition-opacity flex justify-center items-center gap-2 disabled:opacity-50"
+              >
+                {isRenaming ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Proceed & Rename'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </motion.div>
   );
 }
