@@ -10,6 +10,7 @@ import CustomerPortal from './components/Customer/CustomerPortal';
 import ProtectedRoute from './components/ProtectedRoute';
 import PrivacyPolicy from './components/Legal/PrivacyPolicy';
 import FaceSearch from './components/Customer/FaceSearch';
+import ContactCard from './components/ContactCard/ContactCard';
 
 const pageTransition = {
   initial: { opacity: 0, y: 20 },
@@ -47,7 +48,7 @@ function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const isFullPage = location.pathname.startsWith('/admin') || location.pathname.startsWith('/client');
+  const isFullPage = location.pathname.startsWith('/admin') || location.pathname.startsWith('/client') || location.pathname === '/contact-card';
   const showNav = !isFullPage;
 
   return (
@@ -67,6 +68,7 @@ function App() {
             } 
           />
           <Route path="/client/*" element={<CustomerPortal />} />
+          <Route path="/contact-card" element={<ContactCard />} />
         </Routes>
       ) : (
         <AnimatePresence mode="wait">
