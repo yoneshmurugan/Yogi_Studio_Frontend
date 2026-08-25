@@ -81,6 +81,12 @@ function GoldParticles() {
 
 export default function ContactCard() {
   const [saved, setSaved] = useState(false);
+
+  // Auto-trigger save on page load
+  useEffect(() => {
+    const timer = setTimeout(() => { generateVCard(); setSaved(true); setTimeout(() => setSaved(false), 2500); }, 800);
+    return () => clearTimeout(timer);
+  }, []);
   const [shared, setShared] = useState(false);
 
   const handleSave = () => {
