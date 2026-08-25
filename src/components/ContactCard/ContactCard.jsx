@@ -137,7 +137,7 @@ export default function ContactCard() {
 
   return (
     <div className="cc-page">
-      <GoldParticles />
+      
 
       <motion.div
         className="cc-card"
