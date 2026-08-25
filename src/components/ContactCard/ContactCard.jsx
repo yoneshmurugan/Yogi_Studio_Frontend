@@ -4,6 +4,7 @@ import { Phone, Mail, MapPin, ChevronRight, Contact, Share2, Check } from 'lucid
 import { generateVCard } from './generateVCard';
 import studioImg from '../../assets/Studio.webp';
 import logoImg from '../../assets/yogi-logo-removebg-preview.png';
+import appstoreImg from '../../assets/appstore.png';
 import './ContactCard.css';
 
 const MAPS_URL =
@@ -112,7 +113,7 @@ export default function ContactCard() {
 
   const links = [
     {
-      Icon: () => <img src={logoImg} alt="Yogi" className="w-5 h-5 object-contain" />,
+      Icon: () => <img src={appstoreImg} alt="Yogi" className="w-5 h-5 object-contain rounded-sm" />,
       label: 'Website',
       sub: 'yogidigitalstudio.in',
       href: 'https://yogidigitalstudio.in',
