@@ -117,7 +117,7 @@ export default function ContactCard() {
       label: 'Website',
       sub: 'yogidigitalstudio.in',
       href: 'https://yogidigitalstudio.in',
-      gradient: 'linear-gradient(135deg, #D4AF37, #B8960E)',
+      gradient: 'rgba(255,255,255,0.06)',
     },
     {
       Icon: () => <InstagramIcon size={18} color="#fff" />,
