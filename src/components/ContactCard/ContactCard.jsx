@@ -113,7 +113,7 @@ export default function ContactCard() {
 
   const actions = [
     { icon: Phone, label: 'Call', href: 'tel:+919842775676', gradient: 'linear-gradient(135deg, #22c55e, #16a34a)' },
-    { icon: Mail, label: 'Email', href: 'mailto:yogistudio2008@gmail.com', gradient: 'linear-gradient(135deg, #3b82f6, #1d4ed8)' },
+    { icon: Mail, label: 'Email', href: 'mailto:yogistudio2004@gmail.com', gradient: 'linear-gradient(135deg, #3b82f6, #1d4ed8)' },
     { icon: MapPin, label: 'Directions', href: MAPS_URL, gradient: 'linear-gradient(135deg, #ef4444, #b91c1c)' },
   ];
 

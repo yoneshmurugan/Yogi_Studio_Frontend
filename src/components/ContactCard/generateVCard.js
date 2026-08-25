@@ -7,7 +7,7 @@ export const generateVCard = () => {
     'ORG:Yogi Digital Studio',
     'TITLE:Photographer & Videographer',
     'TEL;TYPE=WORK,VOICE:+919842775676',
-    'EMAIL;TYPE=PREF,INTERNET:yogistudio2008@gmail.com',
+    'EMAIL;TYPE=PREF,INTERNET:yogistudio2004@gmail.com',
     'URL;TYPE=Website:https://yogidigitalstudio.in',
     'URL;TYPE=Instagram:https://www.instagram.com/yogistudio_official/',
     'URL;TYPE=YouTube:https://www.youtube.com/@yogistudio-official',
