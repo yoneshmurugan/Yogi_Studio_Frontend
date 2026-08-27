@@ -43,6 +43,10 @@
 	<string>Yogi Studio needs permission to save the high-quality event photos directly to your camera roll.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Yogi Studio needs photo library access to allow you to upload selfies and save your event photos.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
