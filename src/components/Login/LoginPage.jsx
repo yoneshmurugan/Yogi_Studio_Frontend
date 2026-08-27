@@ -40,7 +40,7 @@ export default function LoginPage({ onLoginSuccess, onBack }) {
     }
 
     // Check if admin is already logged in
-    const adminToken = sessionStorage.getItem('adminToken');
+    const adminToken = localStorage.getItem('adminToken');
     if (adminToken) {
       onLoginSuccess('admin');
       return;
