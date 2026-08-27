@@ -93,42 +93,37 @@ export default function LoginPage({ onLoginSuccess, onBack }) {
 
       if (Capacitor.isNativePlatform()) {
         // --- Native Flow (Bypasses reCAPTCHA) ---
-        const result = await Promise.race([
-          new Promise((resolve, reject) => {
-            let sentListener = null;
-            let errListener = null;
+        const result = await new Promise((resolve, reject) => {
+          let sentListener = null;
+          let errListener = null;
 
-            const cleanup = () => {
-              if (sentListener) sentListener.remove();
-              if (errListener) errListener.remove();
-            };
+          const cleanup = () => {
+            if (sentListener) sentListener.remove();
+            if (errListener) errListener.remove();
+          };
 
-            FirebaseAuthentication.addListener('phoneCodeSent', (event) => {
+          FirebaseAuthentication.addListener('phoneCodeSent', (event) => {
+            cleanup();
+            resolve(event.verificationId);
+          }).then(l => sentListener = l);
+
+          FirebaseAuthentication.addListener('phoneVerificationFailed', (event) => {
+            cleanup();
+            reject(new Error(event.message));
+          }).then(l => errListener = l);
+
+          FirebaseAuthentication.signInWithPhoneNumber({
+            phoneNumber: formattedPhone,
+          }).then((res) => {
+            if (res && res.verificationId) {
               cleanup();
-              resolve(event.verificationId);
-            }).then(l => sentListener = l);
-
-            FirebaseAuthentication.addListener('phoneVerificationFailed', (event) => {
-              cleanup();
-              reject(new Error(event.message));
-            }).then(l => errListener = l);
-
-            FirebaseAuthentication.signInWithPhoneNumber({
-              phoneNumber: formattedPhone,
-            }).then((res) => {
-              if (res && res.verificationId) {
-                cleanup();
-                resolve(res.verificationId);
-              }
-            }).catch((err) => {
-              cleanup();
-              reject(err);
-            });
-          }),
-          new Promise((_, reject) =>
-            setTimeout(() => reject(new Error('Phone verification timed out on iOS. Check network or signal.')), 15000)
-          )
-        ]);
+              resolve(res.verificationId);
+            }
+          }).catch((err) => {
+            cleanup();
+            reject(err);
+          });
+        });
         
         setConfirmationResult(result);
       } else {
