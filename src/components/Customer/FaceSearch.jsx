@@ -9,6 +9,8 @@ import { storage } from '../../lib/firebase';
 import { saveAs } from 'file-saver';
 import { saveMultipleFilesHelper, saveFileHelper } from '../../lib/nativeSave';
 import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
+import { Capacitor } from '@capacitor/core';
+import { Camera, CameraResultType, CameraSource, CameraDirection } from '@capacitor/camera';
 import watermarkLogo from '../../assets/Logodownlaod.png';
 
 /* ═══════════════════════════════════════════════════════════
@@ -389,28 +391,52 @@ export default function FaceSearch() {
   };
 
   const triggerCamera = async () => {
-    if (!eventId || !eventId.trim()) { setErrorMsg('Please enter an Event Code.'); return; }
-    Haptics.impact({ style: ImpactStyle.Light }).catch(() => {});
+    if (!eventId) { setErrorMsg('Please enter an Event Code.'); return; }
     setErrorMsg(''); setStatus('checking'); setMatchedPhotos([]); 
 
     try {
-      const { resolvedEventId } = await findEventIndexUrl(eventId);
-      if (resolvedEventId !== eventId) setEventId(resolvedEventId);
+      // Validate Event exists before opening camera
+      await getDownloadURL(ref(storage, `events/${eventId}/face_index.json`));
     } catch (error) {
-      console.error("Event validation error:", error.code || error.message || error);
-      Haptics.notification({ type: NotificationType.Error }).catch(() => {});
       setStatus('error');
-      const isTimeout = error.message && error.message.toLowerCase().includes('timed out');
-      setErrorMsg(isTimeout 
-        ? "Network timeout while verifying event. Check internet connection and try again." 
-        : `Event '${eventId.trim()}' not found. Double-check your Event Code.`);
+      setErrorMsg("Event not found. Double-check your Event Code.");
       return;
     }
     
     setStatus('idle');
 
+    // ── Android: Use native Capacitor Camera (getUserMedia doesn't work in Android WebView) ──
+    if (Capacitor.getPlatform() === 'android') {
+      try {
+        const image = await Camera.getPhoto({
+          quality: 92,
+          allowEditing: false,
+          resultType: CameraResultType.DataUrl,
+          source: CameraSource.Camera,
+          direction: CameraDirection.Front,
+          presentationStyle: 'fullscreen',
+          saveToGallery: false,
+        });
+        if (image.dataUrl) {
+          await processImageCapture(image.dataUrl);
+        }
+      } catch (err) {
+        // User cancelled — just reset to idle quietly
+        if (err?.message?.includes('cancelled') || err?.message?.includes('cancel')) {
+          setStatus('idle');
+        } else {
+          console.error("Native camera error:", err);
+          setStatus('error');
+          setErrorMsg('Camera error. Please try again or use the file upload.');
+          // Fallback to file picker
+          fileInputRef.current?.click();
+        }
+      }
+      return;
+    }
+
+    // ── Web / iOS: Use the Yogi AI Camera Assistant ──
     try {
-      // Request camera without strict dimensions to prevent hardware zooming
       const stream = await navigator.mediaDevices.getUserMedia({ 
         video: { facingMode: 'user' } 
       });
