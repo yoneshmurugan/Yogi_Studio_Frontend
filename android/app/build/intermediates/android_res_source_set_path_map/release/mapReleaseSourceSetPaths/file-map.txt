@@ -1,0 +1,10 @@
+com.yogistudio.app-pngs-0 /Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/android/app/build/generated/res/pngs/release
+com.yogistudio.app-res-1 /Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/android/app/build/generated/res/processReleaseGoogleServices
+com.yogistudio.app-resValues-2 /Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/android/app/build/generated/res/resValues/release
+com.yogistudio.app-updated_navigation_xml-3 /Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/android/app/build/generated/updated_navigation_xml/release
+com.yogistudio.app-packageReleaseResources-4 /Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/android/app/build/intermediates/incremental/release/packageReleaseResources/merged.dir
+com.yogistudio.app-packageReleaseResources-5 /Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/android/app/build/intermediates/incremental/release/packageReleaseResources/stripped.dir
+com.yogistudio.app-release-6 /Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/android/app/build/intermediates/merged_res/release/mergeReleaseResources
+com.yogistudio.app-main-7 /Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/android/app/src/main/res
+com.yogistudio.app-release-8 /Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/android/app/src/release/res
+gradleHome-0 /Users/yonesh/.gradle

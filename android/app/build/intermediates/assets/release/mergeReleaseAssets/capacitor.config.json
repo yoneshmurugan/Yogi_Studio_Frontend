@@ -1,0 +1,19 @@
+{
+	"appId": "com.yogistudio.app",
+	"appName": "YogiStudio",
+	"webDir": "dist",
+	"plugins": {
+		"CapacitorHttp": {
+			"enabled": true
+		},
+		"FirebaseAuthentication": {
+			"providers": [
+				"phone"
+			]
+		},
+		"StatusBar": {
+			"overlaysWebView": true,
+			"style": "DARK"
+		}
+	}
+}

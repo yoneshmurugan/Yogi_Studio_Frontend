@@ -32,6 +32,23 @@ export default function LoginPage({ onLoginSuccess, onBack }) {
 
   const otpInputRef = useRef(null);
 
+  // Auto-login check
+  useEffect(() => {
+    // Check if client is already logged in
+    const clientToken = localStorage.getItem('studio_session_token');
+    if (clientToken) {
+      onLoginSuccess('customer');
+      return;
+    }
+
+    // Check if admin is already logged in
+    const adminToken = sessionStorage.getItem('adminToken');
+    if (adminToken) {
+      onLoginSuccess('admin');
+      return;
+    }
+  }, [onLoginSuccess]);
+
   // Clear stale reCAPTCHA instances (important for React Hot Reload)
   useEffect(() => {
     if (window.recaptchaVerifier) {

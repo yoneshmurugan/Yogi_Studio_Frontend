@@ -1,0 +1,478 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.yogistudio.app"
+4    android:versionCode="3"
+5    android:versionName="3.0" >
+6
+7    <uses-sdk
+7-->INJECTED
+8        android:minSdkVersion="24"
+8-->INJECTED
+9        android:targetSdkVersion="36" />
+9-->INJECTED
+10
+11    <!-- Permissions -->
+12
+13    <uses-permission android:name="android.permission.INTERNET" />
+13-->/Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/android/app/src/main/AndroidManifest.xml:39:5-67
+13-->/Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/android/app/src/main/AndroidManifest.xml:39:22-64
+14
+15    <queries>
+15-->[:capacitor-camera] /Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/node_modules/@capacitor/camera/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:7:5-17:15
+16        <intent>
+16-->[:capacitor-camera] /Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/node_modules/@capacitor/camera/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:8:9-10:18
+17            <action android:name="android.media.action.IMAGE_CAPTURE" />
+17-->[:capacitor-camera] /Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/node_modules/@capacitor/camera/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:9:13-73
+17-->[:capacitor-camera] /Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/node_modules/@capacitor/camera/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:9:21-70
+18        </intent>
+19        <intent>
+19-->[:capacitor-camera] /Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/node_modules/@capacitor/camera/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:11:9-13:18
+20            <action android:name="android.intent.action.GET_CONTENT" />
+20-->[:capacitor-camera] /Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/node_modules/@capacitor/camera/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:12:13-72
+20-->[:capacitor-camera] /Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/node_modules/@capacitor/camera/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:12:21-69
+21        </intent>
+22        <intent>
+22-->[:capacitor-camera] /Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/node_modules/@capacitor/camera/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:14:9-16:18
+23            <action android:name="android.intent.action.PICK" />
+23-->[:capacitor-camera] /Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/node_modules/@capacitor/camera/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:15:13-65
+23-->[:capacitor-camera] /Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/node_modules/@capacitor/camera/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:15:21-62
+24        </intent>
+25    </queries>
+26
+27    <uses-permission android:name="android.permission.VIBRATE" />
+27-->[:capacitor-haptics] /Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/node_modules/@capacitor/haptics/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:7:5-66
+27-->[:capacitor-haptics] /Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/node_modules/@capacitor/haptics/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:7:22-63
+28    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+28-->[com.google.firebase:firebase-auth:24.0.1] /Users/yonesh/.gradle/caches/9.4.1/transforms/1ef7aef3d30f133b2bfb8cc36589eddd/transformed/firebase-auth-24.0.1/AndroidManifest.xml:26:5-79
+28-->[com.google.firebase:firebase-auth:24.0.1] /Users/yonesh/.gradle/caches/9.4.1/transforms/1ef7aef3d30f133b2bfb8cc36589eddd/transformed/firebase-auth-24.0.1/AndroidManifest.xml:26:22-76
+29    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
+29-->[com.google.android.recaptcha:recaptcha:18.6.1] /Users/yonesh/.gradle/caches/9.4.1/transforms/f1ce64da6d9d3d045eb2a810a2daba67/transformed/recaptcha-18.6.1/AndroidManifest.xml:9:5-98
+29-->[com.google.android.recaptcha:recaptcha:18.6.1] /Users/yonesh/.gradle/caches/9.4.1/transforms/f1ce64da6d9d3d045eb2a810a2daba67/transformed/recaptcha-18.6.1/AndroidManifest.xml:9:22-95
+30
+31    <permission
+31-->[androidx.core:core:1.17.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/97ae7a204bd56d0f66ca1871c89f5136/transformed/core-1.17.0/AndroidManifest.xml:22:5-24:47
+32        android:name="com.yogistudio.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+32-->[androidx.core:core:1.17.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/97ae7a204bd56d0f66ca1871c89f5136/transformed/core-1.17.0/AndroidManifest.xml:23:9-81
+33        android:protectionLevel="signature" />
+33-->[androidx.core:core:1.17.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/97ae7a204bd56d0f66ca1871c89f5136/transformed/core-1.17.0/AndroidManifest.xml:24:9-44
+34
+35    <uses-permission android:name="com.yogistudio.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+35-->[androidx.core:core:1.17.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/97ae7a204bd56d0f66ca1871c89f5136/transformed/core-1.17.0/AndroidManifest.xml:26:5-97
+35-->[androidx.core:core:1.17.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/97ae7a204bd56d0f66ca1871c89f5136/transformed/core-1.17.0/AndroidManifest.xml:26:22-94
+36
+37    <application
+37-->/Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/android/app/src/main/AndroidManifest.xml:3:5-35:19
+38        android:allowBackup="true"
+38-->/Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/android/app/src/main/AndroidManifest.xml:4:9-35
+39        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+39-->[androidx.core:core:1.17.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/97ae7a204bd56d0f66ca1871c89f5136/transformed/core-1.17.0/AndroidManifest.xml:28:18-86
+40        android:debuggable="true"
+41        android:extractNativeLibs="false"
+41-->INJECTED
+42        android:icon="@mipmap/ic_launcher"
+42-->/Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/android/app/src/main/AndroidManifest.xml:5:9-43
+43        android:label="@string/app_name"
+43-->/Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/android/app/src/main/AndroidManifest.xml:6:9-41
+44        android:requestLegacyExternalStorage="true"
+44-->[io.ionic.libs:ioncamera-android:1.0.2] /Users/yonesh/.gradle/caches/9.4.1/transforms/7e549c34a7eaebfd372d8ab8aca15496/transformed/ioncamera-android-1.0.2/AndroidManifest.xml:8:18-61
+45        android:roundIcon="@mipmap/ic_launcher_round"
+45-->/Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/android/app/src/main/AndroidManifest.xml:7:9-54
+46        android:supportsRtl="true"
+46-->/Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/android/app/src/main/AndroidManifest.xml:8:9-35
+47        android:testOnly="true"
+48        android:theme="@style/AppTheme" >
+48-->/Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/android/app/src/main/AndroidManifest.xml:9:9-40
+49        <activity
+49-->/Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/android/app/src/main/AndroidManifest.xml:10:9-21:20
+50            android:name="com.yogistudio.app.MainActivity"
+50-->/Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/android/app/src/main/AndroidManifest.xml:12:13-41
+51            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode|navigation|density"
+51-->/Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/android/app/src/main/AndroidManifest.xml:11:13-148
+52            android:exported="true"
+52-->/Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/android/app/src/main/AndroidManifest.xml:16:13-36
+53            android:label="@string/title_activity_main"
+53-->/Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/android/app/src/main/AndroidManifest.xml:13:13-56
+54            android:launchMode="singleTask"
+54-->/Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/android/app/src/main/AndroidManifest.xml:15:13-44
+55            android:theme="@style/AppTheme.NoActionBarLaunch" >
+55-->/Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/android/app/src/main/AndroidManifest.xml:14:13-62
+56            <intent-filter>
+56-->/Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/android/app/src/main/AndroidManifest.xml:17:13-20:29
+57                <action android:name="android.intent.action.MAIN" />
+57-->/Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/android/app/src/main/AndroidManifest.xml:18:17-69
+57-->/Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/android/app/src/main/AndroidManifest.xml:18:25-66
+58
+59                <category android:name="android.intent.category.LAUNCHER" />
+59-->/Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/android/app/src/main/AndroidManifest.xml:19:17-77
+59-->/Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/android/app/src/main/AndroidManifest.xml:19:27-74
+60            </intent-filter>
+61        </activity>
+62
+63        <provider
+63-->INJECTED
+64            android:name="androidx.core.content.FileProvider"
+64-->/Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/android/app/src/main/AndroidManifest.xml:24:13-62
+65            android:authorities="com.yogistudio.app.fileprovider"
+65-->INJECTED
+66            android:exported="false"
+66-->/Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/android/app/src/main/AndroidManifest.xml:26:13-37
+67            android:grantUriPermissions="true" >
+67-->/Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/android/app/src/main/AndroidManifest.xml:27:13-47
+68            <meta-data
+68-->/Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/android/app/src/main/AndroidManifest.xml:28:13-112
+69                android:name="android.support.FILE_PROVIDER_PATHS"
+69-->/Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/android/app/src/main/AndroidManifest.xml:28:24-74
+70                android:resource="@xml/file_paths" />
+70-->/Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/android/app/src/main/AndroidManifest.xml:28:75-109
+71        </provider>
+72
+73        <!-- Force 120Hz Refresh Rate on Supported Devices -->
+74        <meta-data
+74-->/Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/android/app/src/main/AndroidManifest.xml:32:9-92
+75            android:name="android.vendor.display.refreshRate"
+75-->/Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/android/app/src/main/AndroidManifest.xml:32:20-69
+76            android:value="120" />
+76-->/Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/android/app/src/main/AndroidManifest.xml:32:70-89
+77        <meta-data
+77-->/Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/android/app/src/main/AndroidManifest.xml:33:9-89
+78            android:name="com.samsung.android.refreshRate"
+78-->/Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/android/app/src/main/AndroidManifest.xml:33:20-66
+79            android:value="120" />
+79-->/Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/android/app/src/main/AndroidManifest.xml:33:67-86
+80        <meta-data
+80-->/Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/android/app/src/main/AndroidManifest.xml:34:9-88
+81            android:name="com.oneplus.screen.refreshRate"
+81-->/Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/android/app/src/main/AndroidManifest.xml:34:20-65
+82            android:value="120" />
+82-->/Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/android/app/src/main/AndroidManifest.xml:34:66-85
+83
+84        <activity
+84-->[io.ionic.libs:ioncamera-android:1.0.2] /Users/yonesh/.gradle/caches/9.4.1/transforms/7e549c34a7eaebfd372d8ab8aca15496/transformed/ioncamera-android-1.0.2/AndroidManifest.xml:9:9-11:86
+85            android:name="io.ionic.libs.ioncameralib.view.IONCAMRLoadingActivity"
+85-->[io.ionic.libs:ioncamera-android:1.0.2] /Users/yonesh/.gradle/caches/9.4.1/transforms/7e549c34a7eaebfd372d8ab8aca15496/transformed/ioncamera-android-1.0.2/AndroidManifest.xml:10:13-82
+86            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />
+86-->[io.ionic.libs:ioncamera-android:1.0.2] /Users/yonesh/.gradle/caches/9.4.1/transforms/7e549c34a7eaebfd372d8ab8aca15496/transformed/ioncamera-android-1.0.2/AndroidManifest.xml:11:13-83
+87        <activity
+87-->[io.ionic.libs:ioncamera-android:1.0.2] /Users/yonesh/.gradle/caches/9.4.1/transforms/7e549c34a7eaebfd372d8ab8aca15496/transformed/ioncamera-android-1.0.2/AndroidManifest.xml:12:9-16:36
+88            android:name="io.ionic.libs.ioncameralib.view.IONCAMRImageEditorActivity"
+88-->[io.ionic.libs:ioncamera-android:1.0.2] /Users/yonesh/.gradle/caches/9.4.1/transforms/7e549c34a7eaebfd372d8ab8aca15496/transformed/ioncamera-android-1.0.2/AndroidManifest.xml:13:13-86
+89            android:enableOnBackInvokedCallback="true"
+89-->[io.ionic.libs:ioncamera-android:1.0.2] /Users/yonesh/.gradle/caches/9.4.1/transforms/7e549c34a7eaebfd372d8ab8aca15496/transformed/ioncamera-android-1.0.2/AndroidManifest.xml:14:13-55
+90            android:theme="@android:style/Theme.Black.NoTitleBar" />
+90-->[io.ionic.libs:ioncamera-android:1.0.2] /Users/yonesh/.gradle/caches/9.4.1/transforms/7e549c34a7eaebfd372d8ab8aca15496/transformed/ioncamera-android-1.0.2/AndroidManifest.xml:15:13-66
+91        <activity
+91-->[io.ionic.libs:ioncamera-android:1.0.2] /Users/yonesh/.gradle/caches/9.4.1/transforms/7e549c34a7eaebfd372d8ab8aca15496/transformed/ioncamera-android-1.0.2/AndroidManifest.xml:17:9-20:86
+92            android:name="io.ionic.libs.ioncameralib.view.IONCAMROpenPhotoPickerActivity"
+92-->[io.ionic.libs:ioncamera-android:1.0.2] /Users/yonesh/.gradle/caches/9.4.1/transforms/7e549c34a7eaebfd372d8ab8aca15496/transformed/ioncamera-android-1.0.2/AndroidManifest.xml:18:13-90
+93            android:exported="false"
+93-->[io.ionic.libs:ioncamera-android:1.0.2] /Users/yonesh/.gradle/caches/9.4.1/transforms/7e549c34a7eaebfd372d8ab8aca15496/transformed/ioncamera-android-1.0.2/AndroidManifest.xml:19:13-37
+94            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" /> <!-- Trigger Google Play services to install the backported photo picker module. -->
+94-->[io.ionic.libs:ioncamera-android:1.0.2] /Users/yonesh/.gradle/caches/9.4.1/transforms/7e549c34a7eaebfd372d8ab8aca15496/transformed/ioncamera-android-1.0.2/AndroidManifest.xml:20:13-83
+95        <service
+95-->[io.ionic.libs:ioncamera-android:1.0.2] /Users/yonesh/.gradle/caches/9.4.1/transforms/7e549c34a7eaebfd372d8ab8aca15496/transformed/ioncamera-android-1.0.2/AndroidManifest.xml:22:9-34:19
+96            android:name="com.google.android.gms.metadata.ModuleDependencies"
+96-->[io.ionic.libs:ioncamera-android:1.0.2] /Users/yonesh/.gradle/caches/9.4.1/transforms/7e549c34a7eaebfd372d8ab8aca15496/transformed/ioncamera-android-1.0.2/AndroidManifest.xml:23:13-78
+97            android:enabled="false"
+97-->[io.ionic.libs:ioncamera-android:1.0.2] /Users/yonesh/.gradle/caches/9.4.1/transforms/7e549c34a7eaebfd372d8ab8aca15496/transformed/ioncamera-android-1.0.2/AndroidManifest.xml:24:13-36
+98            android:exported="false" >
+98-->[io.ionic.libs:ioncamera-android:1.0.2] /Users/yonesh/.gradle/caches/9.4.1/transforms/7e549c34a7eaebfd372d8ab8aca15496/transformed/ioncamera-android-1.0.2/AndroidManifest.xml:25:13-37
+99            <intent-filter>
+99-->[io.ionic.libs:ioncamera-android:1.0.2] /Users/yonesh/.gradle/caches/9.4.1/transforms/7e549c34a7eaebfd372d8ab8aca15496/transformed/ioncamera-android-1.0.2/AndroidManifest.xml:27:13-29:29
+100                <action android:name="com.google.android.gms.metadata.MODULE_DEPENDENCIES" />
+100-->[io.ionic.libs:ioncamera-android:1.0.2] /Users/yonesh/.gradle/caches/9.4.1/transforms/7e549c34a7eaebfd372d8ab8aca15496/transformed/ioncamera-android-1.0.2/AndroidManifest.xml:28:17-94
+100-->[io.ionic.libs:ioncamera-android:1.0.2] /Users/yonesh/.gradle/caches/9.4.1/transforms/7e549c34a7eaebfd372d8ab8aca15496/transformed/ioncamera-android-1.0.2/AndroidManifest.xml:28:25-91
+101            </intent-filter>
+102
+103            <meta-data
+103-->[io.ionic.libs:ioncamera-android:1.0.2] /Users/yonesh/.gradle/caches/9.4.1/transforms/7e549c34a7eaebfd372d8ab8aca15496/transformed/ioncamera-android-1.0.2/AndroidManifest.xml:31:13-33:36
+104                android:name="photopicker_activity:0:required"
+104-->[io.ionic.libs:ioncamera-android:1.0.2] /Users/yonesh/.gradle/caches/9.4.1/transforms/7e549c34a7eaebfd372d8ab8aca15496/transformed/ioncamera-android-1.0.2/AndroidManifest.xml:32:17-63
+105                android:value="" />
+105-->[io.ionic.libs:ioncamera-android:1.0.2] /Users/yonesh/.gradle/caches/9.4.1/transforms/7e549c34a7eaebfd372d8ab8aca15496/transformed/ioncamera-android-1.0.2/AndroidManifest.xml:33:17-33
+106        </service>
+107
+108        <provider
+108-->[io.ionic.libs:ioncamera-android:1.0.2] /Users/yonesh/.gradle/caches/9.4.1/transforms/7e549c34a7eaebfd372d8ab8aca15496/transformed/ioncamera-android-1.0.2/AndroidManifest.xml:36:9-44:20
+109            android:name="io.ionic.libs.ioncameralib.IONCAMRFileProvider"
+109-->[io.ionic.libs:ioncamera-android:1.0.2] /Users/yonesh/.gradle/caches/9.4.1/transforms/7e549c34a7eaebfd372d8ab8aca15496/transformed/ioncamera-android-1.0.2/AndroidManifest.xml:37:13-74
+110            android:authorities="com.yogistudio.app.camera.provider"
+110-->[io.ionic.libs:ioncamera-android:1.0.2] /Users/yonesh/.gradle/caches/9.4.1/transforms/7e549c34a7eaebfd372d8ab8aca15496/transformed/ioncamera-android-1.0.2/AndroidManifest.xml:38:13-67
+111            android:exported="false"
+111-->[io.ionic.libs:ioncamera-android:1.0.2] /Users/yonesh/.gradle/caches/9.4.1/transforms/7e549c34a7eaebfd372d8ab8aca15496/transformed/ioncamera-android-1.0.2/AndroidManifest.xml:39:13-37
+112            android:grantUriPermissions="true" >
+112-->[io.ionic.libs:ioncamera-android:1.0.2] /Users/yonesh/.gradle/caches/9.4.1/transforms/7e549c34a7eaebfd372d8ab8aca15496/transformed/ioncamera-android-1.0.2/AndroidManifest.xml:40:13-47
+113            <meta-data
+113-->/Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/android/app/src/main/AndroidManifest.xml:28:13-112
+114                android:name="android.support.FILE_PROVIDER_PATHS"
+114-->/Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/android/app/src/main/AndroidManifest.xml:28:24-74
+115                android:resource="@xml/ioncamera_paths" />
+115-->/Users/yonesh/Projects/Yogi_Studio/Yogi_Studio_Frontend/android/app/src/main/AndroidManifest.xml:28:75-109
+116        </provider>
+117
+118        <activity
+118-->[com.google.firebase:firebase-auth:24.0.1] /Users/yonesh/.gradle/caches/9.4.1/transforms/1ef7aef3d30f133b2bfb8cc36589eddd/transformed/firebase-auth-24.0.1/AndroidManifest.xml:29:9-46:20
+119            android:name="com.google.firebase.auth.internal.GenericIdpActivity"
+119-->[com.google.firebase:firebase-auth:24.0.1] /Users/yonesh/.gradle/caches/9.4.1/transforms/1ef7aef3d30f133b2bfb8cc36589eddd/transformed/firebase-auth-24.0.1/AndroidManifest.xml:30:13-80
+120            android:excludeFromRecents="true"
+120-->[com.google.firebase:firebase-auth:24.0.1] /Users/yonesh/.gradle/caches/9.4.1/transforms/1ef7aef3d30f133b2bfb8cc36589eddd/transformed/firebase-auth-24.0.1/AndroidManifest.xml:31:13-46
+121            android:exported="true"
+121-->[com.google.firebase:firebase-auth:24.0.1] /Users/yonesh/.gradle/caches/9.4.1/transforms/1ef7aef3d30f133b2bfb8cc36589eddd/transformed/firebase-auth-24.0.1/AndroidManifest.xml:32:13-36
+122            android:launchMode="singleTask"
+122-->[com.google.firebase:firebase-auth:24.0.1] /Users/yonesh/.gradle/caches/9.4.1/transforms/1ef7aef3d30f133b2bfb8cc36589eddd/transformed/firebase-auth-24.0.1/AndroidManifest.xml:33:13-44
+123            android:theme="@android:style/Theme.Translucent.NoTitleBar" >
+123-->[com.google.firebase:firebase-auth:24.0.1] /Users/yonesh/.gradle/caches/9.4.1/transforms/1ef7aef3d30f133b2bfb8cc36589eddd/transformed/firebase-auth-24.0.1/AndroidManifest.xml:34:13-72
+124            <intent-filter>
+124-->[com.google.firebase:firebase-auth:24.0.1] /Users/yonesh/.gradle/caches/9.4.1/transforms/1ef7aef3d30f133b2bfb8cc36589eddd/transformed/firebase-auth-24.0.1/AndroidManifest.xml:35:13-45:29
+125                <action android:name="android.intent.action.VIEW" />
+125-->[com.google.firebase:firebase-auth:24.0.1] /Users/yonesh/.gradle/caches/9.4.1/transforms/1ef7aef3d30f133b2bfb8cc36589eddd/transformed/firebase-auth-24.0.1/AndroidManifest.xml:36:17-69
+125-->[com.google.firebase:firebase-auth:24.0.1] /Users/yonesh/.gradle/caches/9.4.1/transforms/1ef7aef3d30f133b2bfb8cc36589eddd/transformed/firebase-auth-24.0.1/AndroidManifest.xml:36:25-66
+126
+127                <category android:name="android.intent.category.DEFAULT" />
+127-->[com.google.firebase:firebase-auth:24.0.1] /Users/yonesh/.gradle/caches/9.4.1/transforms/1ef7aef3d30f133b2bfb8cc36589eddd/transformed/firebase-auth-24.0.1/AndroidManifest.xml:38:17-76
+127-->[com.google.firebase:firebase-auth:24.0.1] /Users/yonesh/.gradle/caches/9.4.1/transforms/1ef7aef3d30f133b2bfb8cc36589eddd/transformed/firebase-auth-24.0.1/AndroidManifest.xml:38:27-73
+128                <category android:name="android.intent.category.BROWSABLE" />
+128-->[com.google.firebase:firebase-auth:24.0.1] /Users/yonesh/.gradle/caches/9.4.1/transforms/1ef7aef3d30f133b2bfb8cc36589eddd/transformed/firebase-auth-24.0.1/AndroidManifest.xml:39:17-78
+128-->[com.google.firebase:firebase-auth:24.0.1] /Users/yonesh/.gradle/caches/9.4.1/transforms/1ef7aef3d30f133b2bfb8cc36589eddd/transformed/firebase-auth-24.0.1/AndroidManifest.xml:39:27-75
+129
+130                <data
+130-->[com.google.firebase:firebase-auth:24.0.1] /Users/yonesh/.gradle/caches/9.4.1/transforms/1ef7aef3d30f133b2bfb8cc36589eddd/transformed/firebase-auth-24.0.1/AndroidManifest.xml:41:17-44:51
+131                    android:host="firebase.auth"
+131-->[com.google.firebase:firebase-auth:24.0.1] /Users/yonesh/.gradle/caches/9.4.1/transforms/1ef7aef3d30f133b2bfb8cc36589eddd/transformed/firebase-auth-24.0.1/AndroidManifest.xml:42:21-49
+132                    android:path="/"
+132-->[com.google.firebase:firebase-auth:24.0.1] /Users/yonesh/.gradle/caches/9.4.1/transforms/1ef7aef3d30f133b2bfb8cc36589eddd/transformed/firebase-auth-24.0.1/AndroidManifest.xml:43:21-37
+133                    android:scheme="genericidp" />
+133-->[com.google.firebase:firebase-auth:24.0.1] /Users/yonesh/.gradle/caches/9.4.1/transforms/1ef7aef3d30f133b2bfb8cc36589eddd/transformed/firebase-auth-24.0.1/AndroidManifest.xml:44:21-48
+134            </intent-filter>
+135        </activity>
+136        <activity
+136-->[com.google.firebase:firebase-auth:24.0.1] /Users/yonesh/.gradle/caches/9.4.1/transforms/1ef7aef3d30f133b2bfb8cc36589eddd/transformed/firebase-auth-24.0.1/AndroidManifest.xml:47:9-64:20
+137            android:name="com.google.firebase.auth.internal.RecaptchaActivity"
+137-->[com.google.firebase:firebase-auth:24.0.1] /Users/yonesh/.gradle/caches/9.4.1/transforms/1ef7aef3d30f133b2bfb8cc36589eddd/transformed/firebase-auth-24.0.1/AndroidManifest.xml:48:13-79
+138            android:excludeFromRecents="true"
+138-->[com.google.firebase:firebase-auth:24.0.1] /Users/yonesh/.gradle/caches/9.4.1/transforms/1ef7aef3d30f133b2bfb8cc36589eddd/transformed/firebase-auth-24.0.1/AndroidManifest.xml:49:13-46
+139            android:exported="true"
+139-->[com.google.firebase:firebase-auth:24.0.1] /Users/yonesh/.gradle/caches/9.4.1/transforms/1ef7aef3d30f133b2bfb8cc36589eddd/transformed/firebase-auth-24.0.1/AndroidManifest.xml:50:13-36
+140            android:launchMode="singleTask"
+140-->[com.google.firebase:firebase-auth:24.0.1] /Users/yonesh/.gradle/caches/9.4.1/transforms/1ef7aef3d30f133b2bfb8cc36589eddd/transformed/firebase-auth-24.0.1/AndroidManifest.xml:51:13-44
+141            android:theme="@android:style/Theme.Translucent.NoTitleBar" >
+141-->[com.google.firebase:firebase-auth:24.0.1] /Users/yonesh/.gradle/caches/9.4.1/transforms/1ef7aef3d30f133b2bfb8cc36589eddd/transformed/firebase-auth-24.0.1/AndroidManifest.xml:52:13-72
+142            <intent-filter>
+142-->[com.google.firebase:firebase-auth:24.0.1] /Users/yonesh/.gradle/caches/9.4.1/transforms/1ef7aef3d30f133b2bfb8cc36589eddd/transformed/firebase-auth-24.0.1/AndroidManifest.xml:53:13-63:29
+143                <action android:name="android.intent.action.VIEW" />
+143-->[com.google.firebase:firebase-auth:24.0.1] /Users/yonesh/.gradle/caches/9.4.1/transforms/1ef7aef3d30f133b2bfb8cc36589eddd/transformed/firebase-auth-24.0.1/AndroidManifest.xml:36:17-69
+143-->[com.google.firebase:firebase-auth:24.0.1] /Users/yonesh/.gradle/caches/9.4.1/transforms/1ef7aef3d30f133b2bfb8cc36589eddd/transformed/firebase-auth-24.0.1/AndroidManifest.xml:36:25-66
+144
+145                <category android:name="android.intent.category.DEFAULT" />
+145-->[com.google.firebase:firebase-auth:24.0.1] /Users/yonesh/.gradle/caches/9.4.1/transforms/1ef7aef3d30f133b2bfb8cc36589eddd/transformed/firebase-auth-24.0.1/AndroidManifest.xml:38:17-76
+145-->[com.google.firebase:firebase-auth:24.0.1] /Users/yonesh/.gradle/caches/9.4.1/transforms/1ef7aef3d30f133b2bfb8cc36589eddd/transformed/firebase-auth-24.0.1/AndroidManifest.xml:38:27-73
+146                <category android:name="android.intent.category.BROWSABLE" />
+146-->[com.google.firebase:firebase-auth:24.0.1] /Users/yonesh/.gradle/caches/9.4.1/transforms/1ef7aef3d30f133b2bfb8cc36589eddd/transformed/firebase-auth-24.0.1/AndroidManifest.xml:39:17-78
+146-->[com.google.firebase:firebase-auth:24.0.1] /Users/yonesh/.gradle/caches/9.4.1/transforms/1ef7aef3d30f133b2bfb8cc36589eddd/transformed/firebase-auth-24.0.1/AndroidManifest.xml:39:27-75
+147
+148                <data
+148-->[com.google.firebase:firebase-auth:24.0.1] /Users/yonesh/.gradle/caches/9.4.1/transforms/1ef7aef3d30f133b2bfb8cc36589eddd/transformed/firebase-auth-24.0.1/AndroidManifest.xml:41:17-44:51
+149                    android:host="firebase.auth"
+149-->[com.google.firebase:firebase-auth:24.0.1] /Users/yonesh/.gradle/caches/9.4.1/transforms/1ef7aef3d30f133b2bfb8cc36589eddd/transformed/firebase-auth-24.0.1/AndroidManifest.xml:42:21-49
+150                    android:path="/"
+150-->[com.google.firebase:firebase-auth:24.0.1] /Users/yonesh/.gradle/caches/9.4.1/transforms/1ef7aef3d30f133b2bfb8cc36589eddd/transformed/firebase-auth-24.0.1/AndroidManifest.xml:43:21-37
+151                    android:scheme="recaptcha" />
+151-->[com.google.firebase:firebase-auth:24.0.1] /Users/yonesh/.gradle/caches/9.4.1/transforms/1ef7aef3d30f133b2bfb8cc36589eddd/transformed/firebase-auth-24.0.1/AndroidManifest.xml:44:21-48
+152            </intent-filter>
+153        </activity>
+154
+155        <service
+155-->[com.google.firebase:firebase-auth:24.0.1] /Users/yonesh/.gradle/caches/9.4.1/transforms/1ef7aef3d30f133b2bfb8cc36589eddd/transformed/firebase-auth-24.0.1/AndroidManifest.xml:66:9-72:19
+156            android:name="com.google.firebase.components.ComponentDiscoveryService"
+156-->[com.google.firebase:firebase-auth:24.0.1] /Users/yonesh/.gradle/caches/9.4.1/transforms/1ef7aef3d30f133b2bfb8cc36589eddd/transformed/firebase-auth-24.0.1/AndroidManifest.xml:67:13-84
+157            android:directBootAware="true"
+157-->[com.google.firebase:firebase-common:21.0.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/0513634e8a26a33e1f9185465bdf96b8/transformed/firebase-common-21.0.0/AndroidManifest.xml:32:13-43
+158            android:exported="false" >
+158-->[com.google.firebase:firebase-auth:24.0.1] /Users/yonesh/.gradle/caches/9.4.1/transforms/1ef7aef3d30f133b2bfb8cc36589eddd/transformed/firebase-auth-24.0.1/AndroidManifest.xml:68:13-37
+159            <meta-data
+159-->[com.google.firebase:firebase-auth:24.0.1] /Users/yonesh/.gradle/caches/9.4.1/transforms/1ef7aef3d30f133b2bfb8cc36589eddd/transformed/firebase-auth-24.0.1/AndroidManifest.xml:69:13-71:85
+160                android:name="com.google.firebase.components:com.google.firebase.auth.FirebaseAuthRegistrar"
+160-->[com.google.firebase:firebase-auth:24.0.1] /Users/yonesh/.gradle/caches/9.4.1/transforms/1ef7aef3d30f133b2bfb8cc36589eddd/transformed/firebase-auth-24.0.1/AndroidManifest.xml:70:17-109
+161                android:value="com.google.firebase.components.ComponentRegistrar" />
+161-->[com.google.firebase:firebase-auth:24.0.1] /Users/yonesh/.gradle/caches/9.4.1/transforms/1ef7aef3d30f133b2bfb8cc36589eddd/transformed/firebase-auth-24.0.1/AndroidManifest.xml:71:17-82
+162            <meta-data
+162-->[com.google.firebase:firebase-common:21.0.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/0513634e8a26a33e1f9185465bdf96b8/transformed/firebase-common-21.0.0/AndroidManifest.xml:35:13-37:85
+163                android:name="com.google.firebase.components:com.google.firebase.FirebaseCommonKtxRegistrar"
+163-->[com.google.firebase:firebase-common:21.0.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/0513634e8a26a33e1f9185465bdf96b8/transformed/firebase-common-21.0.0/AndroidManifest.xml:36:17-109
+164                android:value="com.google.firebase.components.ComponentRegistrar" />
+164-->[com.google.firebase:firebase-common:21.0.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/0513634e8a26a33e1f9185465bdf96b8/transformed/firebase-common-21.0.0/AndroidManifest.xml:37:17-82
+165        </service>
+166        <service
+166-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /Users/yonesh/.gradle/caches/9.4.1/transforms/75fe21640d37991830b3cfa2063ebac9/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:24:9-32:19
+167            android:name="androidx.credentials.playservices.CredentialProviderMetadataHolder"
+167-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /Users/yonesh/.gradle/caches/9.4.1/transforms/75fe21640d37991830b3cfa2063ebac9/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:25:13-94
+168            android:enabled="true"
+168-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /Users/yonesh/.gradle/caches/9.4.1/transforms/75fe21640d37991830b3cfa2063ebac9/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:26:13-35
+169            android:exported="false" >
+169-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /Users/yonesh/.gradle/caches/9.4.1/transforms/75fe21640d37991830b3cfa2063ebac9/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:27:13-37
+170            <meta-data
+170-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /Users/yonesh/.gradle/caches/9.4.1/transforms/75fe21640d37991830b3cfa2063ebac9/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:29:13-31:104
+171                android:name="androidx.credentials.CREDENTIAL_PROVIDER_KEY"
+171-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /Users/yonesh/.gradle/caches/9.4.1/transforms/75fe21640d37991830b3cfa2063ebac9/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:30:17-76
+172                android:value="androidx.credentials.playservices.CredentialProviderPlayServicesImpl" />
+172-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /Users/yonesh/.gradle/caches/9.4.1/transforms/75fe21640d37991830b3cfa2063ebac9/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:31:17-101
+173        </service>
+174
+175        <activity
+175-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /Users/yonesh/.gradle/caches/9.4.1/transforms/75fe21640d37991830b3cfa2063ebac9/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:34:9-41:20
+176            android:name="androidx.credentials.playservices.HiddenActivity"
+176-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /Users/yonesh/.gradle/caches/9.4.1/transforms/75fe21640d37991830b3cfa2063ebac9/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:35:13-76
+177            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
+177-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /Users/yonesh/.gradle/caches/9.4.1/transforms/75fe21640d37991830b3cfa2063ebac9/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:36:13-87
+178            android:enabled="true"
+178-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /Users/yonesh/.gradle/caches/9.4.1/transforms/75fe21640d37991830b3cfa2063ebac9/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:37:13-35
+179            android:exported="false"
+179-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /Users/yonesh/.gradle/caches/9.4.1/transforms/75fe21640d37991830b3cfa2063ebac9/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:38:13-37
+180            android:fitsSystemWindows="true"
+180-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /Users/yonesh/.gradle/caches/9.4.1/transforms/75fe21640d37991830b3cfa2063ebac9/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:39:13-45
+181            android:theme="@style/Theme.Hidden" >
+181-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] /Users/yonesh/.gradle/caches/9.4.1/transforms/75fe21640d37991830b3cfa2063ebac9/transformed/credentials-play-services-auth-1.2.0-rc01/AndroidManifest.xml:40:13-48
+182        </activity>
+183        <activity
+183-->[com.google.android.gms:play-services-auth:20.7.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/9da21d8c6d9da1753a157876258ec169/transformed/play-services-auth-20.7.0/AndroidManifest.xml:23:9-27:75
+184            android:name="com.google.android.gms.auth.api.signin.internal.SignInHubActivity"
+184-->[com.google.android.gms:play-services-auth:20.7.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/9da21d8c6d9da1753a157876258ec169/transformed/play-services-auth-20.7.0/AndroidManifest.xml:24:13-93
+185            android:excludeFromRecents="true"
+185-->[com.google.android.gms:play-services-auth:20.7.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/9da21d8c6d9da1753a157876258ec169/transformed/play-services-auth-20.7.0/AndroidManifest.xml:25:13-46
+186            android:exported="false"
+186-->[com.google.android.gms:play-services-auth:20.7.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/9da21d8c6d9da1753a157876258ec169/transformed/play-services-auth-20.7.0/AndroidManifest.xml:26:13-37
+187            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+187-->[com.google.android.gms:play-services-auth:20.7.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/9da21d8c6d9da1753a157876258ec169/transformed/play-services-auth-20.7.0/AndroidManifest.xml:27:13-72
+188        <!--
+189            Service handling Google Sign-In user revocation. For apps that do not integrate with
+190            Google Sign-In, this service will never be started.
+191        -->
+192        <service
+192-->[com.google.android.gms:play-services-auth:20.7.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/9da21d8c6d9da1753a157876258ec169/transformed/play-services-auth-20.7.0/AndroidManifest.xml:33:9-37:51
+193            android:name="com.google.android.gms.auth.api.signin.RevocationBoundService"
+193-->[com.google.android.gms:play-services-auth:20.7.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/9da21d8c6d9da1753a157876258ec169/transformed/play-services-auth-20.7.0/AndroidManifest.xml:34:13-89
+194            android:exported="true"
+194-->[com.google.android.gms:play-services-auth:20.7.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/9da21d8c6d9da1753a157876258ec169/transformed/play-services-auth-20.7.0/AndroidManifest.xml:35:13-36
+195            android:permission="com.google.android.gms.auth.api.signin.permission.REVOCATION_NOTIFICATION"
+195-->[com.google.android.gms:play-services-auth:20.7.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/9da21d8c6d9da1753a157876258ec169/transformed/play-services-auth-20.7.0/AndroidManifest.xml:36:13-107
+196            android:visibleToInstantApps="true" />
+196-->[com.google.android.gms:play-services-auth:20.7.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/9da21d8c6d9da1753a157876258ec169/transformed/play-services-auth-20.7.0/AndroidManifest.xml:37:13-48
+197
+198        <provider
+198-->[com.google.firebase:firebase-common:21.0.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/0513634e8a26a33e1f9185465bdf96b8/transformed/firebase-common-21.0.0/AndroidManifest.xml:23:9-28:39
+199            android:name="com.google.firebase.provider.FirebaseInitProvider"
+199-->[com.google.firebase:firebase-common:21.0.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/0513634e8a26a33e1f9185465bdf96b8/transformed/firebase-common-21.0.0/AndroidManifest.xml:24:13-77
+200            android:authorities="com.yogistudio.app.firebaseinitprovider"
+200-->[com.google.firebase:firebase-common:21.0.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/0513634e8a26a33e1f9185465bdf96b8/transformed/firebase-common-21.0.0/AndroidManifest.xml:25:13-72
+201            android:directBootAware="true"
+201-->[com.google.firebase:firebase-common:21.0.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/0513634e8a26a33e1f9185465bdf96b8/transformed/firebase-common-21.0.0/AndroidManifest.xml:26:13-43
+202            android:exported="false"
+202-->[com.google.firebase:firebase-common:21.0.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/0513634e8a26a33e1f9185465bdf96b8/transformed/firebase-common-21.0.0/AndroidManifest.xml:27:13-37
+203            android:initOrder="100" />
+203-->[com.google.firebase:firebase-common:21.0.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/0513634e8a26a33e1f9185465bdf96b8/transformed/firebase-common-21.0.0/AndroidManifest.xml:28:13-36
+204
+205        <activity
+205-->[com.google.android.gms:play-services-base:18.0.1] /Users/yonesh/.gradle/caches/9.4.1/transforms/de6b4da041f2007f91b2c5ca7da8c3ab/transformed/play-services-base-18.0.1/AndroidManifest.xml:20:9-22:45
+206            android:name="com.google.android.gms.common.api.GoogleApiActivity"
+206-->[com.google.android.gms:play-services-base:18.0.1] /Users/yonesh/.gradle/caches/9.4.1/transforms/de6b4da041f2007f91b2c5ca7da8c3ab/transformed/play-services-base-18.0.1/AndroidManifest.xml:20:19-85
+207            android:exported="false"
+207-->[com.google.android.gms:play-services-base:18.0.1] /Users/yonesh/.gradle/caches/9.4.1/transforms/de6b4da041f2007f91b2c5ca7da8c3ab/transformed/play-services-base-18.0.1/AndroidManifest.xml:22:19-43
+208            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+208-->[com.google.android.gms:play-services-base:18.0.1] /Users/yonesh/.gradle/caches/9.4.1/transforms/de6b4da041f2007f91b2c5ca7da8c3ab/transformed/play-services-base-18.0.1/AndroidManifest.xml:21:19-78
+209
+210        <provider
+210-->[androidx.emoji2:emoji2:1.3.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/b48d0f5ba0377595f86ba8b657872d73/transformed/emoji2-1.3.0/AndroidManifest.xml:24:9-32:20
+211            android:name="androidx.startup.InitializationProvider"
+211-->[androidx.emoji2:emoji2:1.3.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/b48d0f5ba0377595f86ba8b657872d73/transformed/emoji2-1.3.0/AndroidManifest.xml:25:13-67
+212            android:authorities="com.yogistudio.app.androidx-startup"
+212-->[androidx.emoji2:emoji2:1.3.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/b48d0f5ba0377595f86ba8b657872d73/transformed/emoji2-1.3.0/AndroidManifest.xml:26:13-68
+213            android:exported="false" >
+213-->[androidx.emoji2:emoji2:1.3.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/b48d0f5ba0377595f86ba8b657872d73/transformed/emoji2-1.3.0/AndroidManifest.xml:27:13-37
+214            <meta-data
+214-->[androidx.emoji2:emoji2:1.3.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/b48d0f5ba0377595f86ba8b657872d73/transformed/emoji2-1.3.0/AndroidManifest.xml:29:13-31:52
+215                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+215-->[androidx.emoji2:emoji2:1.3.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/b48d0f5ba0377595f86ba8b657872d73/transformed/emoji2-1.3.0/AndroidManifest.xml:30:17-75
+216                android:value="androidx.startup" />
+216-->[androidx.emoji2:emoji2:1.3.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/b48d0f5ba0377595f86ba8b657872d73/transformed/emoji2-1.3.0/AndroidManifest.xml:31:17-49
+217            <meta-data
+217-->[androidx.lifecycle:lifecycle-process:2.6.2] /Users/yonesh/.gradle/caches/9.4.1/transforms/e64215fee3bd95ef93c74c762a83f4a8/transformed/lifecycle-process-2.6.2/AndroidManifest.xml:29:13-31:52
+218                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+218-->[androidx.lifecycle:lifecycle-process:2.6.2] /Users/yonesh/.gradle/caches/9.4.1/transforms/e64215fee3bd95ef93c74c762a83f4a8/transformed/lifecycle-process-2.6.2/AndroidManifest.xml:30:17-78
+219                android:value="androidx.startup" />
+219-->[androidx.lifecycle:lifecycle-process:2.6.2] /Users/yonesh/.gradle/caches/9.4.1/transforms/e64215fee3bd95ef93c74c762a83f4a8/transformed/lifecycle-process-2.6.2/AndroidManifest.xml:31:17-49
+220            <meta-data
+220-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/9474c6508fac577fd68504f9fc5d2750/transformed/profileinstaller-1.4.0/AndroidManifest.xml:29:13-31:52
+221                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+221-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/9474c6508fac577fd68504f9fc5d2750/transformed/profileinstaller-1.4.0/AndroidManifest.xml:30:17-85
+222                android:value="androidx.startup" />
+222-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/9474c6508fac577fd68504f9fc5d2750/transformed/profileinstaller-1.4.0/AndroidManifest.xml:31:17-49
+223        </provider>
+224        <!--
+225        Service for holding metadata. Cannot be instantiated.
+226        Metadata will be merged from other manifests.
+227        -->
+228        <service
+228-->[androidx.camera:camera-core:1.4.2] /Users/yonesh/.gradle/caches/9.4.1/transforms/3007ac324d7bd3fe1ac8818a61ece4e6/transformed/camera-core-1.4.2/AndroidManifest.xml:29:9-33:78
+229            android:name="androidx.camera.core.impl.MetadataHolderService"
+229-->[androidx.camera:camera-core:1.4.2] /Users/yonesh/.gradle/caches/9.4.1/transforms/3007ac324d7bd3fe1ac8818a61ece4e6/transformed/camera-core-1.4.2/AndroidManifest.xml:30:13-75
+230            android:enabled="false"
+230-->[androidx.camera:camera-core:1.4.2] /Users/yonesh/.gradle/caches/9.4.1/transforms/3007ac324d7bd3fe1ac8818a61ece4e6/transformed/camera-core-1.4.2/AndroidManifest.xml:31:13-36
+231            android:exported="false" />
+231-->[androidx.camera:camera-core:1.4.2] /Users/yonesh/.gradle/caches/9.4.1/transforms/3007ac324d7bd3fe1ac8818a61ece4e6/transformed/camera-core-1.4.2/AndroidManifest.xml:32:13-37
+232
+233        <meta-data
+233-->[com.google.android.gms:play-services-basement:18.4.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/58a2efbc53d8253117cbb0c595b8c9d5/transformed/play-services-basement-18.4.0/AndroidManifest.xml:6:9-122
+234            android:name="com.google.android.gms.version"
+234-->[com.google.android.gms:play-services-basement:18.4.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/58a2efbc53d8253117cbb0c595b8c9d5/transformed/play-services-basement-18.4.0/AndroidManifest.xml:6:20-65
+235            android:value="@integer/google_play_services_version" />
+235-->[com.google.android.gms:play-services-basement:18.4.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/58a2efbc53d8253117cbb0c595b8c9d5/transformed/play-services-basement-18.4.0/AndroidManifest.xml:6:66-119
+236
+237        <receiver
+237-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/9474c6508fac577fd68504f9fc5d2750/transformed/profileinstaller-1.4.0/AndroidManifest.xml:34:9-52:20
+238            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+238-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/9474c6508fac577fd68504f9fc5d2750/transformed/profileinstaller-1.4.0/AndroidManifest.xml:35:13-76
+239            android:directBootAware="false"
+239-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/9474c6508fac577fd68504f9fc5d2750/transformed/profileinstaller-1.4.0/AndroidManifest.xml:36:13-44
+240            android:enabled="true"
+240-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/9474c6508fac577fd68504f9fc5d2750/transformed/profileinstaller-1.4.0/AndroidManifest.xml:37:13-35
+241            android:exported="true"
+241-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/9474c6508fac577fd68504f9fc5d2750/transformed/profileinstaller-1.4.0/AndroidManifest.xml:38:13-36
+242            android:permission="android.permission.DUMP" >
+242-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/9474c6508fac577fd68504f9fc5d2750/transformed/profileinstaller-1.4.0/AndroidManifest.xml:39:13-57
+243            <intent-filter>
+243-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/9474c6508fac577fd68504f9fc5d2750/transformed/profileinstaller-1.4.0/AndroidManifest.xml:40:13-42:29
+244                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+244-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/9474c6508fac577fd68504f9fc5d2750/transformed/profileinstaller-1.4.0/AndroidManifest.xml:41:17-91
+244-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/9474c6508fac577fd68504f9fc5d2750/transformed/profileinstaller-1.4.0/AndroidManifest.xml:41:25-88
+245            </intent-filter>
+246            <intent-filter>
+246-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/9474c6508fac577fd68504f9fc5d2750/transformed/profileinstaller-1.4.0/AndroidManifest.xml:43:13-45:29
+247                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+247-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/9474c6508fac577fd68504f9fc5d2750/transformed/profileinstaller-1.4.0/AndroidManifest.xml:44:17-85
+247-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/9474c6508fac577fd68504f9fc5d2750/transformed/profileinstaller-1.4.0/AndroidManifest.xml:44:25-82
+248            </intent-filter>
+249            <intent-filter>
+249-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/9474c6508fac577fd68504f9fc5d2750/transformed/profileinstaller-1.4.0/AndroidManifest.xml:46:13-48:29
+250                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+250-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/9474c6508fac577fd68504f9fc5d2750/transformed/profileinstaller-1.4.0/AndroidManifest.xml:47:17-88
+250-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/9474c6508fac577fd68504f9fc5d2750/transformed/profileinstaller-1.4.0/AndroidManifest.xml:47:25-85
+251            </intent-filter>
+252            <intent-filter>
+252-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/9474c6508fac577fd68504f9fc5d2750/transformed/profileinstaller-1.4.0/AndroidManifest.xml:49:13-51:29
+253                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+253-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/9474c6508fac577fd68504f9fc5d2750/transformed/profileinstaller-1.4.0/AndroidManifest.xml:50:17-95
+253-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/yonesh/.gradle/caches/9.4.1/transforms/9474c6508fac577fd68504f9fc5d2750/transformed/profileinstaller-1.4.0/AndroidManifest.xml:50:25-92
+254            </intent-filter>
+255        </receiver> <!-- The activities will be merged into the manifest of the hosting app. -->
+256        <activity
+256-->[com.google.android.play:core-common:2.0.3] /Users/yonesh/.gradle/caches/9.4.1/transforms/2a14af0c919c5d5dc58386cc0853a7d2/transformed/core-common-2.0.3/AndroidManifest.xml:14:9-18:65
+257            android:name="com.google.android.play.core.common.PlayCoreDialogWrapperActivity"
+257-->[com.google.android.play:core-common:2.0.3] /Users/yonesh/.gradle/caches/9.4.1/transforms/2a14af0c919c5d5dc58386cc0853a7d2/transformed/core-common-2.0.3/AndroidManifest.xml:15:13-93
+258            android:exported="false"
+258-->[com.google.android.play:core-common:2.0.3] /Users/yonesh/.gradle/caches/9.4.1/transforms/2a14af0c919c5d5dc58386cc0853a7d2/transformed/core-common-2.0.3/AndroidManifest.xml:16:13-37
+259            android:stateNotNeeded="true"
+259-->[com.google.android.play:core-common:2.0.3] /Users/yonesh/.gradle/caches/9.4.1/transforms/2a14af0c919c5d5dc58386cc0853a7d2/transformed/core-common-2.0.3/AndroidManifest.xml:17:13-42
+260            android:theme="@style/Theme.PlayCore.Transparent" />
+260-->[com.google.android.play:core-common:2.0.3] /Users/yonesh/.gradle/caches/9.4.1/transforms/2a14af0c919c5d5dc58386cc0853a7d2/transformed/core-common-2.0.3/AndroidManifest.xml:18:13-62
+261    </application>
+262
+263</manifest>
