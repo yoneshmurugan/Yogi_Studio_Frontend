@@ -165,8 +165,8 @@ export default function LoginPage({ onLoginSuccess, onBack }) {
       const idToken = await userCredential.user.getIdToken(true);
       
       // Store token for backend auth verification
-      sessionStorage.setItem('adminToken', idToken);
-      sessionStorage.setItem('adminAuth', 'true'); // Keep for UI state backward compatibility
+      localStorage.setItem('adminToken', idToken);
+      localStorage.setItem('adminAuth', 'true'); // Keep for UI state backward compatibility
       
       onLoginSuccess('admin');
     } catch (err) {
