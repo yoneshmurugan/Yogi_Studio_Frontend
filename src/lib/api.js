@@ -19,10 +19,10 @@ export const adminFetch = async (path, options = {}) => {
 
   const headers = {
     ...options.headers,
-    ...(token ? { 'Authorization': \`Bearer ${token}\` } : {})
+    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
   };
 
-  const url = \`${import.meta.env.VITE_API_BASE_URL}${path}\`;
+  const url = `${import.meta.env.VITE_API_BASE_URL}${path}`;
   const response = await fetch(url, { ...options, headers });
   
   if (response.status === 401 || response.status === 403) {
