@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Camera, Calendar, Folder, FileImage, CheckCircle2, ArrowLeft } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Camera, Calendar, Folder, FileImage, CheckCircle2, ArrowLeft, LogOut, AlertTriangle } from 'lucide-react';
 import WelcomeHeader from './WelcomeHeader';
 import FolderGrid from './FolderGrid';
 import PhotoGrid from './PhotoGrid';
@@ -48,6 +48,13 @@ function CustomerPortalInner() {
   const error = queryError?.message || '';
 
   const [activeEvent, setActiveEvent] = useState(null);
+  const [showSignoutModal, setShowSignoutModal] = useState(false);
+
+  const handleSignout = () => {
+    localStorage.removeItem('studio_session_token');
+    sessionStorage.removeItem('redirectUrl');
+    navigate('/');
+  };
 
   const activeFolderId = folderId ? parseInt(folderId, 10) : null;
   
@@ -300,6 +307,14 @@ function CustomerPortalInner() {
         {/* Background Effects */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gold/5 rounded-full blur-[100px] pointer-events-none" />
         
+        {/* Floating signout button */}
+        <button
+          onClick={() => setShowSignoutModal(true)}
+          className="absolute top-5 right-5 flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 hover:bg-red-500/10 border border-white/10 hover:border-red-500/30 text-zinc-400 hover:text-red-400 transition-all text-sm"
+        >
+          <LogOut className="w-4 h-4" /> Sign Out
+        </button>
+
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -320,13 +335,51 @@ function CustomerPortalInner() {
             We will notify you as soon as your photos are ready to be viewed!
           </p>
           
-          <button 
-            onClick={() => navigate('/')} 
-            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-gold text-black font-medium tracking-wide uppercase text-sm hover:bg-gold-light transition-colors shadow-lg shadow-gold/20 cursor-pointer"
-          >
-            <ArrowLeft className="w-4 h-4" /> Return to Website
-          </button>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <button 
+              onClick={() => navigate('/')} 
+              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-gold text-black font-medium tracking-wide uppercase text-sm hover:bg-gold-light transition-colors shadow-lg shadow-gold/20 cursor-pointer"
+            >
+              <ArrowLeft className="w-4 h-4" /> Return to Website
+            </button>
+            <button
+              onClick={() => setShowSignoutModal(true)}
+              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full border border-white/10 text-zinc-400 hover:text-red-400 hover:border-red-500/30 hover:bg-red-500/5 transition-all text-sm cursor-pointer"
+            >
+              <LogOut className="w-4 h-4" /> Sign Out
+            </button>
+          </div>
         </motion.div>
+
+        {/* Signout Modal */}
+        <AnimatePresence>
+          {showSignoutModal && (
+            <motion.div
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[200] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+            >
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                className="w-full max-w-sm bg-[#0f0f0f] border border-zinc-800 rounded-2xl p-8 text-center shadow-2xl"
+              >
+                <div className="w-14 h-14 mx-auto mb-5 bg-red-500/10 rounded-full flex items-center justify-center border border-red-500/20">
+                  <AlertTriangle className="w-7 h-7 text-red-400" />
+                </div>
+                <h3 className="text-xl font-semibold text-white mb-2">Sign Out?</h3>
+                <p className="text-zinc-500 text-sm mb-7 leading-relaxed">
+                  You will be signed out of your gallery portal.<br />You can log back in anytime with your phone number.
+                </p>
+                <div className="flex gap-3">
+                  <button onClick={() => setShowSignoutModal(false)} className="flex-1 py-2.5 rounded-xl border border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-500 transition-colors text-sm font-medium">Cancel</button>
+                  <button onClick={handleSignout} className="flex-1 py-2.5 rounded-xl bg-red-500 hover:bg-red-600 text-white transition-colors text-sm font-semibold">Yes, Sign Out</button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     );
   }
@@ -373,6 +426,14 @@ function CustomerPortalInner() {
           className="absolute bottom-[-10%] right-[-10%] w-[50vw] h-[50vw] bg-white/5 blur-[100px] rounded-full pointer-events-none mix-blend-screen" 
         />
         
+        {/* Floating signout button */}
+        <button
+          onClick={() => setShowSignoutModal(true)}
+          className="absolute top-5 right-5 z-20 flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 hover:bg-red-500/10 border border-white/10 hover:border-red-500/30 text-zinc-400 hover:text-red-400 transition-all text-sm"
+        >
+          <LogOut className="w-4 h-4" /> Sign Out
+        </button>
+
         {/* Top Icon / Avatar */}
         <motion.div 
           initial={{ opacity: 0, scale: 0.8, rotate: -10 }} 
@@ -492,6 +553,36 @@ function CustomerPortalInner() {
             );
           })}
         </motion.div>
+
+        {/* Signout Modal */}
+        <AnimatePresence>
+          {showSignoutModal && (
+            <motion.div
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[200] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+            >
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                className="w-full max-w-sm bg-[#0f0f0f] border border-zinc-800 rounded-2xl p-8 text-center shadow-2xl"
+              >
+                <div className="w-14 h-14 mx-auto mb-5 bg-red-500/10 rounded-full flex items-center justify-center border border-red-500/20">
+                  <AlertTriangle className="w-7 h-7 text-red-400" />
+                </div>
+                <h3 className="text-xl font-semibold text-white mb-2">Sign Out?</h3>
+                <p className="text-zinc-500 text-sm mb-7 leading-relaxed">
+                  You will be signed out of your gallery portal.<br />You can log back in anytime with your phone number.
+                </p>
+                <div className="flex gap-3">
+                  <button onClick={() => setShowSignoutModal(false)} className="flex-1 py-2.5 rounded-xl border border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-500 transition-colors text-sm font-medium">Cancel</button>
+                  <button onClick={handleSignout} className="flex-1 py-2.5 rounded-xl bg-red-500 hover:bg-red-600 text-white transition-colors text-sm font-semibold">Yes, Sign Out</button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     );
   }
@@ -532,6 +623,44 @@ function CustomerPortalInner() {
 
       <div className="relative z-10 px-4 md:px-8 lg:px-16 pt-16 pb-36 max-w-7xl mx-auto">
         
+        {/* Floating signout button */}
+        <button
+          onClick={() => setShowSignoutModal(true)}
+          className="fixed top-4 right-4 z-50 flex items-center gap-2 px-4 py-2 rounded-full bg-black/60 hover:bg-red-500/10 border border-white/10 hover:border-red-500/30 text-zinc-400 hover:text-red-400 transition-all text-sm backdrop-blur-sm"
+        >
+          <LogOut className="w-4 h-4" /> Sign Out
+        </button>
+
+        {/* Signout Modal */}
+        <AnimatePresence>
+          {showSignoutModal && (
+            <motion.div
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[200] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+            >
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                className="w-full max-w-sm bg-[#0f0f0f] border border-zinc-800 rounded-2xl p-8 text-center shadow-2xl"
+              >
+                <div className="w-14 h-14 mx-auto mb-5 bg-red-500/10 rounded-full flex items-center justify-center border border-red-500/20">
+                  <AlertTriangle className="w-7 h-7 text-red-400" />
+                </div>
+                <h3 className="text-xl font-semibold text-white mb-2">Sign Out?</h3>
+                <p className="text-zinc-500 text-sm mb-7 leading-relaxed">
+                  You will be signed out of your gallery portal.<br />You can log back in anytime with your phone number.
+                </p>
+                <div className="flex gap-3">
+                  <button onClick={() => setShowSignoutModal(false)} className="flex-1 py-2.5 rounded-xl border border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-500 transition-colors text-sm font-medium">Cancel</button>
+                  <button onClick={handleSignout} className="flex-1 py-2.5 rounded-xl bg-red-500 hover:bg-red-600 text-white transition-colors text-sm font-semibold">Yes, Sign Out</button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Event Header is always visible at the top */}
         <WelcomeHeader
           coupleName={eventInfo?.coupleName}

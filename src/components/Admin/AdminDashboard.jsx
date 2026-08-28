@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import {
   LayoutDashboard, UserPlus, Images, Users,
-  ChevronLeft, ChevronRight, LogOut, Camera, Menu, X
+  ChevronLeft, ChevronRight, LogOut, Camera, Menu, X, AlertTriangle
 } from 'lucide-react';
 import AdminOverview    from './AdminOverview';
 import AddUserSection   from './AddUserSection';
@@ -11,7 +11,8 @@ import PortfolioManager from './PortfolioManager';
 import UserManagement   from './UserManagement';
 import AIPhotoModel     from './AIPhotoModel';
 import { ref, deleteObject, listAll } from 'firebase/storage';
-import { storage } from '../../lib/firebase';
+import { storage, auth } from '../../lib/firebase';
+import { signOut } from 'firebase/auth';
 import yogiLogo from '../../assets/Headerlogo.png';
 import { adminFetch } from '../../lib/api';
 
@@ -50,10 +51,18 @@ export default function AdminDashboard() {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   
   // Extract 'overview', 'users', etc. from the URL
   const pathParts = location.pathname.split('/');
   const activeTab = pathParts[2] || 'overview';
+
+  const handleLogout = async () => {
+    try { await signOut(auth); } catch (e) {}
+    localStorage.removeItem('adminToken');
+    localStorage.removeItem('adminAuth');
+    navigate('/');
+  };
 
   // ── Shared state ─────────────────────────────────────────────────────────
   const [users,   setUsers]   = useState([]);
@@ -462,7 +471,7 @@ export default function AdminDashboard() {
             <div className="w-8 h-8 md:w-9 md:h-9 rounded-full flex items-center justify-center shrink-0 overflow-hidden border border-white/10">
               <img src={yogiLogo} alt="Admin Profile" className="w-full h-full object-cover" />
             </div>
-            <button onClick={() => navigate('/')} className="p-2 ml-1 md:ml-0 rounded-lg text-silver/40 hover:text-white hover:bg-white/[0.05] transition-colors">
+            <button onClick={() => setShowLogoutModal(true)} className="p-2 ml-1 md:ml-0 rounded-lg text-silver/40 hover:text-red-400 hover:bg-red-500/[0.08] transition-colors" title="Sign Out">
               <LogOut className="w-4 h-4 md:w-5 md:h-5" />
             </button>
           </div>
@@ -553,6 +562,47 @@ export default function AdminDashboard() {
           </AnimatePresence>
         </main>
       </div>
+      {/* ── Logout Confirmation Modal ── */}
+      <AnimatePresence>
+        {showLogoutModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[200] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+              className="relative w-full max-w-sm bg-[#0f0f0f] border border-zinc-800 rounded-2xl p-8 text-center shadow-2xl"
+            >
+              <div className="w-14 h-14 mx-auto mb-5 bg-red-500/10 rounded-full flex items-center justify-center border border-red-500/20">
+                <AlertTriangle className="w-7 h-7 text-red-400" />
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-2">Sign Out?</h3>
+              <p className="text-zinc-500 text-sm mb-7 leading-relaxed">
+                You will be signed out of the admin panel.<br />Your session will be fully cleared.
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowLogoutModal(false)}
+                  className="flex-1 py-2.5 rounded-xl border border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-500 transition-colors text-sm font-medium"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleLogout}
+                  className="flex-1 py-2.5 rounded-xl bg-red-500 hover:bg-red-600 text-white transition-colors text-sm font-semibold"
+                >
+                  Yes, Sign Out
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
