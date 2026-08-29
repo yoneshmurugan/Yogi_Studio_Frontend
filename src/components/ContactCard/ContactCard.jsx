@@ -346,9 +346,9 @@ export default function ContactCard() {
             <p>Yogi Digital Studio</p>
             <div className="cc-footer-line" />
           </div>
-          <div className="flex flex-col items-center gap-1.5 mt-2 text-white/40 text-xs">
-            <a href="mailto:yogistudio2004@gmail.com" className="hover:text-gold transition-colors">yogistudio2004@gmail.com</a>
-            <a href="tel:+919842775676" className="hover:text-gold transition-colors">+91 98427 75676</a>
+          <div className="flex flex-row justify-between items-center w-full px-6 mt-3 text-white/50 text-[10px] sm:text-xs font-medium">
+            <a href="mailto:yogistudio2004@gmail.com" className="hover:text-gold transition-colors truncate text-left">yogistudio2004@gmail.com</a>
+            <a href="tel:+919842775676" className="hover:text-gold transition-colors text-right shrink-0 ml-2">+91 98427 75676</a>
           </div>
         </motion.div>
       </motion.div>
