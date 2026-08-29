@@ -276,28 +276,51 @@ export default function ContactCard() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.7, duration: 0.5 }}
         >
-          {links.map(({ Icon, label, sub, href, gradient }, i) => (
-            <motion.a
-              key={label}
-              href={href}
-              target="_blank"
-              rel="noreferrer"
-              className="cc-link-card"
-              whileTap={{ scale: 0.97 }}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.75 + i * 0.1, duration: 0.4 }}
-            >
-              <div className="cc-link-icon" style={{ background: gradient }}>
-                <Icon />
-              </div>
-              <div className="cc-link-text">
-                <p className="cc-link-label">{label}</p>
-                <p className="cc-link-sub">{sub}</p>
-              </div>
-              <ChevronRight size={15} className="cc-link-arrow" />
-            </motion.a>
-          ))}
+          {/* Website Link (Full Width) */}
+          <motion.a
+            href={links[0].href}
+            target="_blank"
+            rel="noreferrer"
+            className="cc-link-card"
+            whileTap={{ scale: 0.97 }}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.75, duration: 0.4 }}
+          >
+            <div className="cc-link-icon" style={{ background: links[0].gradient }}>
+              {links[0].Icon()}
+            </div>
+            <div className="cc-link-text">
+              <p className="cc-link-label">{links[0].label}</p>
+              <p className="cc-link-sub">{links[0].sub}</p>
+            </div>
+            <ChevronRight size={15} className="cc-link-arrow" />
+          </motion.a>
+
+          {/* Social Links (Side by Side) */}
+          <div className="flex gap-2.5 w-full">
+            {links.slice(1).map(({ Icon, label, sub, href, gradient }, i) => (
+              <motion.a
+                key={label}
+                href={href}
+                target="_blank"
+                rel="noreferrer"
+                className="cc-link-card flex-1 !p-3 !gap-2"
+                whileTap={{ scale: 0.97 }}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.85 + i * 0.1, duration: 0.4 }}
+              >
+                <div className="cc-link-icon !w-8 !h-8" style={{ background: gradient }}>
+                  <Icon size={16} />
+                </div>
+                <div className="cc-link-text overflow-hidden">
+                  <p className="cc-link-label text-xs sm:text-sm truncate">{label}</p>
+                  <p className="cc-link-sub text-[10px] truncate">{sub}</p>
+                </div>
+              </motion.a>
+            ))}
+          </div>
         </motion.div>
 
         
