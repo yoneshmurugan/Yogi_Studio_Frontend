@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Phone, Mail, MapPin, ChevronRight, Contact, Share2, Check, MessageSquare } from 'lucide-react';
+import { Phone, Mail, MapPin, ChevronRight, Contact, Share2, Check } from 'lucide-react';
 import { AppStoreButton, GooglePlayButton } from '../base/buttons/app-store-buttons';
 
 import { generateVCard } from './generateVCard';
@@ -87,6 +87,19 @@ export default function ContactCard() {
   const [saved, setSaved] = useState(false);
 
 
+  // Inject JotForm Google Reviews widget script
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://www.jotform.com/website-widgets/embed/01a04de34c68700085800949b2173cdd1715';
+    script.async = true;
+    document.body.appendChild(script);
+    return () => {
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
+    };
+  }, []);
+
   // Auto-trigger save on page load
   useEffect(() => {
     const timer = setTimeout(() => { generateVCard(); setSaved(true); setTimeout(() => setSaved(false), 2500); }, 5000);
@@ -120,7 +133,6 @@ export default function ContactCard() {
     { icon: Phone, label: 'Call', href: 'tel:+919842775676', gradient: 'linear-gradient(135deg, #22c55e, #16a34a)' },
     { icon: Mail, label: 'Email', href: 'mailto:yogistudio2004@gmail.com', gradient: 'linear-gradient(135deg, #3b82f6, #1d4ed8)' },
     { icon: MapPin, label: 'Directions', href: MAPS_URL, gradient: 'linear-gradient(135deg, #ef4444, #b91c1c)' },
-    { icon: MessageSquare, label: 'Feedback', href: 'https://search.google.com/local/writereview?placeid=ChIJr8W8J1nqrjoR637iT00U038', gradient: 'linear-gradient(135deg, #8b5cf6, #6d28d9)' },
   ];
 
   const links = [
@@ -298,6 +310,17 @@ export default function ContactCard() {
         >
           <GooglePlayButton size="md" className="w-full sm:w-auto" href="https://play.google.com/store/apps/details?id=com.yogistudio.app&pcampaignid=web_share" />
           <AppStoreButton size="md" className="w-full sm:w-auto" href="https://apps.apple.com/in/app/yogi-digital-studio/id6790760209" />
+        </motion.div>
+
+
+        {/* ── Google Reviews Widget ── */}
+        <motion.div
+          className="w-full px-4 mb-4 mt-2"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.9, duration: 0.5 }}
+        >
+          <div id="JFWebsiteWidget-01a04de34c68700085800949b2173cdd1715"></div>
         </motion.div>
 
         {/* ── Address ── */}
