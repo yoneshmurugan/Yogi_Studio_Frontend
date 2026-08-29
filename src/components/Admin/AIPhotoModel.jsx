@@ -39,8 +39,8 @@ export default function AIPhotoModel() {
     if (qrEventId) {
       if (!qrCodeInstance.current) {
         qrCodeInstance.current = new QRCodeStyling({
-          width: 300,
-          height: 300,
+          width: 240,
+          height: 240,
           type: "svg",
           margin: 15,
           data: `${window.location.origin}/ai-search?eventId=${qrEventId}`,
@@ -185,8 +185,8 @@ export default function AIPhotoModel() {
     
     try {
       // Temporarily bump the internal SVG resolution so html-to-image captures crisp paths
-      const originalSize = 300;
-      const massiveSize = 1800; // 6x the original for ultra crispness
+      const originalSize = 240;
+      const massiveSize = 1440; // 6x the original for ultra crispness
       if (qrCodeInstance.current) {
         qrCodeInstance.current.update({ width: massiveSize, height: massiveSize });
       }
