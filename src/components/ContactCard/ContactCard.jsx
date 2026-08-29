@@ -129,11 +129,6 @@ export default function ContactCard() {
     }
   };
 
-  const actions = [
-    { icon: Phone, label: 'Call', href: 'tel:+919842775676', gradient: 'linear-gradient(135deg, #22c55e, #16a34a)' },
-    { icon: Mail, label: 'Email', href: 'mailto:yogistudio2004@gmail.com', gradient: 'linear-gradient(135deg, #3b82f6, #1d4ed8)' },
-    { icon: MapPin, label: 'Directions', href: MAPS_URL, gradient: 'linear-gradient(135deg, #ef4444, #b91c1c)' },
-  ];
 
   const links = [
     {
@@ -204,33 +199,6 @@ export default function ContactCard() {
             <span className="cc-role-dot" />
             Photographer · Videographer
           </div>
-        </motion.div>
-
-        {/* ── Actions ── */}
-        <motion.div
-          className="cc-actions"
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.45, duration: 0.5 }}
-        >
-          {actions.map(({ icon: Icon, label, href, gradient }, i) => (
-            <motion.a
-              key={label}
-              href={href}
-              target={label === 'Directions' ? '_blank' : undefined}
-              rel="noreferrer"
-              className="cc-action-btn"
-              whileTap={{ scale: 0.88 }}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 + i * 0.08, duration: 0.4 }}
-            >
-              <div className="cc-action-circle" style={{ background: gradient }}>
-                <Icon size={20} color="#fff" />
-              </div>
-              <span className="cc-action-label">{label}</span>
-            </motion.a>
-          ))}
         </motion.div>
 
         {/* ── CTA Buttons ── */}
@@ -366,18 +334,38 @@ export default function ContactCard() {
           </p>
         </motion.a>
 
-        {/* ── Bottom Branding ── */}
+        {/* ── Bottom Branding & Contact Info ── */}
         <motion.div
-          className="cc-footer"
+          className="w-full flex flex-col items-center pb-8 pt-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.1, duration: 0.5 }}
         >
-          <div className="cc-footer-line" />
-          <p>Yogi Digital Studio</p>
-          <div className="cc-footer-line" />
+          <div className="cc-footer w-full">
+            <div className="cc-footer-line" />
+            <p>Yogi Digital Studio</p>
+            <div className="cc-footer-line" />
+          </div>
+          <div className="flex flex-col items-center gap-1.5 mt-2 text-white/40 text-xs">
+            <a href="mailto:yogistudio2004@gmail.com" className="hover:text-gold transition-colors">yogistudio2004@gmail.com</a>
+            <a href="tel:+919842775676" className="hover:text-gold transition-colors">+91 98427 75676</a>
+          </div>
         </motion.div>
       </motion.div>
+
+      {/* ── Floating Call Button ── */}
+      <motion.a
+        href="tel:+919842775676"
+        className="fixed bottom-6 right-6 sm:bottom-10 sm:right-10 z-[100] flex items-center justify-center w-[60px] h-[60px] rounded-full bg-gradient-to-tr from-green-600 to-green-400 text-white shadow-[0_4px_25px_rgba(34,197,94,0.5)] border border-green-300/30"
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ delay: 1.2, type: 'spring', stiffness: 200, damping: 15 }}
+      >
+        <Phone size={24} fill="currentColor" />
+        <div className="absolute inset-0 rounded-full animate-ping opacity-20 bg-green-400" />
+      </motion.a>
     </div>
   );
 }
