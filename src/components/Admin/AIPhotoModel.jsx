@@ -721,14 +721,9 @@ export default function AIPhotoModel() {
               {/* Shine effect */}
               <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.05] to-transparent pointer-events-none" />
               
-              <div className="text-center mb-8 relative z-10">
-                <h2 className="text-[10px] font-bold text-gold tracking-[0.3em] uppercase mb-2">Scan for Photos</h2>
-                <h3 className="text-2xl font-serif text-white tracking-wide">{qrEventId}</h3>
-              </div>
-
               {/* The QR Container */}
-              <div className="relative mx-auto w-fit mt-2">
-                {/* Custom Glow Effect (Fixes html-to-image box-shadow shift bug) */}
+              <div className="relative mx-auto w-fit mt-2 mb-8 z-10">
+                {/* Custom Glow Effect */}
                 <div className="absolute inset-0 bg-gold/20 blur-xl rounded-2xl transform scale-105" />
                 
                 <div className="relative bg-white p-4 rounded-2xl">
@@ -738,12 +733,13 @@ export default function AIPhotoModel() {
                   <div className="absolute -bottom-2 -left-2 w-6 h-6 border-b-2 border-l-2 border-gold rounded-bl-xl pointer-events-none" />
                   <div className="absolute -bottom-2 -right-2 w-6 h-6 border-b-2 border-r-2 border-gold rounded-br-xl pointer-events-none" />
                   
-                  <div ref={qrRef} className="w-[200px] h-[200px] flex items-center justify-center overflow-hidden [&>svg]:w-full [&>svg]:h-full" />
+                  <div ref={qrRef} className="w-[240px] h-[240px] flex items-center justify-center overflow-hidden [&>svg]:w-full [&>svg]:h-full" />
                 </div>
               </div>
 
-              <div className="mt-8 text-center relative z-10">
-                <p className="text-[11px] text-zinc-500 mb-2 font-medium tracking-[0.1em] uppercase">Powered by Yogi Studio AI</p>
+              <div className="text-center relative z-10">
+                <h2 className="text-[12px] font-bold text-gold tracking-[0.3em] uppercase mb-4">Scan for Photos</h2>
+                <p className="text-[11px] text-zinc-500 mb-4 font-medium tracking-[0.1em] uppercase">Powered by Yogi Studio AI</p>
                 <div className="text-sm text-zinc-300 font-medium bg-white/5 py-3 px-5 rounded-xl inline-block border border-white/10 max-w-full">
                   <p className="mb-1">
                     Or visit <span className="text-white font-semibold">yogidigitalstudio.in</span> &rarr; <span className="text-white font-semibold">AI Search</span>
