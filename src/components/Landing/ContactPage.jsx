@@ -2,6 +2,8 @@ import React, { useEffect } from 'react';
 import { RevealLinks } from './RevealLinks';
 import ScrollReveal from '../ui/ScrollReveal';
 import { MapPin, Phone, Mail, Smartphone, Download } from 'lucide-react';
+import { AppStoreButton, GooglePlayButton } from '../base/buttons/app-store-buttons';
+
 
 export default function ContactPage() {
   useEffect(() => {
@@ -34,27 +36,12 @@ export default function ContactPage() {
               <h2 className="text-2xl font-serif text-white mb-8 border-b border-white/10 pb-4">Connect With Us</h2>
               <RevealLinks />
 
+              
               <div className="pt-6 mt-6 border-t border-white/10">
-                <h3 className="text-silver/80 text-sm tracking-[0.1em] uppercase mb-4">Download Our App</h3>
-                <div className="flex flex-col gap-4">
-                  <a href="https://play.google.com/store/apps/details?id=com.yogistudio.app&pcampaignid=web_share" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 group bg-black/40 hover:bg-gold/10 p-4 rounded-xl border border-white/5 hover:border-gold/30 transition-all">
-                    <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-silver group-hover:text-gold transition-colors">
-                      <Smartphone className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <p className="text-white text-sm font-medium group-hover:text-gold transition-colors">Get it on Google Play</p>
-                      <p className="text-silver/60 text-xs">Yogi Digital Studio</p>
-                    </div>
-                  </a>
-                  <a href="https://apps.apple.com/in/app/yogi-digital-studio/id6790760209" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 group bg-black/40 hover:bg-gold/10 p-4 rounded-xl border border-white/5 hover:border-gold/30 transition-all">
-                    <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-silver group-hover:text-gold transition-colors">
-                      <Download className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <p className="text-white text-sm font-medium group-hover:text-gold transition-colors">Download on the App Store</p>
-                      <p className="text-silver/60 text-xs">Yogi Digital Studio</p>
-                    </div>
-                  </a>
+                <h3 className="text-silver/80 text-sm tracking-[0.1em] uppercase mb-6 text-center lg:text-left">Download Our App</h3>
+                <div className="flex flex-col sm:flex-row items-center lg:items-start gap-4">
+                  <GooglePlayButton href="https://play.google.com/store/apps/details?id=com.yogistudio.app&pcampaignid=web_share" />
+                  <AppStoreButton href="https://apps.apple.com/in/app/yogi-digital-studio/id6790760209" />
                 </div>
               </div>
             </div>
