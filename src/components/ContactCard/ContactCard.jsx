@@ -100,11 +100,6 @@ export default function ContactCard() {
     };
   }, []);
 
-  // Auto-trigger save on page load
-  useEffect(() => {
-    const timer = setTimeout(() => { generateVCard(); setSaved(true); setTimeout(() => setSaved(false), 2500); }, 5000);
-    return () => clearTimeout(timer);
-  }, []);
   const [shared, setShared] = useState(false);
 
   const handleSave = () => {
