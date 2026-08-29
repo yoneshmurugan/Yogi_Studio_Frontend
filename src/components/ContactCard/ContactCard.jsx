@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Phone, Mail, MapPin, ChevronRight, Contact, Share2, Check } from 'lucide-react';
+import { Phone, Mail, MapPin, ChevronRight, Contact, Share2, Check, MessageSquare } from 'lucide-react';
 import { AppStoreButton, GooglePlayButton } from '../base/buttons/app-store-buttons';
 
 import { generateVCard } from './generateVCard';
@@ -119,6 +119,7 @@ export default function ContactCard() {
     { icon: Phone, label: 'Call', href: 'tel:+919842775676', gradient: 'linear-gradient(135deg, #22c55e, #16a34a)' },
     { icon: Mail, label: 'Email', href: 'mailto:yogistudio2004@gmail.com', gradient: 'linear-gradient(135deg, #3b82f6, #1d4ed8)' },
     { icon: MapPin, label: 'Directions', href: MAPS_URL, gradient: 'linear-gradient(135deg, #ef4444, #b91c1c)' },
+    { icon: MessageSquare, label: 'Feedback', href: 'mailto:yogistudio2004@gmail.com?subject=Feedback', gradient: 'linear-gradient(135deg, #8b5cf6, #6d28d9)' },
   ];
 
   const links = [
