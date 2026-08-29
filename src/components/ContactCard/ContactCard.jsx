@@ -13,6 +13,13 @@ const MAPS_URL =
   'https://www.google.com/maps/search/?api=1&query=H+96+Shop+no+4+Periyar+Nagar+Main+Road+80+feet+Corner+Erode+Tamil+Nadu+638001';
 
 // Custom SVG brand icons
+
+const WhatsAppIcon = ({ size = 18, color = 'currentColor' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+  </svg>
+);
+
 const InstagramIcon = ({ size = 18, color = 'currentColor' }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
@@ -236,6 +243,25 @@ export default function ContactCard() {
               )}
             </AnimatePresence>
           </button>
+        </motion.div>
+
+        {/* ── WhatsApp Enquiry ── */}
+        <motion.div
+          className="px-6 pt-3 pb-1"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.65, duration: 0.5 }}
+        >
+          <motion.a
+            href="https://wa.me/919842775676?text=Hi%20Yogi%20Digital%20Studio!%20I%20would%20like%20to%20enquire%20about%20a%20photoshoot."
+            target="_blank"
+            rel="noreferrer"
+            whileTap={{ scale: 0.97 }}
+            className="flex items-center justify-center gap-2 w-full py-3.5 rounded-[1rem] bg-[#25D366] hover:bg-[#20b858] transition-colors text-white font-semibold text-[0.85rem] shadow-[0_4px_15px_rgba(37,211,102,0.2)] border border-[#25D366]/50"
+          >
+            <WhatsAppIcon size={18} />
+            Enquire via WhatsApp
+          </motion.a>
         </motion.div>
 
         {/* ── Links ── */}
