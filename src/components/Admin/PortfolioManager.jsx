@@ -41,10 +41,12 @@ function TabBtn({ id, label, icon: Icon, active, onClick, count }) {
 const EVENT_CATEGORIES = [
   'Wedding',
   'Pre-Wedding',
+  'Post-Wedding',
   'Engagement',
   'Maternity',
   'Baby Shower',
   'Birthday',
+  'Puberty',
   'Corporate',
   'General'
 ];
