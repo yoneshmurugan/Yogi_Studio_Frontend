@@ -29,20 +29,32 @@ const config = {
 let human = null;
 let liveHuman = null;
 
+let initPromise = null;
+let liveInitPromise = null;
+
 /**
  * Initializes the AI engine and loads the WebGL models.
+ * Uses a promise lock to prevent race conditions during bulk uploads.
  */
 export const initializeFaceApi = async () => {
   if (human) return;
-  try {
-    human = new Human(config);
-    await human.load(); // Fetch models
-    await human.warmup(); // Warmup GPU
-    console.log('Human AI (Admin) initialized successfully.');
-  } catch (error) {
-    console.error('Error initializing Human AI:', error);
-    throw error;
-  }
+  if (initPromise) return initPromise;
+
+  initPromise = (async () => {
+    try {
+      const h = new Human(config);
+      await h.load(); // Fetch models
+      await h.warmup(); // Warmup GPU
+      human = h;
+      console.log('Human AI (Admin) initialized successfully.');
+    } catch (error) {
+      initPromise = null;
+      console.error('Error initializing Human AI:', error);
+      throw error;
+    }
+  })();
+
+  return initPromise;
 };
 
 /**
@@ -81,19 +93,26 @@ export const extractSingleFace = async (input) => {
  */
 export const initializeLiveFaceApi = async () => {
   if (liveHuman) return;
+  if (liveInitPromise) return liveInitPromise;
 
-  try {
-    // Clone config but optimize for single face speed
-    const liveConfig = JSON.parse(JSON.stringify(config));
-    liveConfig.face.detector.maxDetected = 1;
-    
-    liveHuman = new Human(liveConfig);
-    await liveHuman.load();
-    console.log('Live Human AI initialized successfully.');
-  } catch (error) {
-    console.error('Error initializing Live Human AI:', error);
-    throw error;
-  }
+  liveInitPromise = (async () => {
+    try {
+      // Clone config but optimize for single face speed
+      const liveConfig = JSON.parse(JSON.stringify(config));
+      liveConfig.face.detector.maxDetected = 1;
+      
+      const h = new Human(liveConfig);
+      await h.load();
+      liveHuman = h;
+      console.log('Live Human AI initialized successfully.');
+    } catch (error) {
+      liveInitPromise = null;
+      console.error('Error initializing Live Human AI:', error);
+      throw error;
+    }
+  })();
+
+  return liveInitPromise;
 };
 
 /**
