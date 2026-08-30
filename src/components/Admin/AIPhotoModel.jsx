@@ -412,13 +412,20 @@ export default function AIPhotoModel() {
       // 5. Upload unified index JSON to Firebase Storage
       setProgress({ current: files.length, total: files.length, currentAction: 'Finalizing Index...' });
       const indexRef = ref(storage, `events/${eventId}/face_index.json`);
-      const indexData = JSON.stringify({ 
-        eventId, 
-        photos: faceIndex,
-        totalSizeBytes: existingSizeBytes + newBytesUploaded
-      });
-      
-      await uploadString(indexRef, indexData, 'raw', { contentType: 'application/json' });
+      // Blob Streaming: Bypasses V8 memory limit for massive events
+      const parts = [];
+      parts.push(`{"eventId":${JSON.stringify(eventId)},"totalSizeBytes":${existingSizeBytes + newBytesUploaded},"photos":[`);
+
+      for (let i = 0; i < faceIndex.length; i++) {
+        parts.push(JSON.stringify(faceIndex[i]));
+        if (i < faceIndex.length - 1) {
+          parts.push(',');
+        }
+      }
+      parts.push(`]}`);
+
+      const blob = new Blob(parts, { type: 'application/json' });
+      await uploadBytes(indexRef, blob);
 
       setStatus('complete');
       setProgress({ current: files.length, total: files.length, currentAction: 'Done!' });
