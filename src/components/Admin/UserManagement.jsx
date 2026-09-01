@@ -160,7 +160,76 @@ function CreateEventModal({ user, onSubmit, onCancel }) {
   );
 }
 
+
+// ── Global Upload Queue Manager ────────────────────────────────────────────────
+const uploadQueue = [];
+let isUploadingGlobal = false;
+
+const enqueueUpload = (folderId, files, onProgress, onComplete, onError) => {
+  const existingJob = uploadQueue.find(j => j.folderId === folderId);
+  if (existingJob) {
+    existingJob.files.push(...files);
+  } else {
+    uploadQueue.push({ folderId, files: [...files], onProgress, onComplete, onError });
+  }
+  processGlobalQueue();
+};
+
+const processGlobalQueue = async () => {
+  if (isUploadingGlobal) return;
+  if (uploadQueue.length === 0) return;
+
+  isUploadingGlobal = true;
+
+  while (uploadQueue.length > 0) {
+    const job = uploadQueue[0];
+    const { folderId, files, onProgress, onComplete, onError } = job;
+    let processedCount = 0;
+    const uploadedPhotos = [];
+    const BATCH_SIZE = 5;
+
+    try {
+      let i = 0;
+      while (i < files.length) {
+        const batch = files.slice(i, i + BATCH_SIZE);
+        
+        await Promise.all(batch.map(async (file) => {
+          try {
+            const options = { maxSizeMB: 0.15, maxWidthOrHeight: 1600, useWebWorker: true, initialQuality: 0.7 };
+            const compressedFile = await imageCompression(file, options);
+            const fileName = file.name;
+            const fileRef = ref(storage, `events/folders/${folderId}/${fileName}`);
+            await uploadBytes(fileRef, compressedFile);
+            const downloadUrl = await getDownloadURL(fileRef);
+
+            uploadedPhotos.push({
+              id: fileName, url: downloadUrl, name: file.name, size: (compressedFile.size / 1024).toFixed(0) + ' KB',
+            });
+          } catch (err) {
+            console.error("Upload failed for file:", file.name, err);
+          }
+          processedCount++;
+          if (onProgress) onProgress(Math.round((processedCount / files.length) * 100), processedCount, files.length);
+        }));
+        
+        i += BATCH_SIZE;
+      }
+
+      if (uploadedPhotos.length > 0 && onComplete) {
+        onComplete(folderId, uploadedPhotos);
+      }
+    } catch (err) {
+      if (onError) onError(err);
+    }
+
+    uploadQueue.shift();
+  }
+
+  isUploadingGlobal = false;
+};
+
 // ── Folder Card ────────────────────────────────────────────────────────────────
+
 function FolderCard({ folder, user, onAddPhotos, onDeletePhoto, onDelete, onRename, onSetCoverImage }) {
   const [expanded, setExpanded] = useState(false);
   const [renaming, setRenaming] = useState(false);
@@ -169,47 +238,32 @@ function FolderCard({ folder, user, onAddPhotos, onDeletePhoto, onDelete, onRena
   const [progress, setProgress] = useState(0);
   const fileRef = useRef();
 
+  const [queueStatus, setQueueStatus] = useState(null);
+
   const processAndUploadFiles = async (files) => {
     setUploading(true);
     setProgress(0);
-    const uploadedPhotos = [];
+    setQueueStatus({ processed: 0, total: files.length, status: 'queued' });
 
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      try {
-        // Compress image to ~100-150KB
-        const options = {
-          maxSizeMB: 0.15,
-          maxWidthOrHeight: 1600,
-          useWebWorker: true,
-          initialQuality: 0.7, // Helps to drop quality further if needed
-        };
-        const compressedFile = await imageCompression(file, options);
-        
-        // Upload to Firebase Storage using the exact original file name
-        const fileName = file.name;
-        const fileRef = ref(storage, `events/folders/${folder.id}/${fileName}`);
-        
-        await uploadBytes(fileRef, compressedFile);
-        const downloadUrl = await getDownloadURL(fileRef);
-
-        uploadedPhotos.push({
-          id: fileName,
-          url: downloadUrl,
-          name: file.name,
-          size: (compressedFile.size / 1024).toFixed(0) + ' KB',
-        });
-      } catch (err) {
-        console.error("Upload failed for file:", file.name, err);
+    enqueueUpload(
+      folder.id,
+      files,
+      (progPct, processed, total) => {
+        setProgress(progPct);
+        setQueueStatus({ processed, total, status: 'uploading' });
+      },
+      (fId, newPhotos) => {
+        onAddPhotos(fId, newPhotos);
+        setUploading(false);
+        setQueueStatus(null);
+        setProgress(0);
+      },
+      (err) => {
+        console.error(err);
+        setUploading(false);
+        setQueueStatus(null);
       }
-      setProgress(Math.round(((i + 1) / files.length) * 100));
-    }
-    
-    if (uploadedPhotos.length > 0) {
-      onAddPhotos(folder.id, uploadedPhotos);
-    }
-    setUploading(false);
-    setProgress(0);
+    );
   };
 
   const handleFileInput = async (e) => {
@@ -303,13 +357,17 @@ function FolderCard({ folder, user, onAddPhotos, onDeletePhoto, onDelete, onRena
               {/* Drop zone / Upload State */}
               {uploading ? (
                 <div className="flex flex-col items-center justify-center py-6 rounded-xl border border-white/5 bg-white/[0.02]">
-                  <RefreshCw className="w-5 h-5 text-gold animate-spin mb-3" />
-                  <p className="text-white text-sm font-medium mb-1">Compressing & Uploading...</p>
-                  <p className="text-silver/40 text-xs">{progress}% Complete</p>
+                  <RefreshCw className={`w-5 h-5 text-gold mb-3 ${queueStatus?.status === 'uploading' ? 'animate-spin' : 'opacity-50'}`} />
+                  <p className="text-white text-sm font-medium mb-1">
+                    {queueStatus?.status === 'uploading' ? 'Compressing & Uploading...' : 'Queued (Waiting to start)...'}
+                  </p>
+                  <p className="text-silver/40 text-xs">
+                    {queueStatus?.status === 'uploading' ? `${progress}% Complete (${queueStatus.processed}/${queueStatus.total})` : `${queueStatus?.total || 0} files queued`}
+                  </p>
                   <div className="w-48 h-1 bg-white/10 rounded-full mt-3 overflow-hidden">
                     <div 
-                      className="h-full bg-gold transition-all duration-300"
-                      style={{ width: `${progress}%` }}
+                      className={`h-full transition-all duration-300 ${queueStatus?.status === 'uploading' ? 'bg-gold' : 'bg-silver/40'}`}
+                      style={{ width: `${queueStatus?.status === 'uploading' ? progress : 100}%` }}
                     />
                   </div>
                 </div>
