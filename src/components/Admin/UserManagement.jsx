@@ -243,7 +243,11 @@ function FolderCard({ folder, user, onAddPhotos, onDeletePhoto, onDelete, onRena
   const processAndUploadFiles = async (files) => {
     setUploading(true);
     setProgress(0);
-    setQueueStatus({ processed: 0, total: files.length, status: 'queued' });
+    setQueueStatus(prev => ({ 
+      processed: prev?.processed || 0, 
+      total: (prev?.total || 0) + files.length, 
+      status: prev?.status || 'queued' 
+    }));
 
     enqueueUpload(
       folder.id,
