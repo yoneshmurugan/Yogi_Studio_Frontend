@@ -240,6 +240,21 @@ function FolderCard({ folder, user, onAddPhotos, onDeletePhoto, onDelete, onRena
 
   const [queueStatus, setQueueStatus] = useState(null);
 
+  const [visibleCount, setVisibleCount] = useState(50);
+  const observerRef = useRef(null);
+
+  useEffect(() => {
+    if (!expanded) return;
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        setVisibleCount(prev => Math.min(prev + 50, folder.photos.length));
+      }
+    }, { rootMargin: '100px' });
+    
+    if (observerRef.current) observer.observe(observerRef.current);
+    return () => observer.disconnect();
+  }, [expanded, folder.photos.length]);
+
   const processAndUploadFiles = async (files) => {
     setUploading(true);
     setProgress(0);
@@ -392,7 +407,7 @@ function FolderCard({ folder, user, onAddPhotos, onDeletePhoto, onDelete, onRena
               {folder.photos.length > 0 && (
                 <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2">
                   <AnimatePresence>
-                    {folder.photos.map((ph) => (
+                    {folder.photos.slice(0, visibleCount).map((ph) => (
                       <motion.div
                         key={ph.id}
                         layout
@@ -401,7 +416,7 @@ function FolderCard({ folder, user, onAddPhotos, onDeletePhoto, onDelete, onRena
                         exit={{ opacity: 0, scale: 0.8 }}
                         className="group relative aspect-square rounded-lg overflow-hidden bg-charcoal/50"
                       >
-                        <img src={ph.url} alt={ph.name} className="w-full h-full object-cover" />
+                        <img src={ph.url} alt={ph.name} loading="lazy" className="w-full h-full object-cover" />
                         <div className={`absolute top-1 left-1 flex items-center justify-center transition-all ${folder.coverImage === ph.url ? 'opacity-100 z-10' : 'opacity-0 group-hover:opacity-100 z-10'}`}>
                           <button
                             onClick={() => onSetCoverImage(folder.id, ph.url)}
@@ -424,6 +439,9 @@ function FolderCard({ folder, user, onAddPhotos, onDeletePhoto, onDelete, onRena
                     ))}
                   </AnimatePresence>
                 </div>
+              )}
+              {expanded && visibleCount < folder.photos.length && (
+                <div ref={observerRef} className="w-full h-4 mt-2" />
               )}
             </div>
           </motion.div>
