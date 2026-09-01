@@ -278,11 +278,33 @@ export default function AdminDashboard() {
   };
 
   const addPhotosToFolder = (folderId, photos) => {
-    const folderToEdit = folders.find(f => String(f.id) === String(folderId));
-    if (!folderToEdit) return;
-    const newFolders = folders.map((f) => (String(f.id) === String(folderId) ? { ...f, photos: [...f.photos, ...photos] } : f));
-    setFolders(newFolders);
-    syncEventFolders(folderToEdit.eventId, newFolders);
+    setFolders(prevFolders => {
+      const folderToEdit = prevFolders.find(f => String(f.id) === String(folderId));
+      if (!folderToEdit) return prevFolders;
+
+      const newFolders = prevFolders.map((f) => (String(f.id) === String(folderId) ? { ...f, photos: [...(f.photos || []), ...photos] } : f));
+      
+      setEvents(prevEvents => {
+         const ev = prevEvents.find(e => String(e.id) === String(folderToEdit.eventId));
+         if (ev) {
+            const eventFolders = newFolders.filter(f => String(f.eventId) === String(folderToEdit.eventId));
+            // Sync to backend asynchronously using the latest closure values
+            (async () => {
+              try {
+                await adminFetch(`/admin/events/${ev.id}?phone=${encodeURIComponent(ev.customerPhone)}`, {
+                  method: 'PATCH',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ folders: eventFolders })
+                });
+              } catch(err) { console.error("Folder sync error:", err); }
+            })();
+            return prevEvents.map(e => String(e.id) === String(ev.id) ? { ...e, folders: eventFolders } : e);
+         }
+         return prevEvents;
+      });
+
+      return newFolders;
+    });
   };
 
   const setFolderCoverImage = (folderId, photoUrl) => {
