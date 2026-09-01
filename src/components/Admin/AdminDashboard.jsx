@@ -243,16 +243,35 @@ export default function AdminDashboard() {
   };
 
   const addFolder = (f) => {
-    const newFolders = [...folders, f];
-    setFolders(newFolders);
-    syncEventFolders(f.eventId, newFolders);
+    setFolders(prevFolders => {
+      const newFolders = [...prevFolders, f];
+      
+      setEvents(prevEvents => {
+         const ev = prevEvents.find(e => String(e.id) === String(f.eventId));
+         if (ev) {
+            const eventFolders = newFolders.filter(fol => String(fol.eventId) === String(f.eventId));
+            (async () => {
+              try {
+                await adminFetch(`/admin/events/${ev.id}?phone=${encodeURIComponent(ev.customerPhone)}`, {
+                  method: 'PATCH',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ folders: eventFolders })
+                });
+              } catch(err) { console.error("Folder sync error:", err); }
+            })();
+            return prevEvents.map(e => String(e.id) === String(ev.id) ? { ...e, folders: eventFolders } : e);
+         }
+         return prevEvents;
+      });
+      return newFolders;
+    });
   };
 
   const deleteFolder = async (id) => {
+    // Keep reference for storage deletion
     const folderToDel = folders.find(f => String(f.id) === String(id));
     if (!folderToDel) return;
 
-    // Delete all photos in the folder from Firebase Storage
     if (folderToDel.photos && folderToDel.photos.length > 0) {
       for (const ph of folderToDel.photos) {
         try {
@@ -264,17 +283,56 @@ export default function AdminDashboard() {
       }
     }
 
-    const newFolders = folders.filter((f) => String(f.id) !== String(id));
-    setFolders(newFolders);
-    syncEventFolders(folderToDel.eventId, newFolders);
+    setFolders(prevFolders => {
+      const newFolders = prevFolders.filter((f) => String(f.id) !== String(id));
+      
+      setEvents(prevEvents => {
+         const ev = prevEvents.find(e => String(e.id) === String(folderToDel.eventId));
+         if (ev) {
+            const eventFolders = newFolders.filter(f => String(f.eventId) === String(folderToDel.eventId));
+            (async () => {
+              try {
+                await adminFetch(`/admin/events/${ev.id}?phone=${encodeURIComponent(ev.customerPhone)}`, {
+                  method: 'PATCH',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ folders: eventFolders })
+                });
+              } catch(err) { console.error("Folder sync error:", err); }
+            })();
+            return prevEvents.map(e => String(e.id) === String(ev.id) ? { ...e, folders: eventFolders } : e);
+         }
+         return prevEvents;
+      });
+      return newFolders;
+    });
   };
 
   const renameFolder = (id, name) => {
-    const folderToEdit = folders.find(f => String(f.id) === String(id));
-    if (!folderToEdit) return;
-    const newFolders = folders.map((f) => (String(f.id) === String(id) ? { ...f, name } : f));
-    setFolders(newFolders);
-    syncEventFolders(folderToEdit.eventId, newFolders);
+    setFolders(prevFolders => {
+      const folderToEdit = prevFolders.find(f => String(f.id) === String(id));
+      if (!folderToEdit) return prevFolders;
+
+      const newFolders = prevFolders.map((f) => (String(f.id) === String(id) ? { ...f, name } : f));
+      
+      setEvents(prevEvents => {
+         const ev = prevEvents.find(e => String(e.id) === String(folderToEdit.eventId));
+         if (ev) {
+            const eventFolders = newFolders.filter(f => String(f.eventId) === String(folderToEdit.eventId));
+            (async () => {
+              try {
+                await adminFetch(`/admin/events/${ev.id}?phone=${encodeURIComponent(ev.customerPhone)}`, {
+                  method: 'PATCH',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ folders: eventFolders })
+                });
+              } catch(err) { console.error("Folder sync error:", err); }
+            })();
+            return prevEvents.map(e => String(e.id) === String(ev.id) ? { ...e, folders: eventFolders } : e);
+         }
+         return prevEvents;
+      });
+      return newFolders;
+    });
   };
 
   const addPhotosToFolder = (folderId, photos) => {
@@ -308,11 +366,31 @@ export default function AdminDashboard() {
   };
 
   const setFolderCoverImage = (folderId, photoUrl) => {
-    const folderToEdit = folders.find(f => String(f.id) === String(folderId));
-    if (!folderToEdit) return;
-    const newFolders = folders.map((f) => (String(f.id) === String(folderId) ? { ...f, coverImage: photoUrl } : f));
-    setFolders(newFolders);
-    syncEventFolders(folderToEdit.eventId, newFolders);
+    setFolders(prevFolders => {
+      const folderToEdit = prevFolders.find(f => String(f.id) === String(folderId));
+      if (!folderToEdit) return prevFolders;
+
+      const newFolders = prevFolders.map((f) => (String(f.id) === String(folderId) ? { ...f, coverImage: photoUrl } : f));
+      
+      setEvents(prevEvents => {
+         const ev = prevEvents.find(e => String(e.id) === String(folderToEdit.eventId));
+         if (ev) {
+            const eventFolders = newFolders.filter(f => String(f.eventId) === String(folderToEdit.eventId));
+            (async () => {
+              try {
+                await adminFetch(`/admin/events/${ev.id}?phone=${encodeURIComponent(ev.customerPhone)}`, {
+                  method: 'PATCH',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ folders: eventFolders })
+                });
+              } catch(err) { console.error("Folder sync error:", err); }
+            })();
+            return prevEvents.map(e => String(e.id) === String(ev.id) ? { ...e, folders: eventFolders } : e);
+         }
+         return prevEvents;
+      });
+      return newFolders;
+    });
   };
 
   const deletePhotoFromFolder = async (folderId, photoId) => {
@@ -327,11 +405,36 @@ export default function AdminDashboard() {
       console.error("Error deleting photo from storage:", err);
     }
 
-    const newFolders = folders.map((f) =>
-      String(f.id) === String(folderId) ? { ...f, photos: f.photos.filter((ph) => ph.id !== photoId) } : f
-    );
-    setFolders(newFolders);
-    syncEventFolders(folderToEdit.eventId, newFolders);
+    setFolders(prevFolders => {
+      const folderToEditInner = prevFolders.find(f => String(f.id) === String(folderId));
+      if (!folderToEditInner) return prevFolders;
+
+      const newFolders = prevFolders.map((f) => {
+        if (String(f.id) === String(folderId)) {
+          return { ...f, photos: (f.photos || []).filter(p => String(p.id) !== String(photoId)) };
+        }
+        return f;
+      });
+      
+      setEvents(prevEvents => {
+         const ev = prevEvents.find(e => String(e.id) === String(folderToEditInner.eventId));
+         if (ev) {
+            const eventFolders = newFolders.filter(f => String(f.eventId) === String(folderToEditInner.eventId));
+            (async () => {
+              try {
+                await adminFetch(`/admin/events/${ev.id}?phone=${encodeURIComponent(ev.customerPhone)}`, {
+                  method: 'PATCH',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ folders: eventFolders })
+                });
+              } catch(err) { console.error("Folder sync error:", err); }
+            })();
+            return prevEvents.map(e => String(e.id) === String(ev.id) ? { ...e, folders: eventFolders } : e);
+         }
+         return prevEvents;
+      });
+      return newFolders;
+    });
   };
 
   const currentLabel = navItems.find((n) => n.id === activeTab)?.label ?? '';
