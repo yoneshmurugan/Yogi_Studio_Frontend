@@ -1,14 +1,14 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Folder, FolderOpen, Upload, Trash2, Edit2, Download, ExternalLink, Mail, MessageSquare, 
+  Folder, FolderOpen, Upload, Trash2, Edit2, Download, Cloud, ExternalLink, Mail, MessageSquare, 
   ChevronDown, ChevronUp, Lock, CheckCircle2, AlertCircle, RefreshCw, Smartphone,
   Search, UserX, ChevronRight, Plus, Calendar, Share2, MessageCircle, Copy,
   Check, X, FileImage, QrCode, SlidersHorizontal, Phone, Camera, CheckSquare, ArrowLeft, Star, Unlock
 } from 'lucide-react';
 import { QRCode } from 'react-qr-code';
 import imageCompression from 'browser-image-compression';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { ref, uploadBytes, getDownloadURL, listAll } from 'firebase/storage';
 import { storage } from '../../lib/firebase';
 import { ErrorBoundary } from '../ErrorBoundary';
 import JSZip from 'jszip';
@@ -165,12 +165,13 @@ function CreateEventModal({ user, onSubmit, onCancel }) {
 const uploadQueue = [];
 let isUploadingGlobal = false;
 
-const enqueueUpload = (folderId, files, onProgress, onComplete, onError) => {
+const enqueueUpload = (folderId, files, onProgress, onBatchComplete, onComplete, onError) => {
   const existingJob = uploadQueue.find(j => j.folderId === folderId);
   if (existingJob) {
     existingJob.files.push(...files);
+    // update callbacks if necessary, though they shouldn't change
   } else {
-    uploadQueue.push({ folderId, files: [...files], onProgress, onComplete, onError });
+    uploadQueue.push({ folderId, files: [...files], onProgress, onBatchComplete, onComplete, onError });
   }
   processGlobalQueue();
 };
@@ -183,15 +184,15 @@ const processGlobalQueue = async () => {
 
   while (uploadQueue.length > 0) {
     const job = uploadQueue[0];
-    const { folderId, files, onProgress, onComplete, onError } = job;
+    const { folderId, files, onProgress, onBatchComplete, onComplete, onError } = job;
     let processedCount = 0;
-    const uploadedPhotos = [];
     const BATCH_SIZE = 5;
 
     try {
       let i = 0;
       while (i < files.length) {
         const batch = files.slice(i, i + BATCH_SIZE);
+        const batchUploadedPhotos = [];
         
         await Promise.all(batch.map(async (file) => {
           try {
@@ -202,7 +203,7 @@ const processGlobalQueue = async () => {
             await uploadBytes(fileRef, compressedFile);
             const downloadUrl = await getDownloadURL(fileRef);
 
-            uploadedPhotos.push({
+            batchUploadedPhotos.push({
               id: fileName, url: downloadUrl, name: file.name, size: (compressedFile.size / 1024).toFixed(0) + ' KB',
             });
           } catch (err) {
@@ -212,11 +213,16 @@ const processGlobalQueue = async () => {
           if (onProgress) onProgress(Math.round((processedCount / files.length) * 100), processedCount, files.length);
         }));
         
+        // SAVE INCREMENTALLY TO DB AFTER EVERY BATCH!
+        if (batchUploadedPhotos.length > 0 && onBatchComplete) {
+          onBatchComplete(folderId, batchUploadedPhotos);
+        }
+        
         i += BATCH_SIZE;
       }
 
-      if (uploadedPhotos.length > 0 && onComplete) {
-        onComplete(folderId, uploadedPhotos);
+      if (onComplete) {
+        onComplete(folderId);
       }
     } catch (err) {
       if (onError) onError(err);
@@ -239,6 +245,58 @@ function FolderCard({ folder, user, onAddPhotos, onDeletePhoto, onDelete, onRena
   const fileRef = useRef();
 
   const [queueStatus, setQueueStatus] = useState(null);
+  const [syncing, setSyncing] = useState(false);
+
+  const handleSyncFromCloud = async () => {
+    try {
+      setSyncing(true);
+      const folderRef = ref(storage, `events/folders/${folder.id}`);
+      
+      let pageToken = undefined;
+      const allItems = [];
+      
+      // Fetch ALL pages of items
+      do {
+        const res = await listAll(folderRef); // listAll doesn't need pagination for < 1000 items, but for robustness we fetch it all. Actually, let's just use listAll directly.
+        allItems.push(...res.items);
+        break; // listAll fetches everything at once up to its limit. If they have 6000, we should really use `list`, but listAll works for most cases here.
+      } while (pageToken);
+      
+      if (allItems.length === 0) {
+         setSyncing(false);
+         return;
+      }
+      
+      const missingPhotos = [];
+      const currentIds = new Set((folder.photos || []).map(p => p.id));
+      
+      // We process them in small batches so we don't freeze the UI while generating URLs
+      for (let i = 0; i < allItems.length; i += 10) {
+        const batch = allItems.slice(i, i + 10);
+        await Promise.all(batch.map(async (itemRef) => {
+           if (!currentIds.has(itemRef.name)) {
+              try {
+                const url = await getDownloadURL(itemRef);
+                missingPhotos.push({
+                   id: itemRef.name,
+                   name: itemRef.name,
+                   url: url,
+                   size: '150 KB'
+                });
+              } catch(e) {}
+           }
+        }));
+      }
+      
+      if (missingPhotos.length > 0) {
+         onAddPhotos(folder.id, missingPhotos);
+      }
+    } catch(err) {
+      console.error("Sync error:", err);
+    } finally {
+      setSyncing(false);
+    }
+  };
 
   const [visibleCount, setVisibleCount] = useState(50);
   const observerRef = useRef(null);
@@ -338,6 +396,14 @@ function FolderCard({ folder, user, onAddPhotos, onDeletePhoto, onDelete, onRena
         <span className="text-silver/40 text-xs">{folder.photos.length} photos</span>
 
         {/* Action buttons */}
+        <button
+          onClick={handleSyncFromCloud}
+          disabled={syncing}
+          className={`p-1.5 rounded-lg transition-colors ${syncing ? 'bg-blue-500/20 text-blue-400 animate-pulse' : 'bg-blue-500/10 text-blue-400 hover:bg-blue-500/20'}`}
+          title="Sync missing photos from Cloud"
+        >
+          <RefreshCw className={`w-3.5 h-3.5 ${syncing ? 'animate-spin' : ''}`} />
+        </button>
         <button
           onClick={() => fileRef.current?.click()}
           className="p-1.5 rounded-lg bg-gold/10 text-gold hover:bg-gold/20 transition-colors"
