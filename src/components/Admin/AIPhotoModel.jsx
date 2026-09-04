@@ -425,7 +425,17 @@ export default function AIPhotoModel() {
       parts.push(`]}`);
 
       const blob = new Blob(parts, { type: 'application/json' });
-      await uploadBytes(indexRef, blob);
+      
+      // Compress the massive JSON index using native browser CompressionStream (GZIP)
+      const stream = blob.stream().pipeThrough(new CompressionStream('gzip'));
+      const compressedBlob = await new Response(stream).blob();
+      
+      // Set contentEncoding to gzip so Firebase serves it with the correct HTTP headers,
+      // allowing standard fetch() to automatically decompress it on the fly!
+      await uploadBytes(indexRef, compressedBlob, { 
+        contentType: 'application/json',
+        contentEncoding: 'gzip'
+      });
 
       setStatus('complete');
       setProgress({ current: files.length, total: files.length, currentAction: 'Done!' });
