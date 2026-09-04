@@ -396,7 +396,7 @@ export default function AIPhotoModel() {
             // 4. Push to index (thread-safe array push)
             faceIndex.push({
               photoUrl: downloadUrl,
-              faceEmbeddings: faceDescriptors.map(desc => Array.from(desc))
+              faceEmbeddings: faceDescriptors.map(desc => Array.from(desc).map(v => parseFloat(v.toFixed(4))))
             });
           }
           

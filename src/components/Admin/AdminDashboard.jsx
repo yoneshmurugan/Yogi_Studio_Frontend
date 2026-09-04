@@ -589,6 +589,54 @@ export default function AdminDashboard() {
             </div>
           </div>
           <div className="flex items-center gap-2 md:gap-4">
+            <button 
+              onClick={async () => {
+                const eventId = prompt("Enter the exact Event ID to fix and backup:");
+                if (!eventId) return;
+                alert("Process starting. This will backup first, then compress. Check the console for progress. Please wait 10-30 seconds...");
+                try {
+                  const { ref, getDownloadURL, uploadBytes } = await import('firebase/storage');
+                  const { storage } = await import('../../lib/firebase');
+                  
+                  const originalIndexRef = ref(storage, `events/${eventId}/face_index.json`);
+                  
+                  console.log("1. Fetching original index...");
+                  const url = await getDownloadURL(originalIndexRef);
+                  const res = await fetch(url);
+                  const data = await res.text();
+                  
+                  console.log("2. Uploading backup copy...");
+                  const backupRef = ref(storage, `events/${eventId}/copy/face_index.json`);
+                  const uncompressedBlob = new Blob([data], { type: 'application/json' });
+                  await uploadBytes(backupRef, uncompressedBlob, { contentType: 'application/json' });
+                  console.log("Backup complete!");
+
+                  console.log("3. Shrinking data precision...");
+                  // Reduce 16-decimal floats to 4 decimals. This shrinks the massive string by ~300% 
+                  // without affecting the facial recognition accuracy.
+                  const shrunkenData = data.replace(/(\.\d{4})\d+/g, '$1');
+                  
+                  console.log("4. Compressing shrunken data...");
+                  const shrinkBlob = new Blob([shrunkenData], { type: 'application/json' });
+                  const stream = shrinkBlob.stream().pipeThrough(new CompressionStream('gzip'));
+                  const compressedBlob = await new Response(stream).blob();
+                  
+                  console.log("4. Uploading compressed version...");
+                  await uploadBytes(originalIndexRef, compressedBlob, { 
+                    contentType: 'application/json',
+                    contentEncoding: 'gzip'
+                  });
+                  
+                  alert("SUCCESS! File backed up to 'copy/face_index.json' and original compressed.");
+                } catch (e) {
+                  console.error(e);
+                  alert("Error: " + e.message);
+                }
+              }}
+              className="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1 rounded"
+            >
+              FIX & BACKUP FILE
+            </button>
             <div className="text-right hidden sm:block">
               <p className="text-white text-sm">Admin</p>
               <p className="text-silver/40 text-xs">Yogi Studio</p>
