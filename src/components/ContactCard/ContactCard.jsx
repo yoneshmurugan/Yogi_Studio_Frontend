@@ -327,13 +327,13 @@ export default function ContactCard() {
         
         {/* ── Mobile Apps ── */}
         <motion.div
-          className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full px-5 pb-6 pt-2"
+          className="flex flex-row items-center justify-center gap-2 sm:gap-3 w-full px-5 pb-6 pt-2"
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.85, duration: 0.5 }}
         >
-          <GooglePlayButton size="md" className="w-full sm:w-auto" href="https://play.google.com/store/apps/details?id=com.yogistudio.app&pcampaignid=web_share" />
-          <AppStoreButton size="md" className="w-full sm:w-auto" href="https://apps.apple.com/in/app/yogi-digital-studio/id6790760209" />
+          <GooglePlayButton size="md" className="flex-1 max-w-[160px]" href="https://play.google.com/store/apps/details?id=com.yogistudio.app&pcampaignid=web_share" />
+          <AppStoreButton size="md" className="flex-1 max-w-[160px]" href="https://apps.apple.com/in/app/yogi-digital-studio/id6790760209" />
         </motion.div>
 
 
