@@ -762,7 +762,7 @@ export default function AIPhotoModel() {
                     Or visit <span className="text-white font-semibold">yogidigitalstudio.in</span> &rarr; <span className="text-white font-semibold">AI Search</span>
                   </p>
                   <p className="mb-0.5">and enter code:</p>
-                  <strong className="text-gold text-lg tracking-wide block whitespace-nowrap">"{qrEventId}"</strong>
+                  <strong className="text-gold text-lg tracking-wide block whitespace-nowrap">{qrEventId}</strong>
                 </div>
               </div>
             </div>
