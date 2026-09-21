@@ -99,6 +99,7 @@ export default function FaceSearch() {
   const [status, setStatus] = useState('idle');
   const [errorMsg, setErrorMsg] = useState('');
   const [allowShowAll, setAllowShowAll] = useState(false);
+  const [hasShownAll, setHasShownAll] = useState(false);
   const [displayCount, setDisplayCount] = useState(60);
   const [matchedPhotos, setMatchedPhotos] = useState([]);
   const [downloadStatus, setDownloadStatus] = useState('idle');
@@ -354,6 +355,7 @@ export default function FaceSearch() {
       const res = await fetch(indexUrl);
       const data = await res.json();
       setMatchedPhotos((data.photos || []).map(p => p.photoUrl));
+      setHasShownAll(true);
       setStatus('complete');
       setTimeout(() => {
         resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -366,7 +368,7 @@ export default function FaceSearch() {
 
   const triggerCamera = async () => {
     if (!eventId) { setErrorMsg('Please enter an Event Code.'); return; }
-    setErrorMsg(''); setStatus('checking'); setMatchedPhotos([]); setDisplayCount(60); 
+    setErrorMsg(''); setStatus('checking'); setMatchedPhotos([]); setDisplayCount(60); setHasShownAll(false); 
 
     try {
       // Validate Event exists before opening camera
@@ -959,7 +961,8 @@ export default function FaceSearch() {
                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-8">
                     <button
                       onClick={handleShowAllImages}
-                      className="px-6 py-2.5 bg-zinc-900 border border-zinc-800 text-gray-300 text-sm font-medium rounded-full hover:bg-zinc-800 transition-colors shadow-sm"
+                      disabled={hasShownAll}
+                      className={`px-6 py-2.5 bg-zinc-900 border border-zinc-800 text-sm font-medium rounded-full transition-colors shadow-sm ${hasShownAll ? 'text-gray-600 opacity-50 grayscale cursor-not-allowed' : 'text-gray-300 hover:bg-zinc-800'}`}
                     >
                       Show All Event Images
                     </button>
@@ -1006,7 +1009,8 @@ export default function FaceSearch() {
                 <div className="mt-6">
                   <button
                     onClick={handleShowAllImages}
-                    className="px-6 py-2.5 bg-zinc-800 border border-zinc-700 text-white text-sm font-medium rounded-full hover:bg-zinc-700 transition-colors shadow-sm w-full md:w-auto"
+                    disabled={hasShownAll}
+                    className={`px-6 py-2.5 bg-zinc-800 border border-zinc-700 text-sm font-medium rounded-full transition-colors shadow-sm w-full md:w-auto ${hasShownAll ? 'text-gray-500 opacity-50 grayscale cursor-not-allowed' : 'text-white hover:bg-zinc-700'}`}
                   >
                     View All Event Images
                   </button>
