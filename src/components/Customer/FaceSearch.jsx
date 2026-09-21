@@ -4,7 +4,7 @@ import { Camera as CameraIcon, Loader2, ArrowLeft, Image as ImageIcon, Search, D
 import { useNavigate } from 'react-router-dom';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import { extractSingleFace, detectLiveFaceBox } from '../../lib/faceApi';
-import { ref, getDownloadURL } from 'firebase/storage';
+import { ref, getDownloadURL, getBytes } from 'firebase/storage';
 import { storage } from '../../lib/firebase';
 import { saveAs } from 'file-saver';
 import JSZip from 'jszip';
@@ -351,9 +351,10 @@ export default function FaceSearch() {
     setStatus('checking');
     setErrorMsg('');
     try {
-      const indexUrl = await getDownloadURL(ref(storage, `events/${eventId}/face_index.json`));
-      const res = await fetch(indexUrl);
-      const data = await res.json();
+      const indexRef = ref(storage, `events/${eventId}/face_index.json`);
+      const buffer = await getBytes(indexRef);
+      const text = new TextDecoder().decode(buffer);
+      const data = JSON.parse(text);
       setMatchedPhotos((data.photos || []).map(p => p.photoUrl));
       setHasShownAll(true);
       setStatus('complete');
@@ -375,9 +376,10 @@ export default function FaceSearch() {
       await getDownloadURL(ref(storage, `events/${eventId}/face_index.json`));
       
       try {
-        const configUrl = await getDownloadURL(ref(storage, `events/${eventId}/ai_config.json`));
-        const configRes = await fetch(configUrl);
-        const configData = await configRes.json();
+        const configRef = ref(storage, `events/${eventId}/ai_config.json`);
+        const buffer = await getBytes(configRef);
+        const text = new TextDecoder().decode(buffer);
+        const configData = JSON.parse(text);
         setAllowShowAll(!!configData.allowShowAll);
       } catch (e) {
         setAllowShowAll(false);
