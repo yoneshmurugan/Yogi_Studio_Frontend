@@ -111,10 +111,20 @@ export default function AIPhotoModel() {
             const res = await fetch(url);
             const data = await res.json();
             
+            let allowShowAll = false;
+            try {
+              const configRef = ref(storage, `events/${eventName}/ai_config.json`);
+              const configUrl = await getDownloadURL(configRef);
+              const configRes = await fetch(configUrl);
+              const configData = await configRes.json();
+              allowShowAll = !!configData.allowShowAll;
+            } catch (e) {}
+            
             return {
               id: eventName,
               photoCount: data.photos ? data.photos.length : 0,
-              totalSizeBytes: data.totalSizeBytes || null
+              totalSizeBytes: data.totalSizeBytes || null,
+              allowShowAll
             };
           } catch (e) {
             return {
@@ -136,6 +146,32 @@ export default function AIPhotoModel() {
   useEffect(() => {
     fetchIndexedEvents();
   }, []);
+
+  
+  const toggleShowAll = async (eventName, currentVal) => {
+    try {
+      const configRef = ref(storage, `events/${eventName}/ai_config.json`);
+      const newVal = !currentVal;
+      const blob = new Blob([JSON.stringify({ allowShowAll: newVal })], { type: 'application/json' });
+      await uploadBytes(configRef, blob);
+      setIndexedEvents(prev => prev.map(ev => ev.id === eventName ? { ...ev, allowShowAll: newVal } : ev));
+    } catch (e) {
+      console.error('Failed to toggle allowShowAll', e);
+    }
+  };
+
+  
+  const toggleShowAll = async (eventName, currentVal) => {
+    try {
+      const configRef = ref(storage, `events/${eventName}/ai_config.json`);
+      const newVal = !currentVal;
+      const blob = new Blob([JSON.stringify({ allowShowAll: newVal })], { type: 'application/json' });
+      await uploadBytes(configRef, blob);
+      setIndexedEvents(prev => prev.map(ev => ev.id === eventName ? { ...ev, allowShowAll: newVal } : ev));
+    } catch (e) {
+      console.error('Failed to toggle allowShowAll', e);
+    }
+  };
 
   const confirmDelete = async () => {
     if (!eventToDelete) return;

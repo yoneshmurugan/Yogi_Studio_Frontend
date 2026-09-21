@@ -98,6 +98,7 @@ export default function FaceSearch() {
   const [eventId, setEventId] = useState('');
   const [status, setStatus] = useState('idle');
   const [errorMsg, setErrorMsg] = useState('');
+  const [allowShowAll, setAllowShowAll] = useState(false);
   const [matchedPhotos, setMatchedPhotos] = useState([]);
   const [downloadStatus, setDownloadStatus] = useState('idle');
   const [downloadProgress, setDownloadProgress] = useState({ current: 0, total: 0 });
@@ -343,6 +344,25 @@ export default function FaceSearch() {
     processImageCapture(dataUrl);
   };
 
+  
+  const handleShowAllImages = async () => {
+    setStatus('checking');
+    setErrorMsg('');
+    try {
+      const indexUrl = await getDownloadURL(ref(storage, `events/${eventId}/face_index.json`));
+      const res = await fetch(indexUrl);
+      const data = await res.json();
+      setMatchedPhotos((data.photos || []).map(p => p.url));
+      setStatus('complete');
+      setTimeout(() => {
+        resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 500);
+    } catch(err) {
+      setErrorMsg("Failed to load images.");
+      setStatus('idle');
+    }
+  };
+
   const triggerCamera = async () => {
     if (!eventId) { setErrorMsg('Please enter an Event Code.'); return; }
     setErrorMsg(''); setStatus('checking'); setMatchedPhotos([]); 
@@ -350,6 +370,15 @@ export default function FaceSearch() {
     try {
       // Validate Event exists before opening camera
       await getDownloadURL(ref(storage, `events/${eventId}/face_index.json`));
+      
+      try {
+        const configUrl = await getDownloadURL(ref(storage, `events/${eventId}/ai_config.json`));
+        const configRes = await fetch(configUrl);
+        const configData = await configRes.json();
+        setAllowShowAll(!!configData.allowShowAll);
+      } catch (e) {
+        setAllowShowAll(false);
+      }
     } catch (error) {
       setStatus('error');
       setErrorMsg("Event not found. Double-check your Event Code.");
@@ -914,6 +943,18 @@ export default function FaceSearch() {
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.5 }} className="mt-10 text-center flex flex-col items-center">
                 <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-zinc-800/60 to-transparent mb-6" />
                 
+                {allowShowAll && (
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-8">
+                    <button
+                      onClick={handleShowAllImages}
+                      className="px-6 py-2.5 bg-zinc-900 border border-zinc-800 text-gray-300 text-sm font-medium rounded-full hover:bg-zinc-800 transition-colors shadow-sm"
+                    >
+                      Show All Event Images
+                    </button>
+                  </motion.div>
+                )}
+
+                
                 <AnimatePresence>
                   {hasDownloaded && (
                     <motion.div
@@ -948,6 +989,17 @@ export default function FaceSearch() {
               <p className="text-gray-700 text-sm leading-relaxed max-w-xs mx-auto">
                 We couldn't find your face in this event. Try with better lighting or a clearer photo.
               </p>
+              
+              {allowShowAll && (
+                <div className="mt-6">
+                  <button
+                    onClick={handleShowAllImages}
+                    className="px-6 py-2.5 bg-zinc-800 border border-zinc-700 text-white text-sm font-medium rounded-full hover:bg-zinc-700 transition-colors shadow-sm w-full md:w-auto"
+                  >
+                    View All Event Images
+                  </button>
+                </div>
+              )}
             </motion.div>
           )}
         </AnimatePresence>
