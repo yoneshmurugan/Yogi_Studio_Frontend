@@ -160,19 +160,6 @@ export default function AIPhotoModel() {
     }
   };
 
-  
-  const toggleShowAll = async (eventName, currentVal) => {
-    try {
-      const configRef = ref(storage, `events/${eventName}/ai_config.json`);
-      const newVal = !currentVal;
-      const blob = new Blob([JSON.stringify({ allowShowAll: newVal })], { type: 'application/json' });
-      await uploadBytes(configRef, blob);
-      setIndexedEvents(prev => prev.map(ev => ev.id === eventName ? { ...ev, allowShowAll: newVal } : ev));
-    } catch (e) {
-      console.error('Failed to toggle allowShowAll', e);
-    }
-  };
-
   const confirmDelete = async () => {
     if (!eventToDelete) return;
     setIsDeleting(true);
@@ -795,7 +782,7 @@ export default function AIPhotoModel() {
                 <p className="text-[11px] text-zinc-500 mb-4 font-medium tracking-[0.1em] uppercase">Powered by Yogi Studio AI</p>
                 <div className="text-sm text-zinc-300 font-medium bg-white/5 py-3 px-5 rounded-xl inline-block border border-white/10 max-w-full">
                   <p className="mb-1">
-                    Or visit <span className="text-white font-semibold">yogidigitalstudio.in</span> &rarr; <span className="text-white font-semibold">AI Search</span>
+                    Or visit <span className="text-white font-semibold">yogidigitalstudio.in</span> &rarr; <span className="text-white font-semibold">AI Model</span>
                   </p>
                   <p className="mb-0.5">and enter code:</p>
                   <strong className="text-gold text-lg tracking-wide block whitespace-nowrap">{qrEventId}</strong>
