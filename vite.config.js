@@ -17,13 +17,8 @@ export default defineConfig({
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/api\.yogidigitalstudio\.in\/api\/v1\/.*/i,
-            handler: 'NetworkOnly',
-            options: {
-              backgroundSync: {
-                name: 'api-queue',
-                options: { maxRetentionTime: 24 * 60 }
-              }
-            }
+            handler: 'NetworkOnly'
+            
           },
           {
             urlPattern: /^https:\/\/firebasestorage\.googleapis\.com\/.*/i,
