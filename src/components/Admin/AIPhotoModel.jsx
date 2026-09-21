@@ -659,6 +659,19 @@ export default function AIPhotoModel() {
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
+                  <div className="flex items-center mr-2 md:mr-4 border-r border-zinc-800 pr-2 md:pr-4" title="Allow Client 'Show All' Override">
+                    <span className="text-gray-400 text-xs mr-3 hidden sm:inline font-medium">Show All:</span>
+                    <button 
+                      onClick={() => toggleShowAll(event.id, event.allowShowAll)}
+                      className={`w-9 h-5 rounded-full relative transition-colors duration-300 ${event.allowShowAll ? 'bg-gold' : 'bg-zinc-700'}`}
+                    >
+                      <motion.div 
+                        className="w-3.5 h-3.5 bg-white rounded-full absolute top-[3px] shadow-sm"
+                        animate={{ left: event.allowShowAll ? 'calc(100% - 14px - 3px)' : '3px' }}
+                        transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                      />
+                    </button>
+                  </div>
                   <button
                     onClick={() => handleShareLink(event.id)}
                     className="p-2 text-gray-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-all"
