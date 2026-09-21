@@ -99,6 +99,7 @@ export default function FaceSearch() {
   const [status, setStatus] = useState('idle');
   const [errorMsg, setErrorMsg] = useState('');
   const [allowShowAll, setAllowShowAll] = useState(false);
+  const [displayCount, setDisplayCount] = useState(60);
   const [matchedPhotos, setMatchedPhotos] = useState([]);
   const [downloadStatus, setDownloadStatus] = useState('idle');
   const [downloadProgress, setDownloadProgress] = useState({ current: 0, total: 0 });
@@ -352,7 +353,7 @@ export default function FaceSearch() {
       const indexUrl = await getDownloadURL(ref(storage, `events/${eventId}/face_index.json`));
       const res = await fetch(indexUrl);
       const data = await res.json();
-      setMatchedPhotos((data.photos || []).map(p => p.url));
+      setMatchedPhotos((data.photos || []).map(p => p.photoUrl));
       setStatus('complete');
       setTimeout(() => {
         resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -365,7 +366,7 @@ export default function FaceSearch() {
 
   const triggerCamera = async () => {
     if (!eventId) { setErrorMsg('Please enter an Event Code.'); return; }
-    setErrorMsg(''); setStatus('checking'); setMatchedPhotos([]); 
+    setErrorMsg(''); setStatus('checking'); setMatchedPhotos([]); setDisplayCount(60); 
 
     try {
       // Validate Event exists before opening camera
@@ -893,7 +894,7 @@ export default function FaceSearch() {
               <div className="flex gap-1.5 md:gap-3 w-full">
                 {Array.from({ length: columnsCount }).map((_, colIdx) => (
                   <div key={colIdx} className="flex-1 flex flex-col gap-1.5 md:gap-3">
-                    {matchedPhotos
+                    {matchedPhotos.slice(0, displayCount)
                       .map((url, idx) => ({ url, originalIdx: idx }))
                       .filter((_, idx) => idx % columnsCount === colIdx)
                       .map(({ url, originalIdx }) => (
@@ -938,6 +939,17 @@ export default function FaceSearch() {
                   </div>
                 ))}
               </div>
+              
+              {displayCount < matchedPhotos.length && (
+                <div className="w-full flex justify-center mt-12 mb-4">
+                  <button 
+                    onClick={() => setDisplayCount(prev => prev + 60)}
+                    className="px-8 py-3 bg-zinc-900 border border-zinc-800 text-white font-medium rounded-full hover:bg-zinc-800 transition-colors shadow-[0_4px_20px_rgba(0,0,0,0.4)]"
+                  >
+                    Load More Photos
+                  </button>
+                </div>
+              )}
 
               {/* Bottom branding & CTA */}
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.5 }} className="mt-10 text-center flex flex-col items-center">
