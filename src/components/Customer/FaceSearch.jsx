@@ -117,6 +117,7 @@ export default function FaceSearch() {
   const [errorMsg, setErrorMsg] = useState('');
   const [allowShowAll, setAllowShowAll] = useState(savedState?.allowShowAll || false);
   const [hasShownAll, setHasShownAll] = useState(savedState?.hasShownAll || false);
+  const [isLoadingAll, setIsLoadingAll] = useState(false);
   const [matchedPhotos, setMatchedPhotos] = useState(savedState?.matchedPhotos || []);
   const [downloadStatus, setDownloadStatus] = useState('idle');
   const [downloadProgress, setDownloadProgress] = useState({ current: 0, total: 0 });
@@ -377,6 +378,10 @@ export default function FaceSearch() {
 
   
   const handleShowAllImages = async () => {
+    setIsLoadingAll(true);
+    // Add 15 second delay as requested
+    await new Promise(resolve => setTimeout(resolve, 15000));
+    
     setStatus('checking');
     setErrorMsg('');
     try {
@@ -393,6 +398,8 @@ export default function FaceSearch() {
     } catch(err) {
       setErrorMsg("Failed to load images.");
       setStatus('idle');
+    } finally {
+      setIsLoadingAll(false);
     }
   };
 
@@ -980,10 +987,17 @@ export default function FaceSearch() {
                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-8">
                     <button
                       onClick={handleShowAllImages}
-                      disabled={hasShownAll}
+                      disabled={hasShownAll || isLoadingAll}
                       className={`px-6 py-2.5 bg-zinc-900 border border-zinc-800 text-sm font-medium rounded-full transition-colors shadow-sm ${hasShownAll ? 'text-gray-600 opacity-50 grayscale cursor-not-allowed' : 'text-gray-300 hover:bg-zinc-800'}`}
                     >
-                      Show All Event Images
+                      {isLoadingAll ? (
+                        <div className="flex items-center justify-center gap-2">
+                          <Loader2 className="w-4 h-4 animate-spin text-gold" />
+                          <span>Loading Photos...</span>
+                        </div>
+                      ) : (
+                        "Show All Event Images"
+                      )}
                     </button>
                   </motion.div>
                 )}
@@ -1028,10 +1042,17 @@ export default function FaceSearch() {
                 <div className="mt-6">
                   <button
                     onClick={handleShowAllImages}
-                    disabled={hasShownAll}
+                    disabled={hasShownAll || isLoadingAll}
                     className={`px-6 py-2.5 bg-zinc-800 border border-zinc-700 text-sm font-medium rounded-full transition-colors shadow-sm w-full md:w-auto ${hasShownAll ? 'text-gray-500 opacity-50 grayscale cursor-not-allowed' : 'text-white hover:bg-zinc-700'}`}
                   >
-                    View All Event Images
+                    {isLoadingAll ? (
+                      <div className="flex items-center justify-center gap-2">
+                        <Loader2 className="w-4 h-4 animate-spin text-white" />
+                        <span>Loading Photos...</span>
+                      </div>
+                    ) : (
+                      "View All Event Images"
+                    )}
                   </button>
                 </div>
               )}
