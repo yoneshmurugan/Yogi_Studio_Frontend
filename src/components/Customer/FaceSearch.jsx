@@ -94,20 +94,49 @@ function ScanLine() {
    MAIN COMPONENT
    ═══════════════════════════════════════════════════════════ */
 export default function FaceSearch() {
+  const getSavedSession = () => {
+    try {
+      const item = sessionStorage.getItem('faceSearchState');
+      if (item) {
+        const parsed = JSON.parse(item);
+        const urlEvent = new URLSearchParams(window.location.search).get('eventId');
+        if (urlEvent && parsed.eventId && urlEvent !== parsed.eventId) {
+           sessionStorage.removeItem('faceSearchState');
+           return null;
+        }
+        return parsed;
+      }
+    } catch(e) {}
+    return null;
+  };
+  const savedState = typeof window !== 'undefined' ? getSavedSession() : null;
+
   const navigate = useNavigate();
-  const [eventId, setEventId] = useState('');
-  const [status, setStatus] = useState('idle');
+  const [eventId, setEventId] = useState(savedState?.eventId || '');
+  const [status, setStatus] = useState(savedState?.status || 'idle');
   const [errorMsg, setErrorMsg] = useState('');
-  const [allowShowAll, setAllowShowAll] = useState(false);
-  const [hasShownAll, setHasShownAll] = useState(false);
-  const [displayCount, setDisplayCount] = useState(60);
-  const [matchedPhotos, setMatchedPhotos] = useState([]);
+  const [allowShowAll, setAllowShowAll] = useState(savedState?.allowShowAll || false);
+  const [hasShownAll, setHasShownAll] = useState(savedState?.hasShownAll || false);
+  const [matchedPhotos, setMatchedPhotos] = useState(savedState?.matchedPhotos || []);
   const [downloadStatus, setDownloadStatus] = useState('idle');
   const [downloadProgress, setDownloadProgress] = useState({ current: 0, total: 0 });
   const [hasDownloaded, setHasDownloaded] = useState(false);
   const [showPostDownloadModal, setShowPostDownloadModal] = useState(false);
   const [selectedImageIdx, setSelectedImageIdx] = useState(null);
   const [isSingleDownloading, setIsSingleDownloading] = useState(false);
+
+  useEffect(() => {
+    if (eventId) {
+      sessionStorage.setItem('faceSearchState', JSON.stringify({
+        eventId,
+        status,
+        allowShowAll,
+        hasShownAll,
+        matchedPhotos
+      }));
+    }
+  }, [eventId, status, allowShowAll, hasShownAll, matchedPhotos]);
+
   
   // Custom JS Masonry State to bypass Safari CSS columns bugs
   const [columnsCount, setColumnsCount] = useState(typeof window !== 'undefined' && window.innerWidth >= 768 ? 3 : 2);
@@ -369,7 +398,7 @@ export default function FaceSearch() {
 
   const triggerCamera = async () => {
     if (!eventId) { setErrorMsg('Please enter an Event Code.'); return; }
-    setErrorMsg(''); setStatus('checking'); setMatchedPhotos([]); setDisplayCount(60); setHasShownAll(false); 
+    setErrorMsg(''); setStatus('checking'); setMatchedPhotos([]); setHasShownAll(false); 
 
     try {
       // Validate Event exists before opening camera
@@ -898,19 +927,16 @@ export default function FaceSearch() {
               <div className="flex gap-1.5 md:gap-3 w-full">
                 {Array.from({ length: columnsCount }).map((_, colIdx) => (
                   <div key={colIdx} className="flex-1 flex flex-col gap-1.5 md:gap-3">
-                    {matchedPhotos.slice(0, displayCount)
+                    {matchedPhotos
                       .map((url, idx) => ({ url, originalIdx: idx }))
                       .filter((_, idx) => idx % columnsCount === colIdx)
                       .map(({ url, originalIdx }) => (
-                        <motion.div
+                        <div
                           key={originalIdx}
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          transition={{ delay: 0.6 + originalIdx * 0.07, duration: 0.6, ease: 'easeOut' }}
-                          className="w-full rounded-xl md:rounded-2xl overflow-hidden cursor-pointer group relative shadow-[0_4px_20px_rgba(0,0,0,0.4)]"
+                          className="w-full rounded-xl md:rounded-2xl overflow-hidden cursor-pointer group relative shadow-[0_4px_20px_rgba(0,0,0,0.4)] transition-transform hover:scale-[1.01] duration-300"
                           onClick={() => setSelectedImageIdx(originalIdx)}
                         >
-                          <img src={url} alt={`Photo ${originalIdx + 1}`} className="block w-full h-auto object-cover" />
+                          <img src={url} loading="lazy" alt={`Photo ${originalIdx + 1}`} className="block w-full h-auto object-cover" />
                           
                           {/* Hover overlay */}
                           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400" />
@@ -938,22 +964,13 @@ export default function FaceSearch() {
                               {originalIdx + 1} / {matchedPhotos.length}
                             </span>
                           </div>
-                        </motion.div>
+                        </div>
                       ))}
                   </div>
                 ))}
               </div>
               
-              {displayCount < matchedPhotos.length && (
-                <div className="w-full flex justify-center mt-12 mb-4">
-                  <button 
-                    onClick={() => setDisplayCount(prev => prev + 60)}
-                    className="px-8 py-3 bg-zinc-900 border border-zinc-800 text-white font-medium rounded-full hover:bg-zinc-800 transition-colors shadow-[0_4px_20px_rgba(0,0,0,0.4)]"
-                  >
-                    Load More Photos
-                  </button>
-                </div>
-              )}
+
 
               {/* Bottom branding & CTA */}
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.5 }} className="mt-10 text-center flex flex-col items-center">
