@@ -31,7 +31,7 @@ function CustomerPortalInner() {
   const token = localStorage.getItem('studio_session_token');
 
   const { data: eventsData, isLoading, error: queryError } = useQuery({
-    queryKey: ['customer', 'events'],
+    queryKey: ['customer', 'events', token],
     queryFn: async () => {
       if (!token) throw new Error('No session token');
       const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/customer/events/current`, {
@@ -53,6 +53,7 @@ function CustomerPortalInner() {
   const handleSignout = () => {
     localStorage.removeItem('studio_session_token');
     sessionStorage.removeItem('redirectUrl');
+    queryClient.clear();
     navigate('/');
   };
 
