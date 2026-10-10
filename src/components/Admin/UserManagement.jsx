@@ -703,6 +703,29 @@ function EventDetail({
         </div>
       </div>
 
+      {/* Live Progress Bar */}
+      {(event.selectedPhotoIds?.length > 0 || event.rejectedPhotoIds?.length > 0) && (
+        <div className="glass rounded-2xl p-4 sm:p-5 mb-6 border border-white/[0.05] flex items-center justify-between">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <CheckSquare className="w-4 h-4 text-gold" />
+              <h3 className="font-serif text-lg text-white font-light">Live Progress</h3>
+            </div>
+            <p className="text-silver/50 text-xs">Client's selections are saved automatically</p>
+          </div>
+          <div className="flex gap-3">
+            <div className="text-center bg-green-500/10 border border-green-500/20 rounded-xl px-4 py-2 min-w-[80px]">
+              <p className="text-green-400 font-medium text-lg">{event.selectedPhotoIds?.length || 0}</p>
+              <p className="text-[10px] uppercase tracking-wider text-green-400/50">Selected</p>
+            </div>
+            <div className="text-center bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-2 min-w-[80px]">
+              <p className="text-red-400 font-medium text-lg">{event.rejectedPhotoIds?.length || 0}</p>
+              <p className="text-[10px] uppercase tracking-wider text-red-400/50">Rejected</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Access Pass + Share row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         {/* QR + link */}
@@ -1160,6 +1183,13 @@ function UserDetail({
                     </div>
                     <StatusBadge status={ev.status} />
                   </div>
+
+                  {(ev.selectedPhotoIds?.length > 0 || ev.rejectedPhotoIds?.length > 0) && (
+                    <div className="mt-3 text-[10px] bg-white/[0.02] border border-white/5 rounded-lg px-2.5 py-1.5 flex items-center justify-between">
+                      <span className="text-green-400/80 font-medium">{ev.selectedPhotoIds?.length || 0} Selected</span>
+                      <span className="text-red-400/80 font-medium">{ev.rejectedPhotoIds?.length || 0} Rejected</span>
+                    </div>
+                  )}
 
                   <div className="mt-3 flex items-center justify-end text-gold/50 group-hover:text-gold transition-colors text-xs">
                     View <ChevronRight className="w-3.5 h-3.5 ml-1" />
