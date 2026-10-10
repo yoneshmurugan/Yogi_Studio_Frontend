@@ -1279,6 +1279,52 @@ function UserDetail({
             </motion.div>
           </motion.div>
         )}
+
+        {editPhoneTarget && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md"
+          >
+            <motion.div
+              initial={{ scale: 0.95, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              className="glass w-full max-w-sm rounded-[2rem] p-6 md:p-8 border border-white/10 shadow-2xl relative"
+            >
+              <h3 className="text-xl font-serif text-white mb-2">Edit Phone Number</h3>
+              <p className="text-silver/50 text-sm mb-6">Changing this will migrate all events and selections to the new number.</p>
+              
+              <div className="mb-6">
+                <label className="block text-[10px] tracking-[0.2em] uppercase text-silver/40 mb-2 ml-1">New Phone Number</label>
+                <input
+                  type="text"
+                  value={newPhone}
+                  onChange={(e) => setNewPhone(e.target.value)}
+                  placeholder="+91..."
+                  className="w-full bg-charcoal/40 border border-white/8 rounded-xl py-3 px-4 text-sm text-white focus:outline-none focus:border-gold/40 transition-colors"
+                />
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setEditPhoneTarget(null)}
+                  disabled={editingPhoneStatus === 'updating'}
+                  className="flex-1 py-3 rounded-xl border border-white/10 text-silver/60 hover:text-white transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleEditPhone}
+                  disabled={editingPhoneStatus === 'updating' || !newPhone.trim() || newPhone === user.phone}
+                  className="flex-1 py-3 rounded-xl bg-gold/10 text-gold hover:bg-gold/20 transition-colors border border-gold/20 flex items-center justify-center"
+                >
+                  {editingPhoneStatus === 'updating' ? <RefreshCw className="w-4 h-4 animate-spin" /> : 'Update Number'}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
       </AnimatePresence>
     </motion.div>
   );
