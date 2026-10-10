@@ -1018,6 +1018,38 @@ function UserDetail({
   const [showCreateEvent, setShowCreateEvent] = useState(false);
   const [selectedEvent, setSelectedEvent]     = useState(null);
   const [deleteTarget, setDeleteTarget]       = useState(null);
+  const [editPhoneTarget, setEditPhoneTarget] = useState(null);
+  const [newPhone, setNewPhone] = useState('');
+  const [editingPhoneStatus, setEditingPhoneStatus] = useState(null);
+
+  const handleEditPhone = async () => {
+    if (!newPhone.trim() || newPhone === user.phone) return;
+    setEditingPhoneStatus('updating');
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/admin/users/${encodeURIComponent(user.phone)}/phone`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        },
+        body: JSON.stringify({ newPhone: newPhone.trim() })
+      });
+      if (!res.ok) {
+        const d = await res.json();
+        throw new Error(d.error || 'Update failed');
+      }
+      setEditingPhoneStatus('success');
+      setTimeout(() => {
+        setEditPhoneTarget(null);
+        setEditingPhoneStatus(null);
+        setNewPhone('');
+        alert('Phone number updated successfully! Please refresh the page to see changes.');
+      }, 1000);
+    } catch (e) {
+      alert('Error updating phone: ' + e.message);
+      setEditingPhoneStatus(null);
+    }
+  };
 
   useEffect(() => {
     if (initialEventId) {
@@ -1093,6 +1125,9 @@ function UserDetail({
             <p className="text-white font-medium text-lg">{user.name}</p>
             <p className="text-silver/50 text-sm flex items-center gap-1.5 mt-0.5">
               <Phone className="w-3.5 h-3.5" />{user.phone}
+              <button onClick={() => { setEditPhoneTarget(user.phone); setNewPhone(user.phone); }} className="ml-2 text-silver/40 hover:text-gold transition-colors p-1" title="Edit Phone Number">
+                <Edit2 className="w-3.5 h-3.5" />
+              </button>
             </p>
             <p className="text-silver/30 text-xs mt-1">Client since {new Date(user.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
           </div>

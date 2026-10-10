@@ -612,9 +612,9 @@ export default function AdminDashboard() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.3, ease: 'easeOut' }}
-              className="p-4 md:p-8"
+              className="p-4 md:p-8 w-full min-h-full"
             >
-              <Routes location={location} key={location.pathname}>
+              <Routes location={location}>
                 <Route path="overview" element={
                   <AdminOverview
                     users={users}
